@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 控制台</title>
+    <!-- 使用本地 Chart.js（无需网络） -->
+    <script src="/static/chart.umd.min.js"></script>
+
+    <!-- 注释掉 Google Fonts，在无网络环境下使用系统字体 -->
+    <!--
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0064C8;
+            --primary-hover: #0050a0;
+            --primary-light: rgba(0, 100, 200, 0.08);
+            --success: #00A854;
+            --success-light: rgba(0, 168, 84, 0.08);
+            --warning: #FF9A00;
+            --warning-light: rgba(255, 154, 0, 0.08);
+            --error: #FF4D4F;
+            --error-light: rgba(255, 77, 79, 0.08);
+            --background: #F5F7FA;
+            --surface: #FFFFFF;
+            --surface-hover: #F8F9FB;
+            --text-primary: #1D2129;
+            --text-secondary: #4E5969;
+            --text-muted: #86909C;
+            --border: #E5E6EB;
+            --border-light: #C9CDD4;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 10px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 20px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .product-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .product-logo svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-item {
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--success-light);
+            color: var(--success);
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 56px;
+            padding: 24px;
+            min-height: calc(100vh - 56px);
+        }
+
+        .content-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Action Bar */
+        .action-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .action-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .session-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .session-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .action-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .toggle {
+            width: 40px;
+            height: 22px;
+            background: var(--border-light);
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle.active {
+            background: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle.active::after {
+            transform: translateX(18px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-light);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-light);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .metric-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .metric-icon.success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .metric-icon.warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .metric-icon.error {
+            background: var(--error-light);
+            color: var(--error);
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .metric-unit {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Requests Table */
+        .requests-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary);
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .requests-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--surface-hover);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .requests-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .requests-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .requests-table tbody tr:hover {
+            background: var(--surface-hover);
+        }
+
+        .timestamp {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .badge-stream {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid rgba(0, 100, 200, 0.2);
+        }
+
+        .badge-standard {
+            background: var(--surface-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .metric-value-cell {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-weight: 500;
+        }
+
+        .latency-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .latency-fast {
+            background: var(--success);
+        }
+
+        .latency-medium {
+            background: var(--warning);
+        }
+
+        .latency-slow {
+            background: var(--error);
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 0 16px;
+            }
+
+            .header-nav {
+                display: none;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .action-left,
+            .action-right {
+                justify-content: center;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .metric-value {
+                font-size: 24px;
+            }
+
+            .requests-table th,
+            .requests-table td {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="product-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                </svg>
+                <span>OpenClaw</span>
+            </div>
+            <div class="header-nav">
+                <div class="nav-item active">概览</div>
+                <div class="nav-item">监控</div>
+                <div class="nav-item">日志</div>
+                <div class="nav-item">设置</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>已连接</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Error Banner (默认隐藏) -->
+        <div id="errorBanner" style="display: none; background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; display: flex; align-items: center; gap: 12px;">
+            <svg style="width: 20px; height: 20px; color: #ef4444; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="error-message" style="color: #991b1b; font-weight: 500;"></span>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">服务概览</h1>
+                <p class="page-description">实时监控代理服务的性能指标和请求状态</p>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="action-left">
+                    <div class="session-info">
+                        <span class="session-label">会话开始时间</span>
+                        <span class="session-value" id="sessionStart">加载中...</span>
+                    </div>
+                </div>
+                <div class="action-right">
+                    <div class="toggle-wrapper">
+                        <div class="toggle active" id="autoRefreshToggle"></div>
+                        <span class="toggle-label">自动刷新</span>
+                    </div>
+                    <button class="btn" onclick="refreshData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                            <path d="M16 21h5v-5"/>
+                        </svg>
+                        刷新
+                    </button>
+                    <button class="btn btn-primary" onclick="clearMetrics()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18"/>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                        清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">总请求数</span>
+                    </div>
+                    <div class="metric-value" id="totalRequests">0</div>
+                    <div class="metric-trend">累计请求数量</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">平均响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgTotalTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">端到端延迟</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">代理处理时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgProxyTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">服务器开销</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon warning">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">模型响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgModelTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">AI推理耗时</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">请求间隔</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgGapTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">请求间平均间隔</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon error">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">最大响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="maxResponseTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">峰值延迟</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                            </svg>
+                            响应时间趋势
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="responseTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <path d="M3 9h18M9 21V9"/>
+                            </svg>
+                            时间分布
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="timeDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="requests-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0a0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        最近请求记录
+                    </div>
+                </div>
+                <div id="requestsTableContainer">
+                    <table class="requests-table">
+                        <thead>
+                            <tr>
+                                <th>时间戳</th>
+                                <th>请求类型</th>
+                                <th>总耗时</th>
+                                <th>代理耗时</th>
+                                <th>首token时延</th>
+                                <th>模型耗时</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="loading-state">
+                                        <div class="spinner"></div>
+                                        <div>加载指标数据中...</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let responseTimeChart = null;
+        let timeDistributionChart = null;
+        let autoRefreshInterval = null;
+
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+        Chart.defaults.color = '#4E5969';
+
+        function initCharts() {
+            const ctx1 = document.getElementById('responseTimeChart').getContext('2d');
+            responseTimeChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '总耗时',
+                        data: [],
+                        borderColor: '#0064C8',
+                        backgroundColor: 'rgba(0, 100, 200, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#0064C8',
+                        pointHoverBorderColor: '#FFFFFF',
+                        pointHoverBorderWidth: 2
+                    }, {
+                        label: '模型耗时',
+                        data: [],
+                        borderColor: '#00A854',
+                        backgroundColor: 'rgba(0, 168, 84, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#00A854',
+                        pointHoverBorderColor: '#FFFFFF',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 13,
+                                    weight: '400'
+                                },
+                                color: '#1D2129'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#FFFFFF',
+                            titleColor: '#1D2129',
+                            bodyColor: '#4E5969',
+                            borderColor: '#E5E6EB',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            titleFont: {
+                                weight: '500',
+                                size: 13
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            cornerRadius: 4,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(0) + 'ms';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#86909C'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E5E6EB',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#86909C',
+                                callback: function(value) {
+                                    return value + 'ms';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('timeDistributionChart').getContext('2d');
+            timeDistributionChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['代理处理', '模型响应'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(0, 100, 200, 0.8)',
+                            'rgba(0, 168, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            '#0064C8',
+                            '#00A854'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 4,
+                        barThickness: 60
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#FFFFFF',
+                            titleColor: '#1D2129',
+                            bodyColor: '#4E5969',
+                            borderColor: '#E5E6EB',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 4,
+                            callbacks: {
+                                label: function(context) {
+                                    return '平均: ' + context.parsed.y.toFixed(2) + 'ms';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 13,
+                                    weight: '500'
+                                },
+                                color: '#1D2129'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#E5E6EB',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#86909C',
+                                callback: function(value) {
+                                    return value + 'ms';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let serverAvailable = true;
+
+        async function checkServerStatus() {
+            try {
+                // 使用 GET 请求检查根路径，避免 HEAD 方法不支持的问题
+                const response = await fetch('/', { method: 'GET', cache: 'no-cache' });
+                serverAvailable = response.ok;
+
+                const statusBadge = document.querySelector('.status-badge');
+                const statusText = statusBadge.querySelector('span:last-child');
+
+                if (serverAvailable) {
+                    statusBadge.style.background = '#dcfce7';
+                    statusBadge.querySelector('.status-dot').style.background = '#22c55e';
+                    statusText.textContent = '已连接';
+                } else {
+                    statusBadge.style.background = '#fee2e2';
+                    statusBadge.querySelector('.status-dot').style.background = '#ef4444';
+                    statusText.textContent = '离线';
+                }
+
+                return serverAvailable;
+            } catch (error) {
+                serverAvailable = false;
+                console.warn('服务器状态检查失败:', error);
+                return false;
+            }
+        }
+
+        async function refreshData() {
+            // 先检查服务器状态
+            const isServerUp = await checkServerStatus();
+
+            if (!isServerUp) {
+                // 显示错误提示
+                const errorBanner = document.getElementById('errorBanner');
+                if (errorBanner) {
+                    errorBanner.style.display = 'flex';
+                    errorBanner.querySelector('.error-message').textContent =
+                        `代理服务器离线 (${new Date().toLocaleTimeString()}) - 请启动服务器后刷新页面`;
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch('/metrics');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById('sessionStart').textContent = new Date(data.session_start).toLocaleString('zh-CN', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const summary = await fetch('/metrics/summary').then(r => {
+                    if (!r.ok) {
+                        throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                    }
+                    return r.json();
+                });
+
+                document.getElementById('totalRequests').textContent = summary.total_requests;
+                document.getElementById('avgTotalTime').textContent = (summary.avg_total_time * 1000).toFixed(0);
+                document.getElementById('avgProxyTime').textContent = (summary.avg_proxy_processing_time * 1000).toFixed(2);
+                document.getElementById('avgModelTime').textContent = (summary.avg_model_response_time * 1000).toFixed(0);
+                document.getElementById('avgGapTime').textContent = (summary.avg_inter_request_gap ? (summary.avg_inter_request_gap * 1000).toFixed(0) : 'N/A');
+                document.getElementById('maxResponseTime').textContent = (summary.max_total_time ? (summary.max_total_time * 1000).toFixed(0) : 'N/A');
+
+                updateCharts(data.metrics);
+                updateTable(data.metrics);
+
+                // 隐藏错误提示（如果之前显示了）
+                const errorBanner = document.getElementById('errorBanner');
+                if (errorBanner) {
+                    errorBanner.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('获取指标数据失败:', error);
+
+                // 显示错误提示
+                const errorBanner = document.getElementById('errorBanner');
+                if (errorBanner) {
+                    errorBanner.style.display = 'flex';
+                    errorBanner.querySelector('.error-message').textContent =
+                        `无法连接到代理服务器 (${new Date().toLocaleTimeString()}) - 请确保服务器正在运行`;
+                }
+            }
+        }
+
+        function updateCharts(metrics) {
+            if (!metrics || metrics.length === 0) return;
+
+            const labels = metrics.map((m, i) => `#${i + 1}`);
+            const totalTimeData = metrics.map(m => (m.total_time || m.time_to_first_byte || 0) * 1000);
+            const modelTimeData = metrics.map(m => (m.model_response_time || m.time_to_first_byte || 0) * 1000);
+
+            responseTimeChart.data.labels = labels;
+            responseTimeChart.data.datasets[0].data = totalTimeData;
+            responseTimeChart.data.datasets[1].data = modelTimeData;
+            responseTimeChart.update();
+
+            const avgProxyTime = metrics.reduce((sum, m) => sum + (m.proxy_processing_time || 0) * 1000, 0) / metrics.length || 0;
+            const avgModelTime = metrics.reduce((sum, m) => sum + (m.model_response_time || m.time_to_first_byte || 0) * 1000, 0) / metrics.length || 0;
+
+            timeDistributionChart.data.datasets[0].data = [avgProxyTime, avgModelTime];
+            timeDistributionChart.update();
+        }
+
+        function updateTable(metrics) {
+            const tableBody = document.getElementById('requestsTableBody');
+
+            if (!metrics || metrics.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="loading-state">
+                                <div style="color: #4E5969;">暂无请求记录</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const recentMetrics = metrics.slice(-10).reverse();
+
+            tableBody.innerHTML = recentMetrics.map(m => {
+                const totalTime = (m.total_time || m.time_to_first_byte || 0) * 1000;
+                const proxyTime = (m.proxy_processing_time || 0) * 1000;
+                const firstTokenLatency = (m.first_token_latency || 0) * 1000;
+                const modelTime = (m.model_response_time || m.time_to_first_byte || 0) * 1000;
+                const timestamp = new Date(m.request_received_time * 1000).toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                let latencyClass = 'latency-fast';
+                if (totalTime > 3000) latencyClass = 'latency-slow';
+                else if (totalTime > 1500) latencyClass = 'latency-medium';
+
+                // 首token时延显示：流式请求显示数值，标准请求显示N/A
+                const firstTokenDisplay = m.stream && firstTokenLatency > 0
+                    ? `${firstTokenLatency.toFixed(0)}ms`
+                    : 'N/A';
+
+                return `
+                    <tr>
+                        <td>
+                            <span class="latency-indicator ${latencyClass}"></span>
+                            <span class="timestamp">${timestamp}</span>
+                        </td>
+                        <td>
+                            <span class="badge ${m.stream ? 'badge-stream' : 'badge-standard'}">
+                                ${m.stream ? '流式传输' : '标准请求'}
+                            </span>
+                        </td>
+                        <td class="metric-value-cell">${totalTime.toFixed(0)}ms</td>
+                        <td class="metric-value-cell">${proxyTime.toFixed(2)}ms</td>
+                        <td class="metric-value-cell">${firstTokenDisplay}</td>
+                        <td class="metric-value-cell">${modelTime.toFixed(0)}ms</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function clearMetrics() {
+            if (confirm('确定要清空所有指标数据吗？')) {
+                try {
+                    const response = await fetch('/metrics', { method: 'DELETE' });
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    const result = await response.json();
+                    refreshData();
+                    alert('指标数据已清空');
+                } catch (error) {
+                    alert('清空指标数据失败: ' + error.message);
+                }
+            }
+        }
+
+        const toggle = document.getElementById('autoRefreshToggle');
+        toggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            if (this.classList.contains('active')) {
+                autoRefreshInterval = setInterval(refreshData, 2000);
+            } else {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+
+        window.addEventListener('load', async function() {
+            // 先检查服务器状态
+            const isServerUp = await checkServerStatus();
+
+            if (isServerUp) {
+                // 服务器可用，初始化并开始自动刷新
+                initCharts();
+                refreshData();
+                autoRefreshInterval = setInterval(refreshData, 2000);
+            } else {
+                // 服务器不可用，显示错误
+                const errorBanner = document.getElementById('errorBanner');
+                if (errorBanner) {
+                    errorBanner.style.display = 'flex';
+                    errorBanner.querySelector('.error-message').textContent =
+                        '代理服务器未启动 - 请先启动代理服务器后刷新此页面';
+                }
+
+                // 每5秒尝试重新连接
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
