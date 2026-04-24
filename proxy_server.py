@@ -36,17 +36,33 @@ print(f"ANTHROPIC_API_URL: {ANTHROPIC_API_URL}")
 print(f"解析 ANTHROPIC_API_URL.path: {urlparse(ANTHROPIC_API_URL).path}")
 print("="*80 + "\n")
 
-# 日志存储目录
-LOGS_DIR = Path("logs")
+# 获取脚本所在目录（使用绝对路径，避免工作目录问题）
+SCRIPT_DIR = Path(__file__).parent.resolve()
+
+# 日志存储目录（使用绝对路径）
+LOGS_DIR = SCRIPT_DIR / "logs"
 REQUESTS_DIR = LOGS_DIR / "requests"
 RESPONSES_DIR = LOGS_DIR / "responses"
 METRICS_DIR = LOGS_DIR / "metrics"
 
 # 创建日志目录
-LOGS_DIR.mkdir(exist_ok=True)
-REQUESTS_DIR.mkdir(exist_ok=True)
-RESPONSES_DIR.mkdir(exist_ok=True)
-METRICS_DIR.mkdir(exist_ok=True)
+try:
+    LOGS_DIR.mkdir(exist_ok=True)
+    REQUESTS_DIR.mkdir(exist_ok=True)
+    RESPONSES_DIR.mkdir(exist_ok=True)
+    METRICS_DIR.mkdir(exist_ok=True)
+    print(f"✓ 日志目录初始化成功: {LOGS_DIR}")
+except PermissionError as e:
+    print(f"❌ 创建日志目录失败（权限不足）: {e}")
+    print(f"   目录路径: {LOGS_DIR}")
+    print(f"   当前用户: {os.getenv('USER', 'unknown')}")
+    import sys
+    sys.exit(1)
+except Exception as e:
+    print(f"❌ 创建日志目录失败: {e}")
+    print(f"   目录路径: {LOGS_DIR}")
+    import sys
+    sys.exit(1)
 
 # 全局状态
 request_logs = []
@@ -1070,19 +1086,23 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             self._send_json_response(200, response_data)
             return
 
-        # Dashboard页面
+        # Dashboard页面（使用绝对路径）
         if path == "/dashboard":
+            dashboard_path = SCRIPT_DIR / "dashboard.html"
             try:
-                with open("dashboard.html", "r", encoding="utf-8") as f:
+                with open(dashboard_path, "r", encoding="utf-8") as f:
                     html_content = f.read()
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/html; charset=utf-8')
                 self.send_header('Content-Length', len(html_content.encode('utf-8')))
                 self.end_headers()
                 self.wfile.write(html_content.encode('utf-8'))
+                print(f"✓ Dashboard 已发送: {dashboard_path}")
                 return
             except FileNotFoundError:
-                self._send_json_response(404, {"error": "dashboard.html not found"})
+                error_msg = f"dashboard.html not found at {dashboard_path}"
+                print(f"❌ {error_msg}")
+                self._send_json_response(404, {"error": error_msg})
                 return
 
         # 静态文件服务（用于 Chart.js 等本地资源）
@@ -1094,10 +1114,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self._send_json_response(403, {"error": "Forbidden"})
                 return
 
-            # 尝试多个可能的路径
+            # 尝试多个可能的路径（优先使用脚本目录）
             possible_paths = [
+                SCRIPT_DIR / "static" / file_path,  # 脚本目录（绝对路径）
                 Path("static") / file_path,  # 相对路径
-                Path(__file__).parent / "static" / file_path,  # 脚本目录
                 Path(os.getcwd()) / "static" / file_path,  # 工作目录
             ]
 
@@ -1405,6 +1425,12 @@ def run_server():
     print("\n" + "="*80)
     print("🚀 OpenClaw 代理服务器启动中...")
     print("="*80)
+    print(f"📂 脚本目录: {SCRIPT_DIR}")
+    print(f"📂 工作目录: {os.getcwd()}")
+    print(f"📂 日志目录: {LOGS_DIR}")
+    if SCRIPT_DIR != Path(os.getcwd()):
+        print(f"\n⚠️  警告: 工作目录与脚本目录不一致")
+        print(f"   建议使用: cd {SCRIPT_DIR}")
     print("\n配置说明:")
     print(f"1. OpenAI API 地址：{REAL_API_URL}")
     print(f"2. Anthropic API 地址：{ANTHROPIC_API_URL}")
