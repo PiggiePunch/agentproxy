@@ -115,6 +115,9 @@ def save_response_body(request_id: str, body: dict or str, status_code: int):
 
 def save_metrics(request_id: str, metrics: dict):
     """保存性能指标到文件"""
+    # 确保metrics包含request_id
+    metrics['request_id'] = request_id
+
     filename = METRICS_DIR / f"{request_id}.json"
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(metrics, f, ensure_ascii=False, indent=2)
@@ -124,6 +127,39 @@ def save_metrics(request_id: str, metrics: dict):
             'request_id': request_id,
             **metrics
         })
+
+
+def detect_tool_call(request_body: dict, response_body: dict) -> bool:
+    """检测请求或响应中是否包含工具调用"""
+    # 检查请求中的 tool_calls（OpenAI 格式）
+    if isinstance(request_body, dict):
+        messages = request_body.get('messages', [])
+        for msg in messages:
+            if msg.get('tool_calls') or msg.get('content') and isinstance(msg.get('content'), list):
+                # Anthropic 格式：content 是数组，检查是否有 tool_use 类型
+                if isinstance(msg.get('content'), list):
+                    for content_block in msg.get('content'):
+                        if content_block.get('type') == 'tool_use':
+                            return True
+            # 检查是否有 tool_call_id（表示是工具响应）
+            if msg.get('role') == 'tool' or msg.get('tool_call_id'):
+                return True
+
+    # 检查响应中的 tool_calls（OpenAI 格式）
+    if isinstance(response_body, dict):
+        choices = response_body.get('choices', [])
+        for choice in choices:
+            message = choice.get('message', {})
+            if message.get('tool_calls'):
+                return True
+            # Anthropic 格式
+            content = message.get('content', [])
+            if isinstance(content, list):
+                for content_block in content:
+                    if content_block.get('type') == 'tool_use':
+                        return True
+
+    return False
 
 
 def log_request_info(method: str, path: str, headers: dict, body: dict, request_id: str, api_type: str = "openai"):
@@ -450,6 +486,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         forward_start_time = time.time()
         stream_complete_time = None  # 流完成时间（收到DONE时）
         stream_chunks = []  # 存储所有chunk数据
+        input_tokens = 0  # 输入token数
+        output_tokens = 0  # 输出token数
 
         try:
             print("🔗 建立流式连接：客户端 ↔ 代理 ↔ 大模型")
@@ -535,6 +573,19 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                             "data": chunk_text,
                             "timestamp": time.time()
                         })
+                        # 尝试解析usage信息（OpenAI流式格式）
+                        if '"usage"' in chunk_text:
+                            lines = chunk_text.split('\n')
+                            for line in lines:
+                                if line.startswith('data: ') and 'data: [DONE]' not in line:
+                                    try:
+                                        data_json = json.loads(line[6:])
+                                        if 'usage' in data_json:
+                                            usage = data_json['usage']
+                                            input_tokens = usage.get('prompt_tokens', 0)
+                                            output_tokens = usage.get('completion_tokens', 0)
+                                    except:
+                                        pass
                     except:
                         stream_chunks.append({
                             "chunk_number": chunk_count,
@@ -595,6 +646,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             if stream_complete_time is None:
                 stream_complete_time = time.time()
 
+            # 检测是否有工具调用（检查请求body）
+            has_tool_call = detect_tool_call(body_data, {})
+
             metrics = {
                 "request_received_time": request_received_time,
                 "forward_start_time": forward_start_time,
@@ -608,7 +662,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "total_time": stream_complete_time - request_received_time,
                 "endpoint": "/v1/chat/completions",
                 "method": "POST",
-                "stream": True
+                "stream": True,
+                "status_code": 200,
+                "has_tool_call": has_tool_call,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens
             }
             save_metrics(request_id, metrics)
 
@@ -705,6 +763,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         first_token_time = None  # 首token时间
         has_first_token = False  # 是否已收到首token
         stream_complete_time = None
+        input_tokens = 0  # 输入token数
+        output_tokens = 0  # 输出token数
 
         try:
             print("🔗 建立流式连接：客户端 ↔ 代理 ↔ OpenAI 上游")
@@ -791,6 +851,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
                             try:
                                 openai_chunk = json.loads(data_str)
+                                # 提取usage信息
+                                if 'usage' in openai_chunk:
+                                    usage = openai_chunk['usage']
+                                    input_tokens = usage.get('prompt_tokens', 0)
+                                    output_tokens = usage.get('completion_tokens', 0)
                                 # 转换为 Anthropic 事件
                                 anthropic_event = convert_openai_to_anthropic_stream_chunk(openai_chunk, model)
                                 if anthropic_event:
@@ -805,6 +870,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             # 如果没有检测到 [DONE]，使用当前时间作为完成时间
             if stream_complete_time is None:
                 stream_complete_time = time.time()
+
+            # 检测是否有工具调用（检查请求body）
+            has_tool_call = detect_tool_call(openai_request, {})
 
             # 保存性能指标
             metrics = {
@@ -821,7 +889,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "endpoint": "/v1/messages",
                 "method": "POST",
                 "api_type": "anthropic",
-                "stream": True
+                "stream": True,
+                "status_code": 200,
+                "has_tool_call": has_tool_call,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens
             }
             save_metrics(request_id, metrics)
 
@@ -884,6 +956,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         has_first_token = False  # 是否已收到首token
         stream_complete_time = None  # 流完成时间
         stream_chunks = []  # 存储所有chunk数据
+        input_tokens = 0  # 输入token数
+        output_tokens = 0  # 输出token数
 
         try:
             print("🔗 建立流式连接：客户端 ↔ 代理 ↔ Anthropic 上游")
@@ -972,6 +1046,19 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         "data": chunk_text,
                         "timestamp": time.time()
                     })
+                    # 尝试解析usage信息（Anthropic流式格式）
+                    if 'message_delta' in chunk_text or '"usage"' in chunk_text:
+                        lines = chunk_text.split('\n')
+                        for line in lines:
+                            if line.startswith('data: '):
+                                try:
+                                    data_json = json.loads(line[6:])
+                                    if 'usage' in data_json:
+                                        usage = data_json['usage']
+                                        input_tokens = usage.get('input_tokens', 0)
+                                        output_tokens = usage.get('output_tokens', 0)
+                                except:
+                                    pass
                 except:
                     stream_chunks.append({
                         "chunk_number": chunk_count,
@@ -995,6 +1082,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
             if stream_complete_time is None:
                 stream_complete_time = time.time()
 
+            # 检测是否有工具调用（检查请求body）
+            has_tool_call = detect_tool_call(body_data, {})
+
             # 保存性能指标
             metrics = {
                 "request_received_time": request_received_time,
@@ -1010,7 +1100,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "endpoint": "/v1/messages",
                 "method": "POST",
                 "api_type": "anthropic",
-                "stream": True
+                "stream": True,
+                "status_code": 200,
+                "has_tool_call": has_tool_call,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens
             }
             save_metrics(request_id, metrics)
 
@@ -1164,6 +1258,42 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 self._send_json_response(500, {"error": f"Error reading file: {str(e)}"})
                 return
 
+        # 日志读取接口 - 请求日志
+        if path.startswith("/logs/request/"):
+            request_id = path.split("/logs/request/")[1]
+            file_path = REQUESTS_DIR / f"{request_id}.json"
+
+            if not file_path.exists():
+                self._send_json_response(404, {"error": f"Request log not found: {request_id}"})
+                return
+
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    log_data = json.load(f)
+                self._send_json_response(200, log_data)
+                return
+            except Exception as e:
+                self._send_json_response(500, {"error": f"Error reading log: {str(e)}"})
+                return
+
+        # 日志读取接口 - 响应日志
+        if path.startswith("/logs/response/"):
+            request_id = path.split("/logs/response/")[1]
+            file_path = RESPONSES_DIR / f"{request_id}.json"
+
+            if not file_path.exists():
+                self._send_json_response(404, {"error": f"Response log not found: {request_id}"})
+                return
+
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    log_data = json.load(f)
+                self._send_json_response(200, log_data)
+                return
+            except Exception as e:
+                self._send_json_response(500, {"error": f"Error reading log: {str(e)}"})
+                return
+
         # Metrics接口
         if path == "/metrics":
             with lock:
@@ -1186,12 +1316,23 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         "total_requests": 0,
                         "avg_total_time": 0,
                         "avg_proxy_processing_time": 0,
-                        "avg_model_response_time": 0
+                        "avg_model_response_time": 0,
+                        "success_requests": 0,
+                        "failed_requests": 0,
+                        "success_rate": 0,
+                        "avg_inter_request_gap": 0
                     }
                 else:
                     total_times = [r.get('total_time', 0) for r in requests_data if 'total_time' in r]
                     proxy_times = [r.get('proxy_processing_time', 0) for r in requests_data if 'proxy_processing_time' in r]
                     model_times = [r.get('model_response_time', r.get('time_to_first_byte', 0)) for r in requests_data]
+                    inter_request_gaps = [r.get('inter_request_gap', 0) for r in requests_data if r.get('inter_request_gap')]
+
+                    # 状态码统计
+                    status_codes = [r.get('status_code', 200) for r in requests_data]
+                    success_requests = sum(1 for code in status_codes if code == 200)
+                    failed_requests = sum(1 for code in status_codes if code != 200)
+                    success_rate = (success_requests / len(requests_data) * 100) if requests_data else 0
 
                     response_data = {
                         "session_start": session_start_time.isoformat(),
@@ -1200,7 +1341,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         "avg_proxy_processing_time": sum(proxy_times) / len(proxy_times) if proxy_times else 0,
                         "avg_model_response_time": sum(model_times) / len(model_times) if model_times else 0,
                         "max_total_time": max(total_times) if total_times else 0,
-                        "min_total_time": min(total_times) if total_times else 0
+                        "min_total_time": min(total_times) if total_times else 0,
+                        "success_requests": success_requests,
+                        "failed_requests": failed_requests,
+                        "success_rate": success_rate,
+                        "avg_inter_request_gap": sum(inter_request_gaps) / len(inter_request_gaps) if inter_request_gaps else 0
                     }
             self._send_json_response(200, response_data)
             return
@@ -1300,6 +1445,17 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         anthropic_response = json.loads(response_body.decode('utf-8'))
                         save_response_body(request_id, anthropic_response, response.status)
 
+                        # 检测是否有工具调用
+                        has_tool_call = detect_tool_call(body_data, anthropic_response)
+
+                        # 提取token使用量（Anthropic格式）
+                        input_tokens = 0
+                        output_tokens = 0
+                        if isinstance(anthropic_response, dict):
+                            usage = anthropic_response.get('usage', {})
+                            input_tokens = usage.get('input_tokens', 0)
+                            output_tokens = usage.get('output_tokens', 0)
+
                         # 保存性能指标
                         metrics = {
                             "request_received_time": request_received_time,
@@ -1313,7 +1469,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                             "endpoint": "/v1/messages",
                             "method": "POST",
                             "api_type": "anthropic",
-                            "stream": False
+                            "stream": False,
+                            "status_code": response.status,
+                            "has_tool_call": has_tool_call,
+                            "input_tokens": input_tokens,
+                            "output_tokens": output_tokens
                         }
                         save_metrics(request_id, metrics)
 
@@ -1360,6 +1520,17 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         response_json = json.loads(response_body.decode('utf-8'))
                         save_response_body(request_id, response_json, response.status)
 
+                        # 检测是否有工具调用
+                        has_tool_call = detect_tool_call(body_data, response_json)
+
+                        # 提取token使用量（OpenAI格式）
+                        input_tokens = 0
+                        output_tokens = 0
+                        if isinstance(response_json, dict):
+                            usage = response_json.get('usage', {})
+                            input_tokens = usage.get('prompt_tokens', 0)
+                            output_tokens = usage.get('completion_tokens', 0)
+
                         # 保存性能指标
                         metrics = {
                             "request_received_time": request_received_time,
@@ -1372,7 +1543,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                             "inter_request_gap": inter_request_gap,
                             "endpoint": "/v1/chat/completions",
                             "method": "POST",
-                            "stream": False
+                            "stream": False,
+                            "status_code": response.status,
+                            "has_tool_call": has_tool_call,
+                            "input_tokens": input_tokens,
+                            "output_tokens": output_tokens
                         }
                         save_metrics(request_id, metrics)
 

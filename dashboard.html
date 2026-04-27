@@ -787,6 +787,57 @@
                     </div>
                     <div class="metric-trend">峰值延迟</div>
                 </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">成功请求</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="successRequests">0</span>
+                    </div>
+                    <div class="metric-trend">状态码 200</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon error">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">失败请求</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="failedRequests">0</span>
+                    </div>
+                    <div class="metric-trend">非200状态码</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 20V10"/>
+                                <path d="M18 20V4"/>
+                                <path d="M6 20v-4"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">成功率</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="successRate">0</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-trend">请求成功率</div>
+                </div>
             </div>
 
             <!-- Charts Section -->
@@ -842,15 +893,20 @@
                             <tr>
                                 <th>时间戳</th>
                                 <th>请求类型</th>
+                                <th>工具调用</th>
+                                <th>状态码</th>
+                                <th>输入Token</th>
+                                <th>输出Token</th>
                                 <th>总耗时</th>
                                 <th>代理耗时</th>
                                 <th>首token时延</th>
                                 <th>模型耗时</th>
+                                <th>日志</th>
                             </tr>
                         </thead>
                         <tbody id="requestsTableBody">
                             <tr>
-                                <td colspan="5">
+                                <td colspan="11">
                                     <div class="loading-state">
                                         <div class="spinner"></div>
                                         <div>加载指标数据中...</div>
@@ -863,6 +919,107 @@
             </div>
         </div>
     </div>
+
+    <!-- Log Modal -->
+    <div id="logModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">日志详情</span>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <pre id="logContent" style="background: #f8f9fb; padding: 16px; border-radius: 4px; overflow: auto; max-height: 70vh; font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif; white-space: pre-wrap;"></pre>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #E5E6EB;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D2129;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #86909C;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: #4E5969;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .badge-tool {
+            background: rgba(255, 154, 0, 0.08);
+            color: #FF9A00;
+            border: 1px solid rgba(255, 154, 0, 0.2);
+        }
+        .badge-no-tool {
+            background: var(--surface-hover);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .log-link {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--primary-light);
+        }
+        .log-link:hover {
+            background: rgba(0, 100, 200, 0.16);
+        }
+        .badge-status-success {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid rgba(0, 168, 84, 0.2);
+        }
+        .badge-status-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid rgba(255, 154, 0, 0.2);
+        }
+        .badge-status-error {
+            background: var(--error-light);
+            color: var(--error);
+            border: 1px solid rgba(255, 77, 79, 0.2);
+        }
+    </style>
 
     <script>
         let responseTimeChart = null;
@@ -1133,6 +1290,9 @@
                 document.getElementById('avgModelTime').textContent = (summary.avg_model_response_time * 1000).toFixed(0);
                 document.getElementById('avgGapTime').textContent = (summary.avg_inter_request_gap ? (summary.avg_inter_request_gap * 1000).toFixed(0) : 'N/A');
                 document.getElementById('maxResponseTime').textContent = (summary.max_total_time ? (summary.max_total_time * 1000).toFixed(0) : 'N/A');
+                document.getElementById('successRequests').textContent = summary.success_requests || 0;
+                document.getElementById('failedRequests').textContent = summary.failed_requests || 0;
+                document.getElementById('successRate').textContent = (summary.success_rate || 0).toFixed(1);
 
                 updateCharts(data.metrics);
                 updateTable(data.metrics);
@@ -1181,7 +1341,7 @@
             if (!metrics || metrics.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="11">
                             <div class="loading-state">
                                 <div style="color: #4E5969;">暂无请求记录</div>
                             </div>
@@ -1203,6 +1363,10 @@
                     minute: '2-digit',
                     second: '2-digit'
                 });
+                const requestId = m.request_id || 'unknown';
+                const statusCode = m.status_code || 200;
+                const inputTokens = m.input_tokens || 0;
+                const outputTokens = m.output_tokens || 0;
 
                 let latencyClass = 'latency-fast';
                 if (totalTime > 3000) latencyClass = 'latency-slow';
@@ -1212,6 +1376,21 @@
                 const firstTokenDisplay = m.stream && firstTokenLatency > 0
                     ? `${firstTokenLatency.toFixed(0)}ms`
                     : 'N/A';
+
+                // 工具调用显示
+                const toolCallBadge = m.has_tool_call
+                    ? '<span class="badge badge-tool">有工具</span>'
+                    : '<span class="badge badge-no-tool">无</span>';
+
+                // 状态码显示
+                let statusBadgeClass = 'badge-status-success';
+                if (statusCode >= 400) statusBadgeClass = 'badge-status-error';
+                else if (statusCode >= 300) statusBadgeClass = 'badge-status-warning';
+                const statusBadge = `<span class="badge ${statusBadgeClass}">${statusCode}</span>`;
+
+                // Token显示
+                const inputTokensDisplay = inputTokens > 0 ? inputTokens : 'N/A';
+                const outputTokensDisplay = outputTokens > 0 ? outputTokens : 'N/A';
 
                 return `
                     <tr>
@@ -1224,14 +1403,58 @@
                                 ${m.stream ? '流式传输' : '标准请求'}
                             </span>
                         </td>
+                        <td>${toolCallBadge}</td>
+                        <td>${statusBadge}</td>
+                        <td class="metric-value-cell">${inputTokensDisplay}</td>
+                        <td class="metric-value-cell">${outputTokensDisplay}</td>
                         <td class="metric-value-cell">${totalTime.toFixed(0)}ms</td>
                         <td class="metric-value-cell">${proxyTime.toFixed(2)}ms</td>
                         <td class="metric-value-cell">${firstTokenDisplay}</td>
                         <td class="metric-value-cell">${modelTime.toFixed(0)}ms</td>
+                        <td>
+                            <a class="log-link" onclick="showLogModal('request', '${requestId}')">请求</a>
+                            <span style="margin: 0 4px; color: #E5E6EB;">|</span>
+                            <a class="log-link" onclick="showLogModal('response', '${requestId}')">响应</a>
+                        </td>
                     </tr>
                 `;
             }).join('');
         }
+
+        // 弹框控制函数
+        async function showLogModal(type, requestId) {
+            const modal = document.getElementById('logModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const logContent = document.getElementById('logContent');
+
+            modalTitle.textContent = type === 'request' ? '请求日志' : '响应日志';
+            logContent.textContent = '加载中...';
+            modal.style.display = 'flex';
+
+            try {
+                const response = await fetch(`/logs/${type}/${requestId}`);
+                if (!response.ok) {
+                    logContent.textContent = `错误: ${response.status} ${response.statusText}`;
+                    return;
+                }
+                const data = await response.json();
+                logContent.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                logContent.textContent = `获取日志失败: ${error.message}`;
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('logModal');
+            modal.style.display = 'none';
+        }
+
+        // 点击弹框外部关闭
+        document.getElementById('logModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
 
         async function clearMetrics() {
             if (confirm('确定要清空所有指标数据吗？')) {
