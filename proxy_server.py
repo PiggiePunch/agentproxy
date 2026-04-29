@@ -71,6 +71,20 @@ session_start_time = datetime.now()
 last_request_time = None
 request_counter = 0
 lock = threading.Lock()
+MAX_RECENT_REQUESTS = 100  # 内存中保留的最近请求数量
+
+# 累计统计数据（从启动到现在的所有统计）
+cumulative_stats = {
+    'total_requests': 0,
+    'total_time_sum': 0.0,
+    'total_proxy_time_sum': 0.0,
+    'total_model_time_sum': 0.0,
+    'success_requests': 0,
+    'failed_requests': 0,
+    'inter_request_gaps': [],
+    'max_total_time': 0.0,
+    'min_total_time': float('inf')
+}
 
 
 def sanitize_headers(headers: dict) -> dict:
@@ -123,10 +137,47 @@ def save_metrics(request_id: str, metrics: dict):
         json.dump(metrics, f, ensure_ascii=False, indent=2)
 
     with lock:
+        # 添加到最近请求列表（限制为MAX_RECENT_REQUESTS条）
         performance_metrics['requests'].append({
             'request_id': request_id,
             **metrics
         })
+
+        # 如果超过最大数量，移除最老的记录
+        if len(performance_metrics['requests']) > MAX_RECENT_REQUESTS:
+            performance_metrics['requests'].pop(0)
+
+        # 更新累计统计数据（用于概览统计）
+        cumulative_stats['total_requests'] += 1
+
+        # 累加时间数据
+        if 'total_time' in metrics:
+            cumulative_stats['total_time_sum'] += metrics['total_time']
+        if 'proxy_processing_time' in metrics:
+            cumulative_stats['total_proxy_time_sum'] += metrics['proxy_processing_time']
+        if 'model_response_time' in metrics:
+            cumulative_stats['total_model_time_sum'] += metrics['model_response_time']
+        elif 'time_to_first_byte' in metrics:
+            cumulative_stats['total_model_time_sum'] += metrics['time_to_first_byte']
+
+        # 更新成功/失败统计
+        status_code = metrics.get('status_code', 200)
+        if status_code == 200:
+            cumulative_stats['success_requests'] += 1
+        else:
+            cumulative_stats['failed_requests'] += 1
+
+        # 记录请求间隔（如果有）
+        if 'inter_request_gap' in metrics and metrics['inter_request_gap']:
+            cumulative_stats['inter_request_gaps'].append(metrics['inter_request_gap'])
+
+        # 更新最大最小响应时间
+        if 'total_time' in metrics:
+            total_time = metrics['total_time']
+            if total_time > cumulative_stats['max_total_time']:
+                cumulative_stats['max_total_time'] = total_time
+            if total_time < cumulative_stats['min_total_time']:
+                cumulative_stats['min_total_time'] = total_time
 
 
 def detect_tool_call(request_body: dict, response_body: dict) -> bool:
@@ -589,8 +640,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                         if 'usage' in data_json:
                                             usage = data_json['usage']
                                             # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
-                                            input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
-                                            output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
+                                            # 使用or运算符优先选择非零值
+                                            input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                                            output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
                                     except:
                                         pass
                     except:
@@ -864,8 +916,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                 if 'usage' in openai_chunk:
                                     usage = openai_chunk['usage']
                                     # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
-                                    input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
-                                    output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
+                                    # 使用or运算符优先选择非零值
+                                    input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                                    output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
                                 # 转换为 Anthropic 事件
                                 anthropic_event = convert_openai_to_anthropic_stream_chunk(openai_chunk, model)
                                 if anthropic_event:
@@ -1075,8 +1128,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                     if 'usage' in data_json:
                                         usage = data_json['usage']
                                         # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
-                                        input_tokens = usage.get('input_tokens', usage.get('prompt_tokens', 0))
-                                        output_tokens = usage.get('output_tokens', usage.get('completion_tokens', 0))
+                                        # 使用or运算符优先选择非零值
+                                        input_tokens = usage.get('input_tokens') or usage.get('prompt_tokens', 0)
+                                        output_tokens = usage.get('output_tokens') or usage.get('completion_tokens', 0)
                                 except:
                                     pass
                 except:
@@ -1328,9 +1382,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         # Metrics summary接口
         if path == "/metrics/summary":
             with lock:
-                requests_data = performance_metrics.get('requests', [])
+                total = cumulative_stats['total_requests']
 
-                if not requests_data:
+                if total == 0:
                     response_data = {
                         "session_start": session_start_time.isoformat(),
                         "total_requests": 0,
@@ -1340,32 +1394,27 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         "success_requests": 0,
                         "failed_requests": 0,
                         "success_rate": 0,
-                        "avg_inter_request_gap": 0
+                        "avg_inter_request_gap": 0,
+                        "max_total_time": 0,
+                        "min_total_time": 0
                     }
                 else:
-                    total_times = [r.get('total_time', 0) for r in requests_data if 'total_time' in r]
-                    proxy_times = [r.get('proxy_processing_time', 0) for r in requests_data if 'proxy_processing_time' in r]
-                    model_times = [r.get('model_response_time', r.get('time_to_first_byte', 0)) for r in requests_data]
-                    inter_request_gaps = [r.get('inter_request_gap', 0) for r in requests_data if r.get('inter_request_gap')]
-
-                    # 状态码统计
-                    status_codes = [r.get('status_code', 200) for r in requests_data]
-                    success_requests = sum(1 for code in status_codes if code == 200)
-                    failed_requests = sum(1 for code in status_codes if code != 200)
-                    success_rate = (success_requests / len(requests_data) * 100) if requests_data else 0
+                    success = cumulative_stats['success_requests']
+                    failed = cumulative_stats['failed_requests']
+                    success_rate = (success / total * 100) if total > 0 else 0
 
                     response_data = {
                         "session_start": session_start_time.isoformat(),
-                        "total_requests": len(requests_data),
-                        "avg_total_time": sum(total_times) / len(total_times) if total_times else 0,
-                        "avg_proxy_processing_time": sum(proxy_times) / len(proxy_times) if proxy_times else 0,
-                        "avg_model_response_time": sum(model_times) / len(model_times) if model_times else 0,
-                        "max_total_time": max(total_times) if total_times else 0,
-                        "min_total_time": min(total_times) if total_times else 0,
-                        "success_requests": success_requests,
-                        "failed_requests": failed_requests,
+                        "total_requests": total,
+                        "avg_total_time": cumulative_stats['total_time_sum'] / total if total > 0 else 0,
+                        "avg_proxy_processing_time": cumulative_stats['total_proxy_time_sum'] / total if total > 0 else 0,
+                        "avg_model_response_time": cumulative_stats['total_model_time_sum'] / total if total > 0 else 0,
+                        "success_requests": success,
+                        "failed_requests": failed,
                         "success_rate": success_rate,
-                        "avg_inter_request_gap": sum(inter_request_gaps) / len(inter_request_gaps) if inter_request_gaps else 0
+                        "avg_inter_request_gap": sum(cumulative_stats['inter_request_gaps']) / len(cumulative_stats['inter_request_gaps']) if cumulative_stats['inter_request_gaps'] else 0,
+                        "max_total_time": cumulative_stats['max_total_time'],
+                        "min_total_time": cumulative_stats['min_total_time'] if cumulative_stats['min_total_time'] != float('inf') else 0
                     }
             self._send_json_response(200, response_data)
             return
@@ -1474,8 +1523,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         if isinstance(anthropic_response, dict):
                             usage = anthropic_response.get('usage', {})
                             # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
-                            input_tokens = usage.get('input_tokens', usage.get('prompt_tokens', 0))
-                            output_tokens = usage.get('output_tokens', usage.get('completion_tokens', 0))
+                            # 优先尝试prompt_tokens，再尝试input_tokens（因为有些返回input_tokens=0但prompt_tokens有值）
+                            input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                            output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
 
                         # 保存性能指标
                         metrics = {
@@ -1550,8 +1600,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         if isinstance(response_json, dict):
                             usage = response_json.get('usage', {})
                             # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
-                            input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
-                            output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
+                            # 使用or运算符优先选择非零值
+                            input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                            output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
 
                         # 保存性能指标
                         metrics = {
@@ -1603,11 +1654,23 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
         # 清除metrics
         if path == "/metrics":
-            global performance_metrics, request_counter, session_start_time
+            global performance_metrics, request_counter, session_start_time, cumulative_stats
             with lock:
                 performance_metrics = defaultdict(list)
                 request_counter = 0
                 session_start_time = datetime.now()
+                # 重置累计统计数据
+                cumulative_stats = {
+                    'total_requests': 0,
+                    'total_time_sum': 0.0,
+                    'total_proxy_time_sum': 0.0,
+                    'total_model_time_sum': 0.0,
+                    'success_requests': 0,
+                    'failed_requests': 0,
+                    'inter_request_gaps': [],
+                    'max_total_time': 0.0,
+                    'min_total_time': float('inf')
+                }
             self._send_json_response(200, {"status": "ok", "message": "性能数据已清除"})
             return
 

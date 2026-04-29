@@ -884,7 +884,7 @@
                             <line x1="16" y1="17" x2="8" y2="17"/>
                             <polyline points="10 9 9 9 8 9"/>
                         </svg>
-                        最近请求记录
+                        最近100条请求记录
                     </div>
                 </div>
                 <div id="requestsTableContainer">
@@ -915,6 +915,46 @@
                             </tr>
                         </tbody>
                     </table>
+                    <!-- 分页控件 -->
+                    <div class="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #ffffff; border-top: 1px solid #E5E6EB;">
+                        <div class="pagination-size" style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 13px; color: #86909C; font-weight: 500;">每页显示</span>
+                            <select id="pageSize" style="padding: 6px 12px; border: 1px solid #E5E6EB; border-radius: 6px; font-size: 13px; background: #F7F8FA; color: #1D2129; cursor: pointer; transition: all 0.2s; outline: none;">
+                                <option value="20">20条</option>
+                                <option value="50">50条</option>
+                                <option value="100" selected>100条</option>
+                            </select>
+                        </div>
+                        <div class="pagination-nav" style="display: flex; align-items: center; gap: 8px;">
+                            <button id="prevPage" style="padding: 6px 16px; border: 1px solid #E5E6EB; border-radius: 6px; background: #ffffff; cursor: pointer; font-size: 13px; color: #4E5969; transition: all 0.2s; font-weight: 500;" disabled>上一页</button>
+                            <span id="pageInfo" style="font-size: 13px; color: #4E5969; padding: 0 8px; font-weight: 500;">第 1 页 / 共 1 页</span>
+                            <button id="nextPage" style="padding: 6px 16px; border: 1px solid #E5E6EB; border-radius: 6px; background: #ffffff; cursor: pointer; font-size: 13px; color: #4E5969; transition: all 0.2s; font-weight: 500;" disabled>下一页</button>
+                        </div>
+                    </div>
+
+                    <style>
+                        .pagination-controls select:hover {
+                            border-color: #C9CDD4;
+                            background: #ffffff;
+                        }
+                        .pagination-controls select:focus {
+                            border-color: #165DFF;
+                            background: #ffffff;
+                        }
+                        .pagination-controls button:hover:not(:disabled) {
+                            background: #F7F8FA;
+                            border-color: #C9CDD4;
+                            color: #1D2129;
+                        }
+                        .pagination-controls button:active:not(:disabled) {
+                            background: #E5E6EB;
+                        }
+                        .pagination-controls button:disabled {
+                            opacity: 0.4;
+                            cursor: not-allowed;
+                            background: #F7F8FA;
+                        }
+                    </style>
                 </div>
             </div>
         </div>
@@ -1025,6 +1065,11 @@
         let responseTimeChart = null;
         let timeDistributionChart = null;
         let autoRefreshInterval = null;
+
+        // 分页状态
+        let currentPage = 1;
+        let pageSize = 100;
+        let allMetrics = [];  // 存储所有metrics数据
 
         Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
         Chart.defaults.color = '#4E5969';
@@ -1348,12 +1393,25 @@
                         </td>
                     </tr>
                 `;
+                updatePagination(0);
                 return;
             }
 
-            const recentMetrics = metrics.slice(-10).reverse();
+            // 存储所有metrics数据
+            allMetrics = metrics.slice(-100).reverse();
 
-            tableBody.innerHTML = recentMetrics.map(m => {
+            // 确保当前页不超过总页数
+            const totalPages = Math.ceil(allMetrics.length / pageSize);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            // 计算当前页的数据
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageMetrics = allMetrics.slice(startIndex, endIndex);
+
+            tableBody.innerHTML = pageMetrics.map(m => {
                 const totalTime = (m.total_time || m.time_to_first_byte || 0) * 1000;
                 const proxyTime = (m.proxy_processing_time || 0) * 1000;
                 const firstTokenLatency = (m.first_token_latency || 0) * 1000;
@@ -1419,6 +1477,52 @@
                     </tr>
                 `;
             }).join('');
+
+            // 更新分页控件
+            updatePagination(allMetrics.length);
+        }
+
+        // 更新分页控件
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / pageSize);
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+
+            if (totalItems === 0) {
+                pageInfo.textContent = '第 0 页 / 共 0 页';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                return;
+            }
+
+            pageInfo.textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+        }
+
+        // 切换到上一页
+        function goToPrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable(allMetrics);
+            }
+        }
+
+        // 切换到下一页
+        function goToNextPage() {
+            const totalPages = Math.ceil(allMetrics.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable(allMetrics);
+            }
+        }
+
+        // 改变每页显示数量
+        function changePageSize(newSize) {
+            pageSize = parseInt(newSize);
+            currentPage = 1;  // 重置到第一页
+            updateTable(allMetrics);
         }
 
         // 弹框控制函数
@@ -1480,6 +1584,13 @@
             } else {
                 clearInterval(autoRefreshInterval);
             }
+        });
+
+        // 分页按钮事件监听器
+        document.getElementById('prevPage').addEventListener('click', goToPrevPage);
+        document.getElementById('nextPage').addEventListener('click', goToNextPage);
+        document.getElementById('pageSize').addEventListener('change', function(e) {
+            changePageSize(e.target.value);
         });
 
         window.addEventListener('load', async function() {
