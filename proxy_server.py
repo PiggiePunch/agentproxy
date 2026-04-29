@@ -283,8 +283,8 @@ def convert_openai_to_anthropic_response(openai_response: dict, model: str) -> d
         "stop_reason": "end_turn",
         "stop_sequence": None,
         "usage": {
-            "input_tokens": openai_response.get("usage", {}).get("prompt_tokens", 0),
-            "output_tokens": openai_response.get("usage", {}).get("completion_tokens", 0)
+            "input_tokens": openai_response.get("usage", {}).get("prompt_tokens", openai_response.get("usage", {}).get("input_tokens", 0)),
+            "output_tokens": openai_response.get("usage", {}).get("completion_tokens", openai_response.get("usage", {}).get("output_tokens", 0))
         }
     }
 
@@ -577,13 +577,20 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         if '"usage"' in chunk_text:
                             lines = chunk_text.split('\n')
                             for line in lines:
-                                if line.startswith('data: ') and 'data: [DONE]' not in line:
+                                # 兼容data:和data: 两种格式，排除[DONE]
+                                if (line.startswith('data:') and 'data: [DONE]' not in line and
+                                    line.strip() not in ['data:', 'data: ']):
                                     try:
-                                        data_json = json.loads(line[6:])
+                                        # 去掉data:前缀（兼容"data:"和"data: "两种格式）
+                                        data_content = line[5:].strip() if line.startswith('data: ') else line[5:].strip()
+                                        if not data_content:  # 跳过空的data行
+                                            continue
+                                        data_json = json.loads(data_content)
                                         if 'usage' in data_json:
                                             usage = data_json['usage']
-                                            input_tokens = usage.get('prompt_tokens', 0)
-                                            output_tokens = usage.get('completion_tokens', 0)
+                                            # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
+                                            input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
+                                            output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
                                     except:
                                         pass
                     except:
@@ -834,8 +841,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                     # 解析 OpenAI SSE 事件
                     lines = event_part.split('\n')
                     for line in lines:
-                        if line.startswith('data: '):
-                            data_str = line[6:]
+                        # 兼容data:和data: 两种格式
+                        if line.startswith('data:'):
+                            # 去掉data:前缀（兼容"data:"和"data: "两种格式）
+                            data_str = line[5:].strip() if line.startswith('data: ') else line[5:].strip()
                             if data_str.strip() == '[DONE]':
                                 # 转换为 Anthropic 结束事件
                                 if stream_complete_time is None:
@@ -854,8 +863,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                 # 提取usage信息
                                 if 'usage' in openai_chunk:
                                     usage = openai_chunk['usage']
-                                    input_tokens = usage.get('prompt_tokens', 0)
-                                    output_tokens = usage.get('completion_tokens', 0)
+                                    # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
+                                    input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
+                                    output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
                                 # 转换为 Anthropic 事件
                                 anthropic_event = convert_openai_to_anthropic_stream_chunk(openai_chunk, model)
                                 if anthropic_event:
@@ -1049,14 +1059,24 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                     # 尝试解析usage信息（Anthropic流式格式）
                     if 'message_delta' in chunk_text or '"usage"' in chunk_text:
                         lines = chunk_text.split('\n')
+                        current_event = None  # 跟踪当前事件类型
                         for line in lines:
-                            if line.startswith('data: '):
+                            # 检查是否是事件行
+                            if line.startswith('event:'):
+                                current_event = line[6:].strip()  # 获取事件类型（如message_delta）
+                            # 检查data行（兼容有/无空格）
+                            elif line.startswith('data:'):
                                 try:
-                                    data_json = json.loads(line[6:])
+                                    # 去掉data:前缀（兼容"data:"和"data: "两种格式）
+                                    data_content = line[5:].strip() if line.startswith('data: ') else line[5:].strip()
+                                    if not data_content:  # 跳过空的data行
+                                        continue
+                                    data_json = json.loads(data_content)
                                     if 'usage' in data_json:
                                         usage = data_json['usage']
-                                        input_tokens = usage.get('input_tokens', 0)
-                                        output_tokens = usage.get('output_tokens', 0)
+                                        # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
+                                        input_tokens = usage.get('input_tokens', usage.get('prompt_tokens', 0))
+                                        output_tokens = usage.get('output_tokens', usage.get('completion_tokens', 0))
                                 except:
                                     pass
                 except:
@@ -1453,8 +1473,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         output_tokens = 0
                         if isinstance(anthropic_response, dict):
                             usage = anthropic_response.get('usage', {})
-                            input_tokens = usage.get('input_tokens', 0)
-                            output_tokens = usage.get('output_tokens', 0)
+                            # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
+                            input_tokens = usage.get('input_tokens', usage.get('prompt_tokens', 0))
+                            output_tokens = usage.get('output_tokens', usage.get('completion_tokens', 0))
 
                         # 保存性能指标
                         metrics = {
@@ -1528,8 +1549,9 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                         output_tokens = 0
                         if isinstance(response_json, dict):
                             usage = response_json.get('usage', {})
-                            input_tokens = usage.get('prompt_tokens', 0)
-                            output_tokens = usage.get('completion_tokens', 0)
+                            # 兼容OpenAI格式(prompt_tokens/completion_tokens)和Anthropic格式(input_tokens/output_tokens)
+                            input_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
+                            output_tokens = usage.get('completion_tokens', usage.get('output_tokens', 0))
 
                         # 保存性能指标
                         metrics = {
