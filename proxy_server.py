@@ -26,6 +26,7 @@ ANTHROPIC_API_URL = os.getenv("ANTHROPIC_API_URL", "https://api.moonshot.cn/anth
 VERBOSE_LOGGING = os.getenv("VERBOSE_LOGGING", "true").lower() == "true"
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
+LOG_RETENTION_DAYS = int(os.getenv("LOG_RETENTION_DAYS", "3"))  # 日志保留天数
 
 # 打印实际配置
 print("\n" + "="*80)
@@ -63,6 +64,48 @@ except Exception as e:
     print(f"   目录路径: {LOGS_DIR}")
     import sys
     sys.exit(1)
+
+
+def cleanup_old_logs(days_to_keep=3):
+    """清理指定天数前的旧日志文件"""
+    try:
+        cutoff_time = datetime.now().timestamp() - (days_to_keep * 24 * 60 * 60)
+        total_deleted = 0
+
+        # 清理三个子目录
+        for subdir_name, subdir_path in [
+            ("请求日志", REQUESTS_DIR),
+            ("响应日志", RESPONSES_DIR),
+            ("性能指标", METRICS_DIR)
+        ]:
+            if not subdir_path.exists():
+                continue
+
+            deleted_count = 0
+            try:
+                for file_path in subdir_path.glob("*.json"):
+                    if file_path.stat().st_mtime < cutoff_time:
+                        file_path.unlink()
+                        deleted_count += 1
+                        total_deleted += 1
+
+                if deleted_count > 0:
+                    print(f"  ✓ 已清理 {subdir_name}: {deleted_count} 个文件")
+            except Exception as e:
+                print(f"  ⚠️  清理 {subdir_name} 时出错: {e}")
+
+        if total_deleted > 0:
+            print(f"✓ 日志清理完成: 共删除 {total_deleted} 个 {days_to_keep} 天前的旧文件")
+        else:
+            print(f"✓ 日志清理完成: 无需删除的旧文件")
+
+    except Exception as e:
+        print(f"❌ 日志清理失败: {e}")
+
+
+# 启动时清理旧日志
+print("🔍 检查并清理旧日志文件...")
+cleanup_old_logs(days_to_keep=LOG_RETENTION_DAYS)
 
 # 全局状态
 request_logs = []
@@ -1713,6 +1756,7 @@ def run_server():
     print("  - ✓ 流式和非流式转发")
     print("  - ✓ 请求和响应持久化保存")
     print("  - ✓ 性能监控和分析")
+    print(f"  - ✓ 自动清理{LOG_RETENTION_DAYS}天前的旧日志")
     print("\n📁 日志存储位置:")
     print(f"  - 请求体：{REQUESTS_DIR}")
     print(f"  - 响应体：{RESPONSES_DIR}")
@@ -1730,6 +1774,24 @@ def run_server():
     print(f"  - POST /v1/messages           (消息 API)")
     print("\n所有请求和响应信息将在此控制台输出")
     print("="*80 + "\n")
+
+    # 启动日志清理后台线程
+    def periodic_cleanup():
+        """定期清理旧日志的后台任务"""
+        import time
+        while True:
+            try:
+                time.sleep(24 * 60 * 60)  # 每24小时执行一次
+                print("\n" + "="*80)
+                print("🔍 执行定期日志清理...")
+                print("="*80)
+                cleanup_old_logs(days_to_keep=LOG_RETENTION_DAYS)
+            except Exception as e:
+                print(f"❌ 定期清理失败: {e}")
+
+    cleanup_thread = threading.Thread(target=periodic_cleanup, daemon=True)
+    cleanup_thread.start()
+    print("✓ 日志清理后台任务已启动（每24小时执行一次）\n")
 
     try:
         httpd.serve_forever()
