@@ -484,7 +484,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(response_body)
 
-    def _send_stream_response(self, request_id: str, forward_headers: dict, body_data: dict, request_received_time: float):
+    def _send_stream_response(self, request_id: str, forward_headers: dict, body_data: dict, request_received_time: float, forward_start_time: float = None):
         """发送流式响应（OpenAI 格式）"""
         import uuid
 
@@ -534,7 +534,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         response_first_byte_time = None
         first_token_time = None  # 首token时间（首个实际内容）
         has_first_token = False  # 是否已收到首token
-        forward_start_time = time.time()
+        if forward_start_time is None:
+            forward_start_time = time.time()
         stream_complete_time = None  # 流完成时间（收到DONE时）
         stream_chunks = []  # 存储所有chunk数据
         input_tokens = 0  # 输入token数
@@ -713,12 +714,12 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "forward_start_time": forward_start_time,
                 "response_first_byte_time": response_first_byte_time,
                 "response_complete_time": stream_complete_time,
-                "proxy_processing_time": forward_start_time - request_received_time,
-                "time_to_first_byte": (response_first_byte_time - forward_start_time) if response_first_byte_time else 0,
-                "first_token_latency": (first_token_time - forward_start_time) if first_token_time else 0,
-                "model_response_time": stream_complete_time - forward_start_time,  # 模型总耗时
-                "total_stream_time": stream_complete_time - forward_start_time,
-                "total_time": stream_complete_time - request_received_time,
+                "proxy_processing_time": max(0, forward_start_time - request_received_time),
+                "time_to_first_byte": max(0, (response_first_byte_time - forward_start_time) if response_first_byte_time else 0),
+                "first_token_latency": max(0, (first_token_time - forward_start_time) if first_token_time else 0),
+                "model_response_time": max(0, stream_complete_time - forward_start_time),  # 模型总耗时
+                "total_stream_time": max(0, stream_complete_time - forward_start_time),
+                "total_time": max(0, stream_complete_time - request_received_time),
                 "endpoint": "/v1/chat/completions",
                 "method": "POST",
                 "stream": True,
@@ -943,12 +944,12 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "forward_start_time": forward_start_time,
                 "response_first_byte_time": response_first_byte_time,
                 "response_complete_time": stream_complete_time,
-                "proxy_processing_time": forward_start_time - request_received_time,
-                "time_to_first_byte": (response_first_byte_time - forward_start_time) if response_first_byte_time else 0,
-                "first_token_latency": (first_token_time - forward_start_time) if first_token_time else 0,
-                "model_response_time": stream_complete_time - forward_start_time,  # 模型总耗时
-                "total_stream_time": stream_complete_time - forward_start_time,
-                "total_time": stream_complete_time - request_received_time,
+                "proxy_processing_time": max(0, forward_start_time - request_received_time),
+                "time_to_first_byte": max(0, (response_first_byte_time - forward_start_time) if response_first_byte_time else 0),
+                "first_token_latency": max(0, (first_token_time - forward_start_time) if first_token_time else 0),
+                "model_response_time": max(0, stream_complete_time - forward_start_time),  # 模型总耗时
+                "total_stream_time": max(0, stream_complete_time - forward_start_time),
+                "total_time": max(0, stream_complete_time - request_received_time),
                 "endpoint": "/v1/messages",
                 "method": "POST",
                 "api_type": "anthropic",
@@ -1165,12 +1166,12 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 "forward_start_time": forward_start_time,
                 "response_first_byte_time": response_first_byte_time,
                 "response_complete_time": stream_complete_time,
-                "proxy_processing_time": forward_start_time - request_received_time,
-                "time_to_first_byte": (response_first_byte_time - forward_start_time) if response_first_byte_time else 0,
-                "first_token_latency": (first_token_time - forward_start_time) if first_token_time else 0,
-                "model_response_time": stream_complete_time - forward_start_time,  # 模型总耗时
-                "total_stream_time": stream_complete_time - forward_start_time,
-                "total_time": stream_complete_time - request_received_time,
+                "proxy_processing_time": max(0, forward_start_time - request_received_time),
+                "time_to_first_byte": max(0, (response_first_byte_time - forward_start_time) if response_first_byte_time else 0),
+                "first_token_latency": max(0, (first_token_time - forward_start_time) if first_token_time else 0),
+                "model_response_time": max(0, stream_complete_time - forward_start_time),  # 模型总耗时
+                "total_stream_time": max(0, stream_complete_time - forward_start_time),
+                "total_time": max(0, stream_complete_time - request_received_time),
                 "endpoint": "/v1/messages",
                 "method": "POST",
                 "api_type": "anthropic",
@@ -1532,10 +1533,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                             "request_received_time": request_received_time,
                             "forward_start_time": forward_start_time,
                             "response_received_time": response_received_time,
-                            "proxy_processing_time": forward_start_time - request_received_time,
+                            "proxy_processing_time": max(0, forward_start_time - request_received_time),
                             "first_token_latency": 0,  # 标准请求没有首token时延
-                            "model_response_time": response_received_time - forward_start_time,
-                            "total_time": response_received_time - request_received_time,
+                            "model_response_time": max(0, response_received_time - forward_start_time),
+                            "total_time": max(0, response_received_time - request_received_time),
                             "inter_request_gap": inter_request_gap,
                             "endpoint": "/v1/messages",
                             "method": "POST",
@@ -1572,7 +1573,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
             if is_stream:
                 # 流式请求
-                self._send_stream_response(request_id, forward_headers, body_data, request_received_time)
+                self._send_stream_response(request_id, forward_headers, body_data, request_received_time, forward_start_time)
             else:
                 # 非流式请求
                 print("📦 非流式请求模式")
@@ -1609,10 +1610,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                             "request_received_time": request_received_time,
                             "forward_start_time": forward_start_time,
                             "response_received_time": response_received_time,
-                            "proxy_processing_time": forward_start_time - request_received_time,
+                            "proxy_processing_time": max(0, forward_start_time - request_received_time),
                             "first_token_latency": 0,  # 标准请求没有首token时延
-                            "model_response_time": response_received_time - forward_start_time,
-                            "total_time": response_received_time - request_received_time,
+                            "model_response_time": max(0, response_received_time - forward_start_time),
+                            "total_time": max(0, response_received_time - request_received_time),
                             "inter_request_gap": inter_request_gap,
                             "endpoint": "/v1/chat/completions",
                             "method": "POST",

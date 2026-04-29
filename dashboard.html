@@ -884,7 +884,7 @@
                             <line x1="16" y1="17" x2="8" y2="17"/>
                             <polyline points="10 9 9 9 8 9"/>
                         </svg>
-                        最近100条请求记录
+                        最近请求记录
                     </div>
                 </div>
                 <div id="requestsTableContainer">
@@ -918,12 +918,13 @@
                     <!-- 分页控件 -->
                     <div class="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #ffffff; border-top: 1px solid #E5E6EB;">
                         <div class="pagination-size" style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 13px; color: #86909C; font-weight: 500;">每页显示</span>
-                            <select id="pageSize" style="padding: 6px 12px; border: 1px solid #E5E6EB; border-radius: 6px; font-size: 13px; background: #F7F8FA; color: #1D2129; cursor: pointer; transition: all 0.2s; outline: none;">
-                                <option value="20">20条</option>
-                                <option value="50">50条</option>
-                                <option value="100" selected>100条</option>
+                            <select id="pageSize" style="padding: 4px 8px; border: 1px solid #E5E6EB; border-radius: 4px; font-size: 12px; background: #ffffff; color: #4E5969; cursor: pointer; transition: all 0.2s; outline: none; min-width: 60px;">
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
                             </select>
+                            <span style="font-size: 12px; color: #86909C;">条/页</span>
                         </div>
                         <div class="pagination-nav" style="display: flex; align-items: center; gap: 8px;">
                             <button id="prevPage" style="padding: 6px 16px; border: 1px solid #E5E6EB; border-radius: 6px; background: #ffffff; cursor: pointer; font-size: 13px; color: #4E5969; transition: all 0.2s; font-weight: 500;" disabled>上一页</button>
@@ -935,11 +936,9 @@
                     <style>
                         .pagination-controls select:hover {
                             border-color: #C9CDD4;
-                            background: #ffffff;
                         }
                         .pagination-controls select:focus {
                             border-color: #165DFF;
-                            background: #ffffff;
                         }
                         .pagination-controls button:hover:not(:disabled) {
                             background: #F7F8FA;
@@ -1068,7 +1067,7 @@
 
         // 分页状态
         let currentPage = 1;
-        let pageSize = 100;
+        let pageSize = 10;  // 默认每页10条
         let allMetrics = [];  // 存储所有metrics数据
 
         Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
