@@ -10,7 +10,7 @@ import os
 import threading
 import socket
 import ssl
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, ParseResult
 from datetime import datetime
 from pathlib import Path
@@ -22,7 +22,7 @@ import io
 
 # ============= 配置区域 =============
 REAL_API_URL = os.getenv("REAL_API_URL", "https://api.deepseek.com")
-ANTHROPIC_API_URL = os.getenv("ANTHROPIC_API_URL", "https://api.moonshot.cn/anthropic")
+ANTHROPIC_API_URL = os.getenv("ANTHROPIC_API_URL", "https://open.bigmodel.cn/api/anthropic")
 VERBOSE_LOGGING = os.getenv("VERBOSE_LOGGING", "true").lower() == "true"
 SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
 SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
@@ -1724,7 +1724,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 def run_server():
     """启动服务器"""
     server_address = (SERVER_HOST, SERVER_PORT)
-    httpd = HTTPServer(server_address, ProxyHTTPRequestHandler)
+    httpd = ThreadingHTTPServer(server_address, ProxyHTTPRequestHandler)
 
     print("\n" + "="*80)
     print("🚀 OpenClaw 代理服务器启动中...")
