@@ -577,6 +577,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         response_first_byte_time = None
         first_token_time = None  # 首token时间（首个实际内容）
         has_first_token = False  # 是否已收到首token
+        ft_buffer = ""  # SSE行缓冲，用于跨read1()调用解析首token
         if forward_start_time is None:
             forward_start_time = time.time()
         stream_complete_time = None  # 流完成时间（收到DONE时）
@@ -627,30 +628,40 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                     chunk_count += 1
                     total_bytes += len(chunk)
 
-                    # 检测首token：查找包含实际内容的 data 行
+                    # 检测首token：使用 SSE 行缓冲解析，兼容跨 read1() 的不完整行
                     if not has_first_token:
                         try:
                             chunk_str = chunk.decode('utf-8', errors='ignore')
-                            # 检查是否包含 content 字段且有内容（不仅仅是元数据）
-                            if '"content"' in chunk_str and '"delta"' in chunk_str:
-                                # 进一步检查是否有非空内容
-                                lines = chunk_str.split('\n')
-                                for line in lines:
-                                    if line.startswith('data: ') and 'data: [DONE]' not in line:
-                                        try:
-                                            data_json = json.loads(line[6:])
-                                            if 'choices' in data_json and len(data_json['choices']) > 0:
-                                                delta = data_json['choices'][0].get('delta', {})
-                                                content = delta.get('content', '')
-                                                if content:  # 有实际内容
-                                                    if not has_first_token:
-                                                        first_token_time = time.time()
-                                                        has_first_token = True
-                                                        print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
-                                                        break
-                                        except:
-                                            pass
-                        except:
+                            ft_buffer += chunk_str
+                            # 处理完整的 SSE 事件（以 \n\n 分隔）
+                            while '\n\n' in ft_buffer:
+                                event_text, ft_buffer = ft_buffer.split('\n\n', 1)
+                                if '[DONE]' in event_text:
+                                    continue
+                                for line in event_text.split('\n'):
+                                    line = line.strip()
+                                    if not line.startswith('data:'):
+                                        continue
+                                    data_str = line[5:].strip()  # 去掉 "data:" 前缀（兼容有/无空格）
+                                    if not data_str or data_str == '[DONE]':
+                                        continue
+                                    try:
+                                        data = json.loads(data_str)
+                                        for choice in data.get('choices', []):
+                                            delta = choice.get('delta', {})
+                                            content = delta.get('content', '')
+                                            if content:
+                                                first_token_time = time.time()
+                                                has_first_token = True
+                                                print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
+                                                break
+                                    except (json.JSONDecodeError, KeyError, TypeError):
+                                        pass
+                                    if has_first_token:
+                                        break
+                                if has_first_token:
+                                    break
+                        except Exception:
                             pass
 
                     if VERBOSE_LOGGING or chunk_count % 5 == 0:
@@ -904,32 +915,6 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 total_bytes += len(chunk)
                 buffer += chunk.decode('utf-8', errors='ignore')
 
-                # 检测首token：在解析前检查是否有实际内容
-                if not has_first_token:
-                    if '"content"' in chunk and '"delta"' in chunk:
-                        try:
-                            # 尝试查找包含内容的data行
-                            lines = chunk.split('\n')
-                            for line in lines:
-                                if line.startswith('data: ') and 'data: [DONE]' not in line:
-                                    try:
-                                        data_json = json.loads(line[6:])
-                                        if 'choices' in data_json and len(data_json['choices']) > 0:
-                                            delta = data_json['choices'][0].get('delta', {})
-                                            content = delta.get('content', '')
-                                            if content:  # 有实际内容
-                                                if not has_first_token:
-                                                    first_token_time = time.time()
-                                                    has_first_token = True
-                                                    print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
-                                                    break
-                                    except:
-                                        pass
-                                if has_first_token:
-                                    break
-                        except:
-                            pass
-
                 # 按 SSE 行分割处理
                 while '\n\n' in buffer:
                     event_part, buffer = buffer.split('\n\n', 1)
@@ -956,6 +941,16 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
                             try:
                                 openai_chunk = json.loads(data_str)
+                                # 首token检测（在 SSE 解析循环内部，利用已缓冲的完整事件）
+                                if not has_first_token:
+                                    for choice in openai_chunk.get('choices', []):
+                                        delta = choice.get('delta', {})
+                                        content = delta.get('content', '')
+                                        if content:
+                                            first_token_time = time.time()
+                                            has_first_token = True
+                                            print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
+                                            break
                                 # 提取usage信息
                                 if 'usage' in openai_chunk:
                                     usage = openai_chunk['usage']
@@ -1061,6 +1056,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         response_first_byte_time = None
         first_token_time = None  # 首token时间（首个实际内容）
         has_first_token = False  # 是否已收到首token
+        ft_buffer = ""  # SSE行缓冲，用于跨read1()调用解析首token
         stream_complete_time = None  # 流完成时间
         stream_chunks = []  # 存储所有chunk数据
         input_tokens = 0  # 输入token数
@@ -1099,35 +1095,49 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 chunk_count += 1
                 total_bytes += len(chunk)
 
-                # 检测首token：查找 content_block_delta 事件中的 text_delta
+                # 检测首token：使用 SSE 行缓冲解析 Anthropic 事件格式
                 if not has_first_token:
                     try:
                         chunk_str = chunk.decode('utf-8', errors='ignore')
-                        # 检查是否包含 content_block_delta 事件和 text_delta
-                        if 'event: content_block_delta' in chunk_str and '"type":"text_delta"' in chunk_str:
-                            # 进一步检查是否有非空内容
-                            lines = chunk_str.split('\n')
-                            for i, line in enumerate(lines):
-                                if line.startswith('event: content_block_delta'):
-                                    # 查找对应的 data 行
-                                    for j in range(i+1, min(i+5, len(lines))):
-                                        if lines[j].startswith('data: '):
-                                            try:
-                                                data_json = json.loads(lines[j][6:])
-                                                if 'delta' in data_json:
-                                                    delta = data_json['delta']
-                                                    if delta.get('type') == 'text_delta':
-                                                        text = delta.get('text', '')
-                                                        if text:  # 有实际内容
-                                                            if not has_first_token:
-                                                                first_token_time = time.time()
-                                                                has_first_token = True
-                                                                print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
-                                                                break
-                                            except:
-                                                pass
-                                    break
-                    except:
+                        ft_buffer += chunk_str
+                        # 处理完整的 SSE 事件（以 \n\n 分隔）
+                        while '\n\n' in ft_buffer:
+                            event_text, ft_buffer = ft_buffer.split('\n\n', 1)
+                            if 'event: message_stop' in event_text or 'event: ping' in event_text:
+                                continue
+                            # 解析 event:/data: 配对行
+                            current_event = None
+                            for line in event_text.split('\n'):
+                                line = line.strip()
+                                if line.startswith('event:'):
+                                    current_event = line[6:].strip()
+                                elif line.startswith('data:'):
+                                    data_str = line[5:].strip()  # 去掉 "data:" 前缀（兼容有/无空格）
+                                    if not data_str:
+                                        continue
+                                    try:
+                                        data = json.loads(data_str)
+                                    except (json.JSONDecodeError, TypeError):
+                                        continue
+                                    # 检查 content_block_delta 中的 text_delta
+                                    if current_event == 'content_block_delta':
+                                        delta = data.get('delta', {})
+                                        if delta.get('type') == 'text_delta' and delta.get('text', ''):
+                                            first_token_time = time.time()
+                                            has_first_token = True
+                                            print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
+                                            break
+                                    # 某些实现把 type 放在 data JSON 而非 event 行
+                                    elif data.get('type') == 'content_block_delta':
+                                        delta = data.get('delta', {})
+                                        if delta.get('type') == 'text_delta' and delta.get('text', ''):
+                                            first_token_time = time.time()
+                                            has_first_token = True
+                                            print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
+                                            break
+                            if has_first_token:
+                                break
+                    except Exception:
                         pass
 
                 # 检测 message_stop 事件（流结束标记）
