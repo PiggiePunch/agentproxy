@@ -632,11 +632,13 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                     if not has_first_token:
                         try:
                             chunk_str = chunk.decode('utf-8', errors='ignore')
-                            ft_buffer += chunk_str
+                            # 统一 \r\n → \n，兼容不同上游的行尾格式
+                            ft_buffer += chunk_str.replace('\r\n', '\n')
                             # 处理完整的 SSE 事件（以 \n\n 分隔）
                             while '\n\n' in ft_buffer:
                                 event_text, ft_buffer = ft_buffer.split('\n\n', 1)
-                                if '[DONE]' in event_text:
+                                # 跳过 [DONE] 和 ping 事件
+                                if '[DONE]' in event_text or 'event: ping' in event_text:
                                     continue
                                 for line in event_text.split('\n'):
                                     line = line.strip()
@@ -913,7 +915,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                     break
 
                 total_bytes += len(chunk)
-                buffer += chunk.decode('utf-8', errors='ignore')
+                # 统一 \r\n → \n，兼容不同上游的行尾格式
+                buffer += chunk.decode('utf-8', errors='ignore').replace('\r\n', '\n')
 
                 # 按 SSE 行分割处理
                 while '\n\n' in buffer:
@@ -1099,7 +1102,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                 if not has_first_token:
                     try:
                         chunk_str = chunk.decode('utf-8', errors='ignore')
-                        ft_buffer += chunk_str
+                        # 统一 \r\n → \n，兼容不同上游的行尾格式
+                        ft_buffer += chunk_str.replace('\r\n', '\n')
                         # 处理完整的 SSE 事件（以 \n\n 分隔）
                         while '\n\n' in ft_buffer:
                             event_text, ft_buffer = ft_buffer.split('\n\n', 1)
