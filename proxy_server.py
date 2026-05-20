@@ -649,6 +649,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                         continue
                                     try:
                                         data = json.loads(data_str)
+                                        # OpenAI 格式: choices[].delta.content
                                         for choice in data.get('choices', []):
                                             delta = choice.get('delta', {})
                                             content = delta.get('content', '')
@@ -657,6 +658,14 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                                 has_first_token = True
                                                 print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
                                                 break
+                                        # Anthropic 格式: delta.text 或 delta.thinking
+                                        if not has_first_token:
+                                            delta = data.get('delta', {})
+                                            content = delta.get('text', '') or delta.get('thinking', '')
+                                            if content:
+                                                first_token_time = time.time()
+                                                has_first_token = True
+                                                print(f"\n✓ 首token延迟(Anthropic): {(first_token_time - forward_start_time)*1000:.2f}ms")
                                     except (json.JSONDecodeError, KeyError, TypeError):
                                         pass
                                     if has_first_token:
@@ -1123,10 +1132,11 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                         data = json.loads(data_str)
                                     except (json.JSONDecodeError, TypeError):
                                         continue
-                                    # 检查 content_block_delta 中的 text_delta
+                                    # 检查 content_block_delta 中的 text_delta 或 thinking_delta
                                     if current_event == 'content_block_delta':
                                         delta = data.get('delta', {})
-                                        if delta.get('type') == 'text_delta' and delta.get('text', ''):
+                                        if (delta.get('type') == 'text_delta' and delta.get('text', '')) or \
+                                           (delta.get('type') == 'thinking_delta' and delta.get('thinking', '')):
                                             first_token_time = time.time()
                                             has_first_token = True
                                             print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
@@ -1134,7 +1144,8 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
                                     # 某些实现把 type 放在 data JSON 而非 event 行
                                     elif data.get('type') == 'content_block_delta':
                                         delta = data.get('delta', {})
-                                        if delta.get('type') == 'text_delta' and delta.get('text', ''):
+                                        if (delta.get('type') == 'text_delta' and delta.get('text', '')) or \
+                                           (delta.get('type') == 'thinking_delta' and delta.get('thinking', '')):
                                             first_token_time = time.time()
                                             has_first_token = True
                                             print(f"\n✓ 首token延迟: {(first_token_time - forward_start_time)*1000:.2f}ms")
