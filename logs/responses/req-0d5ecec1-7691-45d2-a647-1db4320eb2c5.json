@@ -1,0 +1,14 @@
+{
+  "status_code": 401,
+  "body": {
+    "stream": true,
+    "status_code": 401,
+    "error": {
+      "error": "{\"error\":{\"message\":\"Authentication Fails, Your api key: ****_key is invalid\",\"type\":\"authentication_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+      "type": "upstream_error"
+    },
+    "timestamp": 1779432052.3972208,
+    "failed_at": "stream_setup"
+  },
+  "timestamp": "2026-05-22T14:40:52.397235"
+}

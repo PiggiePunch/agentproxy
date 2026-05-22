@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "msg_20260522150913a55ba7ae35784354",
+    "type": "message",
+    "role": "assistant",
+    "model": "glm-4.7",
+    "content": [
+      {
+        "type": "text",
+        "text": "你好！我是Z.ai训练的GLM大语言模型，致力于为你提供准确、有价值的知识和信息。\n\n我被设计用来回答问题、提供建议和进行各类对话，很高兴能为你服务！有什么我可以帮助你的吗？"
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 12,
+      "output_tokens": 50,
+      "cache_read_input_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard"
+    }
+  },
+  "timestamp": "2026-05-22T15:09:14.115312"
+}

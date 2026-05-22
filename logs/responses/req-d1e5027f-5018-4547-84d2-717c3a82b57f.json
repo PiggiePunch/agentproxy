@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "ef9e1a37-a3f6-446c-92eb-533d01ac2fae",
+    "object": "chat.completion",
+    "created": 1779264633,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "好的，张三！为了给你推荐一本最适合的书，我想先了解一下你的阅读偏好。你平时喜欢看什么类型的书呢？比如小说、历史、哲学、自我提升，还是科幻、悬疑推理？或者你最近有没有特别想探索的主题？"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 60,
+      "completion_tokens": 53,
+      "total_tokens": 113,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 60
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-20T16:10:34.897675"
+}

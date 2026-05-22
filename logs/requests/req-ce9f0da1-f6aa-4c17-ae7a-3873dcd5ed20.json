@@ -1,0 +1,25 @@
+{
+  "request_id": "req-ce9f0da1-f6aa-4c17-ae7a-3873dcd5ed20",
+  "timestamp": "2026-05-22T14:40:24.774838",
+  "headers": {
+    "Host": "localhost:8000",
+    "Accept-Encoding": "identity",
+    "Content-Length": "233",
+    "Authorization": "Bearer sk-ef89f69a45e4421e9ea8bd967812adba",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "deepseek-chat",
+    "messages": [
+      {
+        "role": "system",
+        "content": "你是一个有帮助的助手。"
+      },
+      {
+        "role": "user",
+        "content": "我的名字叫张三"
+      }
+    ],
+    "stream": false
+  }
+}

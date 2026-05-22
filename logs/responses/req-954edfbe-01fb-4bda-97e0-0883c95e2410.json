@@ -1,0 +1,223 @@
+{
+  "status_code": 200,
+  "body": {
+    "stream": true,
+    "status_code": 200,
+    "total_chunks": 35,
+    "total_bytes": 5212,
+    "timestamp": "2026-05-20T16:17:02.593626",
+    "chunks": [
+      {
+        "chunk_number": 1,
+        "size": 316,
+        "data": "event: message_start\ndata: {\"type\": \"message_start\", \"message\": {\"id\": \"msg_20260520161657f40d702968444a9a\", \"type\": \"message\", \"role\": \"assistant\", \"model\": \"glm-4.7\", \"content\": [], \"stop_reason\": null, \"stop_sequence\": null, \"usage\": {\"input_tokens\": 0, \"output_tokens\": 0}}}\n\nevent: ping\ndata: {\"type\": \"ping\"}\n\n",
+        "timestamp": 1779265019.5402715
+      },
+      {
+        "chunk_number": 2,
+        "size": 311,
+        "data": "event: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 0, \"content_block\": {\"type\": \"thinking\", \"thinking\": \"\", \"signature\": \"77a638fb602e48e3b174e086\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779265019.5412877
+      },
+      {
+        "chunk_number": 3,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"再次\"}}\n\n",
+        "timestamp": 1779265020.429564
+      },
+      {
+        "chunk_number": 4,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要求\"}}\n\n",
+        "timestamp": 1779265020.489829
+      },
+      {
+        "chunk_number": 5,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"查询\"}}\n\n",
+        "timestamp": 1779265020.5012906
+      },
+      {
+        "chunk_number": 6,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"上海\"}}\n\n",
+        "timestamp": 1779265020.5769672
+      },
+      {
+        "chunk_number": 7,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"天气\"}}\n\n",
+        "timestamp": 1779265020.583088
+      },
+      {
+        "chunk_number": 8,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"实\"}}\n\n",
+        "timestamp": 1779265020.5839713
+      },
+      {
+        "chunk_number": 9,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"况\"}}\n\n",
+        "timestamp": 1779265020.586526
+      },
+      {
+        "chunk_number": 10,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779265020.5890071
+      },
+      {
+        "chunk_number": 11,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"我\"}}\n\n",
+        "timestamp": 1779265020.5898583
+      },
+      {
+        "chunk_number": 12,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779265020.6546996
+      },
+      {
+        "chunk_number": 13,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"再次\"}}\n\n",
+        "timestamp": 1779265020.7283528
+      },
+      {
+        "chunk_number": 14,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获取\"}}\n\n",
+        "timestamp": 1779265020.8052936
+      },
+      {
+        "chunk_number": 15,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"最新的\"}}\n\n",
+        "timestamp": 1779265020.8113663
+      },
+      {
+        "chunk_number": 16,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"天气\"}}\n\n",
+        "timestamp": 1779265020.814719
+      },
+      {
+        "chunk_number": 17,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"数据\"}}\n\n",
+        "timestamp": 1779265020.8164942
+      },
+      {
+        "chunk_number": 18,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779265020.8826406
+      },
+      {
+        "chunk_number": 19,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779265020.8875666
+      },
+      {
+        "chunk_number": 20,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"使用\"}}\n\n",
+        "timestamp": 1779265020.9612234
+      },
+      {
+        "chunk_number": 21,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"wt\"}}\n\n",
+        "timestamp": 1779265020.9636476
+      },
+      {
+        "chunk_number": 22,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"tr\"}}\n\n",
+        "timestamp": 1779265021.0347786
+      },
+      {
+        "chunk_number": 23,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".in\"}}\n\n",
+        "timestamp": 1779265021.0394888
+      },
+      {
+        "chunk_number": 24,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"来\"}}\n\n",
+        "timestamp": 1779265021.1229944
+      },
+      {
+        "chunk_number": 25,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获取\"}}\n\n",
+        "timestamp": 1779265021.1259668
+      },
+      {
+        "chunk_number": 26,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"当前的\"}}\n\n",
+        "timestamp": 1779265021.1301427
+      },
+      {
+        "chunk_number": 27,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"天气\"}}\n\n",
+        "timestamp": 1779265021.1984954
+      },
+      {
+        "chunk_number": 28,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信息\"}}\n\n",
+        "timestamp": 1779265021.2012618
+      },
+      {
+        "chunk_number": 29,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779265021.20785
+      },
+      {
+        "chunk_number": 30,
+        "size": 76,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 0}\n\n",
+        "timestamp": 1779265022.5208685
+      },
+      {
+        "chunk_number": 31,
+        "size": 185,
+        "data": "event: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 1, \"content_block\": {\"type\": \"tool_use\", \"id\": \"call_69b78a05f2aa4f10aa819116\", \"name\": \"exec\", \"input\": {}}}\n\n",
+        "timestamp": 1779265022.521135
+      },
+      {
+        "chunk_number": 32,
+        "size": 246,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"input_json_delta\", \"partial_json\": \"{\\\"command\\\":\\\"curl -s \\\\\\\"wttr.in/Shanghai?format=%l:+%c+%t+(体感+%f)+%w+风速+湿度:%h+降水:%p\\\\\\\"\\\"}\"}}\n\n",
+        "timestamp": 1779265022.5215442
+      },
+      {
+        "chunk_number": 33,
+        "size": 76,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 1}\n\n",
+        "timestamp": 1779265022.5217392
+      },
+      {
+        "chunk_number": 34,
+        "size": 267,
+        "data": "event: message_delta\ndata: {\"type\": \"message_delta\", \"delta\": {\"stop_reason\": \"tool_use\", \"stop_sequence\": null}, \"usage\": {\"input_tokens\": 26822, \"output_tokens\": 75, \"cache_read_input_tokens\": 192, \"server_tool_use\": {\"web_search_requests\": 0}, \"service_tier\": \"sta",
+        "timestamp": 1779265022.5907147
+      },
+      {
+        "chunk_number": 35,
+        "size": 62,
+        "data": "ndard\"}}\n\nevent: message_stop\ndata: {\"type\": \"message_stop\"}\n\n",
+        "timestamp": 1779265022.5911853
+      }
+    ]
+  },
+  "timestamp": "2026-05-20T16:17:02.593653"
+}

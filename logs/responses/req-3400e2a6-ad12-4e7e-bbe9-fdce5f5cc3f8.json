@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "msg_202605221534510409b56e2c8a44ad",
+    "type": "message",
+    "role": "assistant",
+    "model": "glm-4.7",
+    "content": [
+      {
+        "type": "text",
+        "text": "你好，**张三**！\n\n这是一个非常有“国民度”的名字。作为中国法律体系和教科书中的“常驻男主角”，你的名字无人不知，无人不晓。\n\n很高兴认识你！今天有什么我可以帮你的吗？"
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 10,
+      "output_tokens": 46,
+      "cache_read_input_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard"
+    }
+  },
+  "timestamp": "2026-05-22T15:35:00.218723"
+}

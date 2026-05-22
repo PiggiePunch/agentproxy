@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "503933e7-3366-44cd-ab4b-b46ce26fa9c8",
+    "object": "chat.completion",
+    "created": 1779432364,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "你好，张三！很高兴认识你。有什么我可以帮你的吗？"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 14,
+      "completion_tokens": 14,
+      "total_tokens": 28,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 14
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-22T14:46:05.258038"
+}

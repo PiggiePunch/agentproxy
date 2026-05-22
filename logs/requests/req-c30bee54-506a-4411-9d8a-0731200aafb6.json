@@ -1,0 +1,22 @@
+{
+  "request_id": "req-c30bee54-506a-4411-9d8a-0731200aafb6",
+  "timestamp": "2026-05-22T14:21:17.866190",
+  "headers": {
+    "Host": "localhost:8000",
+    "User-Agent": "curl/7.81.0",
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer test_key",
+    "Content-Length": "86"
+  },
+  "body": {
+    "model": "invalid_model",
+    "messages": [
+      {
+        "role": "user",
+        "content": "test"
+      }
+    ],
+    "stream": false
+  }
+}

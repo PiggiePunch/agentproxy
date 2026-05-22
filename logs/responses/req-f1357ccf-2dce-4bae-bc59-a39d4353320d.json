@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "2fd923b3-02b9-4d59-9a72-dc457ac6b0d3",
+    "object": "chat.completion",
+    "created": 1779432365,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "你刚才说的名字是**张三**。需要我帮你记住这个名字，还是有什么其他事情想聊聊吗？"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 37,
+      "completion_tokens": 23,
+      "total_tokens": 60,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 37
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-22T14:46:06.464611"
+}

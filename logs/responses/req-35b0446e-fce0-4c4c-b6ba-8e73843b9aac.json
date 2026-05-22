@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "msg_202605221458496c4216c64fda4395",
+    "type": "message",
+    "role": "assistant",
+    "model": "glm-4.7",
+    "content": [
+      {
+        "type": "text",
+        "text": "你好，**张三**！\n\n这个名字听起来非常有亲切感（毕竟李四和王五可能也都在附近）。很高兴认识你，有什么我可以帮你的吗？"
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 10,
+      "output_tokens": 34,
+      "cache_read_input_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard"
+    }
+  },
+  "timestamp": "2026-05-22T14:58:50.144167"
+}

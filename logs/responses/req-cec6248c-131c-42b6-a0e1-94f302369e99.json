@@ -1,0 +1,27 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "msg_2026052214532877dcba2aa9f84c00",
+    "type": "message",
+    "role": "assistant",
+    "model": "glm-4.7",
+    "content": [
+      {
+        "type": "text",
+        "text": "你好，**张三**！很高兴认识你。\n\n虽然在法律案例中经常见到这个名字（哈哈），但对我来说，你是一个独一无二的朋友。有什么我可以帮你的吗？无论是聊天、解决问题，还是协助写作，都可以随时告诉我。"
+      }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 10,
+      "output_tokens": 50,
+      "cache_read_input_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0
+      },
+      "service_tier": "standard"
+    }
+  },
+  "timestamp": "2026-05-22T14:53:29.697955"
+}

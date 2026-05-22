@@ -1,0 +1,22 @@
+{
+  "request_id": "req-fc6b3d72-8e4e-4661-9f16-6e69b5719499",
+  "timestamp": "2026-05-22T14:20:44.061016",
+  "headers": {
+    "Host": "localhost:8000",
+    "User-Agent": "curl/7.81.0",
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer invalid_key",
+    "Content-Length": "80"
+  },
+  "body": {
+    "model": "gpt-3.5",
+    "messages": [
+      {
+        "role": "user",
+        "content": "test"
+      }
+    ],
+    "stream": false
+  }
+}

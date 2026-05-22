@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw 控制台</title>
+
+    <!-- 本地资源 -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="product-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                </svg>
+                <span>OpenClaw</span>
+            </div>
+            <div class="header-nav">
+                <div class="nav-item active">概览</div>
+                <div class="nav-item">监控</div>
+                <div class="nav-item">日志</div>
+                <div class="nav-item">设置</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>已连接</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Error Banner -->
+        <div id="errorBanner" style="display: none; background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; display: flex; align-items: center; gap: 12px;">
+            <svg style="width: 20px; height: 20px; color: #ef4444; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="error-message" style="color: #991b1b; font-weight: 500;"></span>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">服务概览</h1>
+                <p class="page-description">实时监控代理服务的性能指标和请求状态</p>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="action-left">
+                    <div class="session-info">
+                        <span class="session-label">会话开始时间</span>
+                        <span class="session-value" id="sessionStart">加载中...</span>
+                    </div>
+                </div>
+                <div class="action-right">
+                    <div class="toggle-wrapper">
+                        <div class="toggle active" id="autoRefreshToggle"></div>
+                        <span class="toggle-label">自动刷新</span>
+                    </div>
+                    <button class="btn" onclick="refreshData()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                            <path d="M16 21h5v-5"/>
+                        </svg>
+                        刷新
+                    </button>
+                    <button class="btn btn-primary" onclick="clearMetrics()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18"/>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                        </svg>
+                        清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">总请求数</span>
+                    </div>
+                    <div class="metric-value" id="totalRequests">0</div>
+                    <div class="metric-trend">累计请求数量</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">平均响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgTotalTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">端到端延迟</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">代理处理时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgProxyTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">服务器开销</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon warning">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">模型响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgModelTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">AI推理耗时</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">请求间隔</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="avgGapTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">请求间平均间隔</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon error">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">最大响应时间</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="maxResponseTime">0</span>
+                        <span class="metric-unit">ms</span>
+                    </div>
+                    <div class="metric-trend">峰值延迟</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">成功请求</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="successRequests">0</span>
+                    </div>
+                    <div class="metric-trend">状态码 200</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon error">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">失败请求</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="failedRequests">0</span>
+                    </div>
+                    <div class="metric-trend">非200状态码</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 20V10"/>
+                                <path d="M18 20V4"/>
+                                <path d="M6 20v-4"/>
+                            </svg>
+                        </div>
+                        <span class="metric-title">成功率</span>
+                    </div>
+                    <div class="metric-value">
+                        <span id="successRate">0</span>
+                        <span class="metric-unit">%</span>
+                    </div>
+                    <div class="metric-trend">请求成功率</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                            </svg>
+                            响应时间趋势
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="responseTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <path d="M3 9h18M9 21V9"/>
+                            </svg>
+                            时间分布
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="timeDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="requests-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        最近请求记录
+                    </div>
+                </div>
+                <div id="requestsTableContainer">
+                    <table class="requests-table">
+                        <thead>
+                            <tr>
+                                <th>时间戳</th>
+                                <th>请求类型</th>
+                                <th>工具调用</th>
+                                <th>状态码</th>
+                                <th>输入Token</th>
+                                <th>输出Token</th>
+                                <th>总耗时</th>
+                                <th>代理耗时</th>
+                                <th>首token时延</th>
+                                <th>模型耗时</th>
+                                <th>日志</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody">
+                            <tr>
+                                <td colspan="11">
+                                    <div class="loading-state">
+                                        <div class="spinner"></div>
+                                        <div>加载指标数据中...</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- 分页控件 -->
+                    <div class="pagination-controls">
+                        <div class="pagination-size">
+                            <select id="pageSize">
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span>条/页</span>
+                        </div>
+                        <div class="pagination-nav">
+                            <button id="prevPage" disabled>上一页</button>
+                            <span id="pageInfo">第 1 页 / 共 1 页</span>
+                            <button id="nextPage" disabled>下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Modal -->
+    <div id="logModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">日志详情</span>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <pre id="logContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 前端逻辑 -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

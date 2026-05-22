@@ -1,0 +1,21 @@
+{
+  "request_received_time": 1779266654.6274896,
+  "forward_start_time": 1779266654.6514812,
+  "response_first_byte_time": 1779266656.9279625,
+  "response_complete_time": 1779266659.0844126,
+  "proxy_processing_time": 0.02399158477783203,
+  "time_to_first_byte": 2.2764813899993896,
+  "first_token_latency": 2.2766683101654053,
+  "model_response_time": 4.432931423187256,
+  "total_stream_time": 4.432931423187256,
+  "total_time": 4.456923007965088,
+  "endpoint": "/v1/messages",
+  "method": "POST",
+  "api_type": "anthropic",
+  "stream": true,
+  "status_code": 200,
+  "has_tool_call": true,
+  "input_tokens": 26320,
+  "output_tokens": 59,
+  "request_id": "req-fdb859ac-5b77-4841-9edd-a6b4f7e71290"
+}

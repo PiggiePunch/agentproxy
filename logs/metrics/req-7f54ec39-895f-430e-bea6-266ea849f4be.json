@@ -1,0 +1,19 @@
+{
+  "request_received_time": 1779433738.2006884,
+  "forward_start_time": 1779433738.2036576,
+  "response_received_time": 1779433739.0412853,
+  "proxy_processing_time": 0.0029692649841308594,
+  "first_token_latency": 0,
+  "model_response_time": 0.837627649307251,
+  "total_time": 0.8405969142913818,
+  "inter_request_gap": 2.5865976810455322,
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "api_type": "openai",
+  "stream": false,
+  "status_code": 200,
+  "has_tool_call": false,
+  "input_tokens": 14,
+  "output_tokens": 14,
+  "request_id": "req-7f54ec39-895f-430e-bea6-266ea849f4be"
+}

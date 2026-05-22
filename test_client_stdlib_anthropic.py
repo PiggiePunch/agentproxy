@@ -14,8 +14,8 @@ from urllib.parse import urlparse
 # ============= 配置区域 =============
 # 从环境变量读取配置
 config = {
-    "api_key": os.getenv("ANTHROPIC_AUTH_TOKEN", "sk-t5EKVi3y8Mf5aiB27596ur1eQEXcquZDXmh6QWbrdZGHcHJ1"),
-    "model": os.getenv("ANTHROPIC_MODEL", "kimi-k2.5"),
+    "api_key": os.getenv("ANTHROPIC_AUTH_TOKEN", "09f83c3a74fb4895a3f5d2df722aab3a.2ke3ztItzBwcvOZz"),
+    "model": os.getenv("ANTHROPIC_MODEL", "glm-4.7"),
     # 通过代理连接（推荐）
     "base_url": os.getenv("ANTHROPIC_BASE_URL", "http://localhost:8000/v1"),
     # 如果直连 Moonshot，使用：

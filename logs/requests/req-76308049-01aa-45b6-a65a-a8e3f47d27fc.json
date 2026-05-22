@@ -1,0 +1,41 @@
+{
+  "request_id": "req-76308049-01aa-45b6-a65a-a8e3f47d27fc",
+  "timestamp": "2026-05-22T14:46:06.481641",
+  "headers": {
+    "Host": "localhost:8000",
+    "Accept-Encoding": "identity",
+    "Content-Length": "865",
+    "Authorization": "Bearer sk-ef89f69a45e4421e9ea8bd967812adba",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "deepseek-chat",
+    "messages": [
+      {
+        "role": "system",
+        "content": "你是一个有帮助的助手。"
+      },
+      {
+        "role": "user",
+        "content": "我的名字叫张三"
+      },
+      {
+        "role": "assistant",
+        "content": "你好，张三！很高兴认识你。有什么我可以帮你的吗？"
+      },
+      {
+        "role": "user",
+        "content": "我刚才说我叫什么名字？"
+      },
+      {
+        "role": "assistant",
+        "content": "你刚才说的名字是**张三**。需要我帮你记住这个名字，还是有什么其他事情想聊聊吗？"
+      },
+      {
+        "role": "user",
+        "content": "请给我推荐一本好书"
+      }
+    ],
+    "stream": false
+  }
+}

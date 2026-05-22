@@ -1,0 +1,21 @@
+{
+  "request_id": "req-aa4eb07f-aeb6-407b-97eb-54d47f6e4c8f",
+  "timestamp": "2026-05-22T14:57:33.693395",
+  "headers": {
+    "Host": "localhost:8000",
+    "Accept-Encoding": "identity",
+    "Content-Length": "168",
+    "Authorization": "Bearer sk-ef89f69a45e4421e9ea8bd967812adba",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "deepseek-chat",
+    "messages": [
+      {
+        "role": "user",
+        "content": "你好，请用一句话介绍你自己"
+      }
+    ],
+    "stream": false
+  }
+}

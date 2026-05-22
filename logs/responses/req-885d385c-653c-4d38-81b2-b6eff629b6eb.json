@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "4623d94c-5688-48e0-8ab4-75c5e08aa9e7",
+    "object": "chat.completion",
+    "created": 1779433739,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "你刚才说你的名字叫张三。😊"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 37,
+      "completion_tokens": 10,
+      "total_tokens": 47,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 37
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-22T15:08:59.846457"
+}

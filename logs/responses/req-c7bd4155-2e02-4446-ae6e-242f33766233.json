@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "735bf0b2-3981-4457-9249-6de48d599a53",
+    "object": "chat.completion",
+    "created": 1779431278,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "好的，张三！既然你是第一次向我提问，我想推荐一本既能引人深思又具有普世价值的小说——《百年孤独》。这是加西亚·马尔克斯的经典之作，讲述了一个家族七代人的故事，充满了魔幻现实主义的色彩。\n\n如果你偏爱非虚构类作品，尤瓦尔·赫拉利的《人类简史》也很不错，能帮你从宏观角度了解人类历史。\n\n你更喜欢哪种类型？或者有特别感兴趣的主题（比如科幻、心理学、哲学、推理等）吗？我可以根据你的兴趣再推荐更合适的书。"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 53,
+      "completion_tokens": 114,
+      "total_tokens": 167,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 53
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-22T14:28:00.380568"
+}

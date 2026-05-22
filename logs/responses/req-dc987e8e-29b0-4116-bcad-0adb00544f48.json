@@ -1,0 +1,649 @@
+{
+  "status_code": 200,
+  "body": {
+    "stream": true,
+    "status_code": 200,
+    "total_chunks": 106,
+    "total_bytes": 16474,
+    "timestamp": "2026-05-20T16:17:10.905233",
+    "chunks": [
+      {
+        "chunk_number": 1,
+        "size": 627,
+        "data": "event: message_start\ndata: {\"type\": \"message_start\", \"message\": {\"id\": \"msg_202605201617045974f15e459c4020\", \"type\": \"message\", \"role\": \"assistant\", \"model\": \"glm-4.7\", \"content\": [], \"stop_reason\": null, \"stop_sequence\": null, \"usage\": {\"input_tokens\": 0, \"output_tokens\": 0}}}\n\nevent: ping\ndata: {\"type\": \"ping\"}\n\nevent: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 0, \"content_block\": {\"type\": \"thinking\", \"thinking\": \"\", \"signature\": \"c770eda9880642e4bc68da7e\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779265029.0167964
+      },
+      {
+        "chunk_number": 2,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要求\"}}\n\n",
+        "timestamp": 1779265029.0769334
+      },
+      {
+        "chunk_number": 3,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"实时\"}}\n\n",
+        "timestamp": 1779265029.12026
+      },
+      {
+        "chunk_number": 4,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"天气\"}}\n\n",
+        "timestamp": 1779265029.1676624
+      },
+      {
+        "chunk_number": 5,
+        "size": 268,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"实\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"况\"}}\n\n",
+        "timestamp": 1779265029.1750495
+      },
+      {
+        "chunk_number": 6,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779265029.175306
+      },
+      {
+        "chunk_number": 7,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"我已经\"}}\n\n",
+        "timestamp": 1779265029.175473
+      },
+      {
+        "chunk_number": 8,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获取\"}}\n\n",
+        "timestamp": 1779265029.2159169
+      },
+      {
+        "chunk_number": 9,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"到了\"}}\n\n",
+        "timestamp": 1779265029.2167242
+      },
+      {
+        "chunk_number": 10,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"最新的\"}}\n\n",
+        "timestamp": 1779265029.2620792
+      },
+      {
+        "chunk_number": 11,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"数据\"}}\n\n",
+        "timestamp": 1779265029.266032
+      },
+      {
+        "chunk_number": 12,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779265029.3103952
+      },
+      {
+        "chunk_number": 13,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779265029.3176267
+      },
+      {
+        "chunk_number": 14,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用\"}}\n\n",
+        "timestamp": 1779265029.318406
+      },
+      {
+        "chunk_number": 15,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"中文\"}}\n\n",
+        "timestamp": 1779265029.360057
+      },
+      {
+        "chunk_number": 16,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"清晰地\"}}\n\n",
+        "timestamp": 1779265029.4071088
+      },
+      {
+        "chunk_number": 17,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"展示\"}}\n\n",
+        "timestamp": 1779265029.471328
+      },
+      {
+        "chunk_number": 18,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这些\"}}\n\n",
+        "timestamp": 1779265029.472026
+      },
+      {
+        "chunk_number": 19,
+        "size": 271,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信息\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779265029.5337973
+      },
+      {
+        "chunk_number": 20,
+        "size": 201,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 0}\n\nevent: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 1, \"content_block\": {\"type\": \"text\", \"text\": \"\"}}\n\n",
+        "timestamp": 1779265029.5341573
+      },
+      {
+        "chunk_number": 21,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"🌤\"}}\n\n",
+        "timestamp": 1779265029.5345566
+      },
+      {
+        "chunk_number": 22,
+        "size": 381,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"️\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"上海\"}}\n\n",
+        "timestamp": 1779265029.5641794
+      },
+      {
+        "chunk_number": 23,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"天气\"}}\n\n",
+        "timestamp": 1779265029.564553
+      },
+      {
+        "chunk_number": 24,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"实\"}}\n\n",
+        "timestamp": 1779265029.56479
+      },
+      {
+        "chunk_number": 25,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"况\"}}\n\n",
+        "timestamp": 1779265029.5652401
+      },
+      {
+        "chunk_number": 26,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265029.5989573
+      },
+      {
+        "chunk_number": 27,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779265029.5993729
+      },
+      {
+        "chunk_number": 28,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"实时\"}}\n\n",
+        "timestamp": 1779265029.6029177
+      },
+      {
+        "chunk_number": 29,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"更新\"}}\n\n",
+        "timestamp": 1779265029.6586096
+      },
+      {
+        "chunk_number": 30,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\\n\"}}\n\n",
+        "timestamp": 1779265029.659358
+      },
+      {
+        "chunk_number": 31,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265029.6600096
+      },
+      {
+        "chunk_number": 32,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"📍\"}}\n\n",
+        "timestamp": 1779265029.6833549
+      },
+      {
+        "chunk_number": 33,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 上海\"}}\n\n",
+        "timestamp": 1779265029.6858814
+      },
+      {
+        "chunk_number": 34,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\\n\"}}\n\n",
+        "timestamp": 1779265029.726379
+      },
+      {
+        "chunk_number": 35,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779265029.7331374
+      },
+      {
+        "chunk_number": 36,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779265029.7333646
+      },
+      {
+        "chunk_number": 37,
+        "size": 258,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"当前\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"温度\"}}\n\n",
+        "timestamp": 1779265029.7497141
+      },
+      {
+        "chunk_number": 38,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265029.7698102
+      },
+      {
+        "chunk_number": 39,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265029.7708962
+      },
+      {
+        "chunk_number": 40,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265029.7725313
+      },
+      {
+        "chunk_number": 41,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"24\"}}\n\n",
+        "timestamp": 1779265029.772863
+      },
+      {
+        "chunk_number": 42,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"°C\"}}\n\nevent: c",
+        "timestamp": 1779265029.7759285
+      },
+      {
+        "chunk_number": 43,
+        "size": 118,
+        "data": "ontent_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779265029.7762303
+      },
+      {
+        "chunk_number": 44,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"体\"}}\n\n",
+        "timestamp": 1779265029.8169763
+      },
+      {
+        "chunk_number": 45,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"感\"}}\n\n",
+        "timestamp": 1779265029.8175156
+      },
+      {
+        "chunk_number": 46,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265029.8179772
+      },
+      {
+        "chunk_number": 47,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"26\"}}\n\n",
+        "timestamp": 1779265029.8183756
+      },
+      {
+        "chunk_number": 48,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"°C\"}}\n\n",
+        "timestamp": 1779265029.8188183
+      },
+      {
+        "chunk_number": 49,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\"}}\n\n",
+        "timestamp": 1779265029.8194482
+      },
+      {
+        "chunk_number": 50,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779265029.8599355
+      },
+      {
+        "chunk_number": 51,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779265029.8604255
+      },
+      {
+        "chunk_number": 52,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"天气\"}}\n\n",
+        "timestamp": 1779265029.861086
+      },
+      {
+        "chunk_number": 53,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"状况\"}}\n\n",
+        "timestamp": 1779265029.8616107
+      },
+      {
+        "chunk_number": 54,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265029.8994374
+      },
+      {
+        "chunk_number": 55,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265029.90127
+      },
+      {
+        "chunk_number": 56,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265029.9043462
+      },
+      {
+        "chunk_number": 57,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"☁\"}}\n\n",
+        "timestamp": 1779265029.9050748
+      },
+      {
+        "chunk_number": 58,
+        "size": 250,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"️\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265029.9089723
+      },
+      {
+        "chunk_number": 59,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"阴\"}}\n\n",
+        "timestamp": 1779265029.9507275
+      },
+      {
+        "chunk_number": 60,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"天\"}}\n\n",
+        "timestamp": 1779265029.9513674
+      },
+      {
+        "chunk_number": 61,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779265029.988736
+      },
+      {
+        "chunk_number": 62,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779265029.9893541
+      },
+      {
+        "chunk_number": 63,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779265029.9898214
+      },
+      {
+        "chunk_number": 64,
+        "size": 258,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"风速\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"风向\"}}\n\n",
+        "timestamp": 1779265029.9978526
+      },
+      {
+        "chunk_number": 65,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265030.0315897
+      },
+      {
+        "chunk_number": 66,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265030.0344734
+      },
+      {
+        "chunk_number": 67,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" →\"}}\n\n",
+        "timestamp": 1779265030.0388718
+      },
+      {
+        "chunk_number": 68,
+        "size": 374,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"9\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" km\"}}\n\n",
+        "timestamp": 1779265030.076441
+      },
+      {
+        "chunk_number": 69,
+        "size": 374,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"/h\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779265030.077049
+      },
+      {
+        "chunk_number": 70,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779265030.1295743
+      },
+      {
+        "chunk_number": 71,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"相对\"}}\n\n",
+        "timestamp": 1779265030.129809
+      },
+      {
+        "chunk_number": 72,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"湿度\"}}\n\n",
+        "timestamp": 1779265030.154644
+      },
+      {
+        "chunk_number": 73,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265030.1548672
+      },
+      {
+        "chunk_number": 74,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265030.1550407
+      },
+      {
+        "chunk_number": 75,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265030.1551921
+      },
+      {
+        "chunk_number": 76,
+        "size": 251,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"81\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"%\\n\"}}\n\n",
+        "timestamp": 1779265030.1568875
+      },
+      {
+        "chunk_number": 77,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779265030.1902592
+      },
+      {
+        "chunk_number": 78,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779265030.1936734
+      },
+      {
+        "chunk_number": 79,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"降水量\"}}\n\n",
+        "timestamp": 1779265030.195495
+      },
+      {
+        "chunk_number": 80,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265030.2326772
+      },
+      {
+        "chunk_number": 81,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265030.2329898
+      },
+      {
+        "chunk_number": 82,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779265030.2331607
+      },
+      {
+        "chunk_number": 83,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"0\"}}\n\n",
+        "timestamp": 1779265030.2332778
+      },
+      {
+        "chunk_number": 84,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\n",
+        "timestamp": 1779265030.2391844
+      },
+      {
+        "chunk_number": 85,
+        "size": 630,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"0\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"mm\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"无\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"降水\"}}\n\n",
+        "timestamp": 1779265030.289424
+      },
+      {
+        "chunk_number": 86,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\\n\"}}\n\n",
+        "timestamp": 1779265030.315304
+      },
+      {
+        "chunk_number": 87,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265030.3174298
+      },
+      {
+        "chunk_number": 88,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"整体\"}}\n\n",
+        "timestamp": 1779265030.317629
+      },
+      {
+        "chunk_number": 89,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"感受\"}}\n\n",
+        "timestamp": 1779265030.3494332
+      },
+      {
+        "chunk_number": 90,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779265030.3497245
+      },
+      {
+        "chunk_number": 91,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779265030.3569407
+      },
+      {
+        "chunk_number": 92,
+        "size": 250,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"阴\"}}\n\n",
+        "timestamp": 1779265030.357294
+      },
+      {
+        "chunk_number": 93,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"天\"}}\n\n",
+        "timestamp": 1779265030.545979
+      },
+      {
+        "chunk_number": 94,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"较\"}}\n\n",
+        "timestamp": 1779265030.5465803
+      },
+      {
+        "chunk_number": 95,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"闷\"}}\n\n",
+        "timestamp": 1779265030.5811985
+      },
+      {
+        "chunk_number": 96,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热\"}}\n\n",
+        "timestamp": 1779265030.5824366
+      },
+      {
+        "chunk_number": 97,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"，\"}}\n\n",
+        "timestamp": 1779265030.5912988
+      },
+      {
+        "chunk_number": 98,
+        "size": 258,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"湿度\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"较高\"}}\n\n",
+        "timestamp": 1779265030.591829
+      },
+      {
+        "chunk_number": 99,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"，\"}}\n\n",
+        "timestamp": 1779265030.5922887
+      },
+      {
+        "chunk_number": 100,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"建议\"}}\n\n",
+        "timestamp": 1779265030.6213202
+      },
+      {
+        "chunk_number": 101,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"适当\"}}\n\n",
+        "timestamp": 1779265030.6645706
+      },
+      {
+        "chunk_number": 102,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"补水\"}}\n\n",
+        "timestamp": 1779265030.704918
+      },
+      {
+        "chunk_number": 103,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"。\"}}\n\n",
+        "timestamp": 1779265030.897504
+      },
+      {
+        "chunk_number": 104,
+        "size": 76,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 1}\n\n",
+        "timestamp": 1779265030.899801
+      },
+      {
+        "chunk_number": 105,
+        "size": 279,
+        "data": "event: message_delta\ndata: {\"type\": \"message_delta\", \"delta\": {\"stop_reason\": \"end_turn\", \"stop_sequence\": null}, \"usage\": {\"input_tokens\": 25915, \"output_tokens\": 127, \"cache_read_input_tokens\": 1216, \"server_tool_use\": {\"web_search_requests\": 0}, \"service_tier\": \"standard\"}}\n\n",
+        "timestamp": 1779265030.9019554
+      },
+      {
+        "chunk_number": 106,
+        "size": 52,
+        "data": "event: message_stop\ndata: {\"type\": \"message_stop\"}\n\n",
+        "timestamp": 1779265030.902623
+      }
+    ]
+  },
+  "timestamp": "2026-05-20T16:17:10.905252"
+}

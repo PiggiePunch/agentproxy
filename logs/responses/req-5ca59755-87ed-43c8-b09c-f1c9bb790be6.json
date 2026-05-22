@@ -1,0 +1,32 @@
+{
+  "status_code": 200,
+  "body": {
+    "id": "d07380d9-8f80-4e8a-9083-5459cbad6f0f",
+    "object": "chat.completion",
+    "created": 1779431753,
+    "model": "deepseek-v4-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "你好！我是DeepSeek，由深度求索公司创造的AI助手，擅长回答各种问题、提供创意灵感、处理文档信息并支持联网搜索，乐于用热情细腻的方式为你提供帮助！"
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 11,
+      "completion_tokens": 42,
+      "total_tokens": 53,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 11
+    },
+    "system_fingerprint": "fp_8b330d02d0_prod0820_fp8_kvcache_20260402"
+  },
+  "timestamp": "2026-05-22T14:35:53.951019"
+}

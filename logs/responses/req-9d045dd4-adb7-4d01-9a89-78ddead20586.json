@@ -1,0 +1,12 @@
+{
+  "status_code": 200,
+  "body": {
+    "stream": true,
+    "status_code": 200,
+    "total_chunks": 127,
+    "total_bytes": 19839,
+    "timestamp": 1779430374.4994788,
+    "chunks": []
+  },
+  "timestamp": "2026-05-22T14:12:54.499506"
+}

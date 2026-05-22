@@ -1,0 +1,3031 @@
+{
+  "status_code": 200,
+  "body": {
+    "stream": true,
+    "status_code": 200,
+    "total_chunks": 503,
+    "total_bytes": 72291,
+    "timestamp": "2026-05-20T16:45:46.547168",
+    "chunks": [
+      {
+        "chunk_number": 1,
+        "size": 627,
+        "data": "event: message_start\ndata: {\"type\": \"message_start\", \"message\": {\"id\": \"msg_20260520164519a1ade259887d4c4d\", \"type\": \"message\", \"role\": \"assistant\", \"model\": \"glm-4.7\", \"content\": [], \"stop_reason\": null, \"stop_sequence\": null, \"usage\": {\"input_tokens\": 0, \"output_tokens\": 0}}}\n\nevent: ping\ndata: {\"type\": \"ping\"}\n\nevent: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 0, \"content_block\": {\"type\": \"thinking\", \"thinking\": \"\", \"signature\": \"8d6c7ea648ae44df82ae5fef\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这个\"}}\n\n",
+        "timestamp": 1779266721.2171443
+      },
+      {
+        "chunk_number": 2,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"aut\"}}\n\n",
+        "timestamp": 1779266721.5139856
+      },
+      {
+        "chunk_number": 3,
+        "size": 405,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"og\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"lm\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-browser\"}}\n\n",
+        "timestamp": 1779266721.5498738
+      },
+      {
+        "chunk_number": 4,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-agent\"}}\n\n",
+        "timestamp": 1779266721.5501015
+      },
+      {
+        "chunk_number": 5,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"技能\"}}\n\n",
+        "timestamp": 1779266721.550269
+      },
+      {
+        "chunk_number": 6,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"看起来\"}}\n\n",
+        "timestamp": 1779266721.5503936
+      },
+      {
+        "chunk_number": 7,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"非常\"}}\n\n",
+        "timestamp": 1779266721.550547
+      },
+      {
+        "chunk_number": 8,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"复杂\"}}\n\n",
+        "timestamp": 1779266721.5582328
+      },
+      {
+        "chunk_number": 9,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266722.0655432
+      },
+      {
+        "chunk_number": 10,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779266722.0663493
+      },
+      {
+        "chunk_number": 11,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"很多\"}}\n\n",
+        "timestamp": 1779266722.0670617
+      },
+      {
+        "chunk_number": 12,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"前置\"}}\n\n",
+        "timestamp": 1779266722.0677927
+      },
+      {
+        "chunk_number": 13,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266722.068606
+      },
+      {
+        "chunk_number": 14,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779266722.4018614
+      },
+      {
+        "chunk_number": 15,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779266722.499616
+      },
+      {
+        "chunk_number": 16,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"分析\"}}\n\n",
+        "timestamp": 1779266722.5003967
+      },
+      {
+        "chunk_number": 17,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"一下\"}}\n\n",
+        "timestamp": 1779266722.593014
+      },
+      {
+        "chunk_number": 18,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"：\\n\\n\"}}\n\n",
+        "timestamp": 1779266722.6023743
+      },
+      {
+        "chunk_number": 19,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"1\"}}\n\n",
+        "timestamp": 1779266722.603245
+      },
+      {
+        "chunk_number": 20,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266722.6061027
+      },
+      {
+        "chunk_number": 21,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\n",
+        "timestamp": 1779266722.6084867
+      },
+      {
+        "chunk_number": 22,
+        "size": 268,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\n",
+        "timestamp": 1779266722.8785233
+      },
+      {
+        "chunk_number": 23,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"检查\"}}\n\n",
+        "timestamp": 1779266722.8854735
+      },
+      {
+        "chunk_number": 24,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"和\"}}\n\n",
+        "timestamp": 1779266722.8895435
+      },
+      {
+        "chunk_number": 25,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"配置\"}}\n\n",
+        "timestamp": 1779266722.8898022
+      },
+      {
+        "chunk_number": 26,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"浏览器\"}}\n\n",
+        "timestamp": 1779266722.890118
+      },
+      {
+        "chunk_number": 27,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"偏好\"}}\n\n",
+        "timestamp": 1779266722.923914
+      },
+      {
+        "chunk_number": 28,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"（\"}}\n\n",
+        "timestamp": 1779266722.9247913
+      },
+      {
+        "chunk_number": 29,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"Chrome\"}}\n\n",
+        "timestamp": 1779266722.9864874
+      },
+      {
+        "chunk_number": 30,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"/\"}}\n\n",
+        "timestamp": 1779266723.09481
+      },
+      {
+        "chunk_number": 31,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"Edge\"}}\n\n",
+        "timestamp": 1779266723.0958376
+      },
+      {
+        "chunk_number": 32,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"）\\n\"}}\n\n",
+        "timestamp": 1779266723.0965765
+      },
+      {
+        "chunk_number": 33,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"2\"}}\n\n",
+        "timestamp": 1779266723.0975108
+      },
+      {
+        "chunk_number": 34,
+        "size": 264,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\n",
+        "timestamp": 1779266723.0985425
+      },
+      {
+        "chunk_number": 35,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需\"}}\n\n",
+        "timestamp": 1779266723.21241
+      },
+      {
+        "chunk_number": 36,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\n",
+        "timestamp": 1779266723.2133384
+      },
+      {
+        "chunk_number": 37,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"安装\"}}\n\n",
+        "timestamp": 1779266723.2189417
+      },
+      {
+        "chunk_number": 38,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"M\"}}\n\n",
+        "timestamp": 1779266723.2972765
+      },
+      {
+        "chunk_number": 39,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"CP\"}}\n\n",
+        "timestamp": 1779266723.4132984
+      },
+      {
+        "chunk_number": 40,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"服务器\"}}\n\n",
+        "timestamp": 1779266723.4142895
+      },
+      {
+        "chunk_number": 41,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\"}}\n\n",
+        "timestamp": 1779266723.5200403
+      },
+      {
+        "chunk_number": 42,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"3\"}}\n\n",
+        "timestamp": 1779266723.521401
+      },
+      {
+        "chunk_number": 43,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266723.5222745
+      },
+      {
+        "chunk_number": 44,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\n",
+        "timestamp": 1779266723.5231438
+      },
+      {
+        "chunk_number": 45,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需\"}}\n\n",
+        "timestamp": 1779266723.5238693
+      },
+      {
+        "chunk_number": 46,
+        "size": 271,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"安装\"}}\n\n",
+        "timestamp": 1779266723.5813916
+      },
+      {
+        "chunk_number": 47,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"浏览器\"}}\n\n",
+        "timestamp": 1779266723.5816836
+      },
+      {
+        "chunk_number": 48,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"扩展\"}}\n\n",
+        "timestamp": 1779266723.5818949
+      },
+      {
+        "chunk_number": 49,
+        "size": 265,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"4\"}}\n\n",
+        "timestamp": 1779266723.5821261
+      },
+      {
+        "chunk_number": 50,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266723.6867929
+      },
+      {
+        "chunk_number": 51,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\n",
+        "timestamp": 1779266723.7137542
+      },
+      {
+        "chunk_number": 52,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需\"}}\n\n",
+        "timestamp": 1779266723.7143583
+      },
+      {
+        "chunk_number": 53,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\n",
+        "timestamp": 1779266723.7150376
+      },
+      {
+        "chunk_number": 54,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"启动\"}}\n\n",
+        "timestamp": 1779266723.715764
+      },
+      {
+        "chunk_number": 55,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"relay\"}}\n\n",
+        "timestamp": 1779266723.7658865
+      },
+      {
+        "chunk_number": 56,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"守护\"}}\n\n",
+        "timestamp": 1779266723.7731185
+      },
+      {
+        "chunk_number": 57,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"进程\"}}\n\n",
+        "timestamp": 1779266723.8497148
+      },
+      {
+        "chunk_number": 58,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\"}}\n\n",
+        "timestamp": 1779266723.8526762
+      },
+      {
+        "chunk_number": 59,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"5\"}}\n\n",
+        "timestamp": 1779266723.8603594
+      },
+      {
+        "chunk_number": 60,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266723.8610845
+      },
+      {
+        "chunk_number": 61,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\n",
+        "timestamp": 1779266723.86177
+      },
+      {
+        "chunk_number": 62,
+        "size": 268,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\n",
+        "timestamp": 1779266723.953181
+      },
+      {
+        "chunk_number": 63,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"配置\"}}\n\n",
+        "timestamp": 1779266723.991161
+      },
+      {
+        "chunk_number": 64,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信任\"}}\n\n",
+        "timestamp": 1779266724.0259883
+      },
+      {
+        "chunk_number": 65,
+        "size": 272,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"模式\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\\n\"}}\n\n",
+        "timestamp": 1779266724.1120358
+      },
+      {
+        "chunk_number": 66,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这对于\"}}\n\n",
+        "timestamp": 1779266724.1134698
+      },
+      {
+        "chunk_number": 67,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"一个\"}}\n\n",
+        "timestamp": 1779266724.176842
+      },
+      {
+        "chunk_number": 68,
+        "size": 273,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"简单的\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\\"\"}}\n\n",
+        "timestamp": 1779266724.5315158
+      },
+      {
+        "chunk_number": 69,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"查询\"}}\n\n",
+        "timestamp": 1779266724.5317948
+      },
+      {
+        "chunk_number": 70,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"热点\"}}\n\n",
+        "timestamp": 1779266724.5319545
+      },
+      {
+        "chunk_number": 71,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信息\"}}\n\n",
+        "timestamp": 1779266724.5321178
+      },
+      {
+        "chunk_number": 72,
+        "size": 270,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\\"\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"请求\"}}\n\n",
+        "timestamp": 1779266724.5322368
+      },
+      {
+        "chunk_number": 73,
+        "size": 271,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"来说\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266724.5323565
+      },
+      {
+        "chunk_number": 74,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"太\"}}\n\n",
+        "timestamp": 1779266724.532536
+      },
+      {
+        "chunk_number": 75,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"复杂\"}}\n\n",
+        "timestamp": 1779266724.948347
+      },
+      {
+        "chunk_number": 76,
+        "size": 405,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"了\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"而且\"}}\n\n",
+        "timestamp": 1779266724.9491644
+      },
+      {
+        "chunk_number": 77,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这些\"}}\n\n",
+        "timestamp": 1779266725.0058708
+      },
+      {
+        "chunk_number": 78,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266725.107209
+      },
+      {
+        "chunk_number": 79,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779266725.191129
+      },
+      {
+        "chunk_number": 80,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779266725.555294
+      },
+      {
+        "chunk_number": 81,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"手动\"}}\n\n",
+        "timestamp": 1779266725.5561414
+      },
+      {
+        "chunk_number": 82,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"操作\"}}\n\n",
+        "timestamp": 1779266725.5572174
+      },
+      {
+        "chunk_number": 83,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266725.5581717
+      },
+      {
+        "chunk_number": 84,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"我不能\"}}\n\n",
+        "timestamp": 1779266725.5591204
+      },
+      {
+        "chunk_number": 85,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"自动\"}}\n\n",
+        "timestamp": 1779266726.0222814
+      },
+      {
+        "chunk_number": 86,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"完成\"}}\n\n",
+        "timestamp": 1779266726.1084375
+      },
+      {
+        "chunk_number": 87,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\\n\\n\"}}\n\n",
+        "timestamp": 1779266726.109441
+      },
+      {
+        "chunk_number": 88,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779266726.1101975
+      },
+      {
+        "chunk_number": 89,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"重新\"}}\n\n",
+        "timestamp": 1779266726.1110966
+      },
+      {
+        "chunk_number": 90,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"考虑\"}}\n\n",
+        "timestamp": 1779266726.111777
+      },
+      {
+        "chunk_number": 91,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"一下\"}}\n\n",
+        "timestamp": 1779266726.1125784
+      },
+      {
+        "chunk_number": 92,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"：\\n\"}}\n\n",
+        "timestamp": 1779266726.16948
+      },
+      {
+        "chunk_number": 93,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-\"}}\n\n",
+        "timestamp": 1779266726.2661183
+      },
+      {
+        "chunk_number": 94,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" web\"}}\n\n",
+        "timestamp": 1779266726.2672384
+      },
+      {
+        "chunk_number": 95,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"_search\"}}\n\n",
+        "timestamp": 1779266726.2679648
+      },
+      {
+        "chunk_number": 96,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"工具\"}}\n\n",
+        "timestamp": 1779266726.2687135
+      },
+      {
+        "chunk_number": 97,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"不可\"}}\n\n",
+        "timestamp": 1779266726.342045
+      },
+      {
+        "chunk_number": 98,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用\"}}\n\n",
+        "timestamp": 1779266726.4299738
+      },
+      {
+        "chunk_number": 99,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"（\"}}\n\n",
+        "timestamp": 1779266726.4324505
+      },
+      {
+        "chunk_number": 100,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"认证\"}}\n\n",
+        "timestamp": 1779266726.4348667
+      },
+      {
+        "chunk_number": 101,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"错误\"}}\n\n",
+        "timestamp": 1779266726.529081
+      },
+      {
+        "chunk_number": 102,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"）\\n\"}}\n\n",
+        "timestamp": 1779266726.5298886
+      },
+      {
+        "chunk_number": 103,
+        "size": 267,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" aut\"}}\n\n",
+        "timestamp": 1779266726.5306327
+      },
+      {
+        "chunk_number": 104,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"og\"}}\n\n",
+        "timestamp": 1779266726.601792
+      },
+      {
+        "chunk_number": 105,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"lm\"}}\n\n",
+        "timestamp": 1779266726.6048148
+      },
+      {
+        "chunk_number": 106,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-web\"}}\n\n",
+        "timestamp": 1779266726.6120455
+      },
+      {
+        "chunk_number": 107,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"search\"}}\n\n",
+        "timestamp": 1779266726.612964
+      },
+      {
+        "chunk_number": 108,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779266726.615232
+      },
+      {
+        "chunk_number": 109,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"本地\"}}\n\n",
+        "timestamp": 1779266726.6908946
+      },
+      {
+        "chunk_number": 110,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"token\"}}\n\n",
+        "timestamp": 1779266726.6917093
+      },
+      {
+        "chunk_number": 111,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"服务\"}}\n\n",
+        "timestamp": 1779266726.6975174
+      },
+      {
+        "chunk_number": 112,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"（\"}}\n\n",
+        "timestamp": 1779266726.6987185
+      },
+      {
+        "chunk_number": 113,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"未\"}}\n\n",
+        "timestamp": 1779266726.7887268
+      },
+      {
+        "chunk_number": 114,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"运行\"}}\n\n",
+        "timestamp": 1779266726.7898805
+      },
+      {
+        "chunk_number": 115,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"）\\n\"}}\n\n",
+        "timestamp": 1779266726.7908459
+      },
+      {
+        "chunk_number": 116,
+        "size": 267,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" aut\"}}\n\n",
+        "timestamp": 1779266726.7918262
+      },
+      {
+        "chunk_number": 117,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"og\"}}\n\n",
+        "timestamp": 1779266726.8642273
+      },
+      {
+        "chunk_number": 118,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"lm\"}}\n\n",
+        "timestamp": 1779266726.8722496
+      },
+      {
+        "chunk_number": 119,
+        "size": 139,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-browser\"}}\n\n",
+        "timestamp": 1779266726.8739522
+      },
+      {
+        "chunk_number": 120,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"-agent\"}}\n\n",
+        "timestamp": 1779266726.8749156
+      },
+      {
+        "chunk_number": 121,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779266726.9024947
+      },
+      {
+        "chunk_number": 122,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"复杂\"}}\n\n",
+        "timestamp": 1779266726.903516
+      },
+      {
+        "chunk_number": 123,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的前\"}}\n\n",
+        "timestamp": 1779266726.9637249
+      },
+      {
+        "chunk_number": 124,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"置\"}}\n\n",
+        "timestamp": 1779266726.9646974
+      },
+      {
+        "chunk_number": 125,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266726.9655275
+      },
+      {
+        "chunk_number": 126,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\\n\"}}\n\n",
+        "timestamp": 1779266726.9661672
+      },
+      {
+        "chunk_number": 127,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"目前\"}}\n\n",
+        "timestamp": 1779266726.9988537
+      },
+      {
+        "chunk_number": 128,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"看来\"}}\n\n",
+        "timestamp": 1779266727.0477238
+      },
+      {
+        "chunk_number": 129,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266727.1296608
+      },
+      {
+        "chunk_number": 130,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这些\"}}\n\n",
+        "timestamp": 1779266727.130608
+      },
+      {
+        "chunk_number": 131,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"工具\"}}\n\n",
+        "timestamp": 1779266727.2145507
+      },
+      {
+        "chunk_number": 132,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"都\"}}\n\n",
+        "timestamp": 1779266727.2196298
+      },
+      {
+        "chunk_number": 133,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"不可\"}}\n\n",
+        "timestamp": 1779266727.300673
+      },
+      {
+        "chunk_number": 134,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用\"}}\n\n",
+        "timestamp": 1779266727.3893862
+      },
+      {
+        "chunk_number": 135,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"或者\"}}\n\n",
+        "timestamp": 1779266727.3931735
+      },
+      {
+        "chunk_number": 136,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"需要\"}}\n\n",
+        "timestamp": 1779266727.4917295
+      },
+      {
+        "chunk_number": 137,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"额外的\"}}\n\n",
+        "timestamp": 1779266727.49249
+      },
+      {
+        "chunk_number": 138,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266727.5786452
+      },
+      {
+        "chunk_number": 139,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\\n\\n\"}}\n\n",
+        "timestamp": 1779266727.6571836
+      },
+      {
+        "chunk_number": 140,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"但我\"}}\n\n",
+        "timestamp": 1779266727.748854
+      },
+      {
+        "chunk_number": 141,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"注意到\"}}\n\n",
+        "timestamp": 1779266727.8522084
+      },
+      {
+        "chunk_number": 142,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779266727.9336019
+      },
+      {
+        "chunk_number": 143,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"是在\"}}\n\n",
+        "timestamp": 1779266727.9396005
+      },
+      {
+        "chunk_number": 144,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"通过\"}}\n\n",
+        "timestamp": 1779266728.0311158
+      },
+      {
+        "chunk_number": 145,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"web\"}}\n\n",
+        "timestamp": 1779266728.0988557
+      },
+      {
+        "chunk_number": 146,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"chat\"}}\n\n",
+        "timestamp": 1779266728.1003034
+      },
+      {
+        "chunk_number": 147,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"界面\"}}\n\n",
+        "timestamp": 1779266728.1011717
+      },
+      {
+        "chunk_number": 148,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"与我\"}}\n\n",
+        "timestamp": 1779266728.106525
+      },
+      {
+        "chunk_number": 149,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"交互\"}}\n\n",
+        "timestamp": 1779266728.1831374
+      },
+      {
+        "chunk_number": 150,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266728.1842604
+      },
+      {
+        "chunk_number": 151,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这可能\"}}\n\n",
+        "timestamp": 1779266728.1849234
+      },
+      {
+        "chunk_number": 152,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"意味着\"}}\n\n",
+        "timestamp": 1779266728.2582629
+      },
+      {
+        "chunk_number": 153,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"：\\n\"}}\n\n",
+        "timestamp": 1779266728.3363566
+      },
+      {
+        "chunk_number": 154,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"1\"}}\n\n",
+        "timestamp": 1779266728.4193938
+      },
+      {
+        "chunk_number": 155,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266728.4198012
+      },
+      {
+        "chunk_number": 156,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" 用户\"}}\n\n",
+        "timestamp": 1779266728.4221537
+      },
+      {
+        "chunk_number": 157,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"可能\"}}\n\n",
+        "timestamp": 1779266728.4962013
+      },
+      {
+        "chunk_number": 158,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"想要\"}}\n\n",
+        "timestamp": 1779266728.5047307
+      },
+      {
+        "chunk_number": 159,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"直接\"}}\n\n",
+        "timestamp": 1779266728.57443
+      },
+      {
+        "chunk_number": 160,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获得\"}}\n\n",
+        "timestamp": 1779266728.6546626
+      },
+      {
+        "chunk_number": 161,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"热点\"}}\n\n",
+        "timestamp": 1779266728.73827
+      },
+      {
+        "chunk_number": 162,
+        "size": 270,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信息\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\"}}\n\n",
+        "timestamp": 1779266728.8296292
+      },
+      {
+        "chunk_number": 163,
+        "size": 264,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"2\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266728.8309546
+      },
+      {
+        "chunk_number": 164,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" 或者\"}}\n\n",
+        "timestamp": 1779266728.8317316
+      },
+      {
+        "chunk_number": 165,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779266728.8972235
+      },
+      {
+        "chunk_number": 166,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"可能\"}}\n\n",
+        "timestamp": 1779266729.3561046
+      },
+      {
+        "chunk_number": 167,
+        "size": 271,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"希望\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"我\"}}\n\n",
+        "timestamp": 1779266729.3576274
+      },
+      {
+        "chunk_number": 168,
+        "size": 274,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"帮助\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266729.3620646
+      },
+      {
+        "chunk_number": 169,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这些\"}}\n\n",
+        "timestamp": 1779266729.362653
+      },
+      {
+        "chunk_number": 170,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"工具\"}}\n\n",
+        "timestamp": 1779266729.363099
+      },
+      {
+        "chunk_number": 171,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\\n\"}}\n\n",
+        "timestamp": 1779266729.3636827
+      },
+      {
+        "chunk_number": 172,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779266729.364261
+      },
+      {
+        "chunk_number": 173,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"尝试\"}}\n\n",
+        "timestamp": 1779266729.364754
+      },
+      {
+        "chunk_number": 174,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"一个\"}}\n\n",
+        "timestamp": 1779266729.3780787
+      },
+      {
+        "chunk_number": 175,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"更\"}}\n\n",
+        "timestamp": 1779266729.4613323
+      },
+      {
+        "chunk_number": 176,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"简单\"}}\n\n",
+        "timestamp": 1779266729.462078
+      },
+      {
+        "chunk_number": 177,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的方法\"}}\n\n",
+        "timestamp": 1779266729.4628217
+      },
+      {
+        "chunk_number": 178,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" -\"}}\n\n",
+        "timestamp": 1779266729.4635835
+      },
+      {
+        "chunk_number": 179,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" 直接\"}}\n\n",
+        "timestamp": 1779266729.8316958
+      },
+      {
+        "chunk_number": 180,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"使用\"}}\n\n",
+        "timestamp": 1779266729.832661
+      },
+      {
+        "chunk_number": 181,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"curl\"}}\n\n",
+        "timestamp": 1779266729.8691638
+      },
+      {
+        "chunk_number": 182,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"或\"}}\n\n",
+        "timestamp": 1779266729.904908
+      },
+      {
+        "chunk_number": 183,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"类似的\"}}\n\n",
+        "timestamp": 1779266729.988964
+      },
+      {
+        "chunk_number": 184,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"工具\"}}\n\n",
+        "timestamp": 1779266730.0689256
+      },
+      {
+        "chunk_number": 185,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"从\"}}\n\n",
+        "timestamp": 1779266730.0697708
+      },
+      {
+        "chunk_number": 186,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"公开\"}}\n\n",
+        "timestamp": 1779266730.1564548
+      },
+      {
+        "chunk_number": 187,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的热\"}}\n\n",
+        "timestamp": 1779266730.2624362
+      },
+      {
+        "chunk_number": 188,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"搜\"}}\n\n",
+        "timestamp": 1779266730.3348994
+      },
+      {
+        "chunk_number": 189,
+        "size": 182,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"API\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"conte",
+        "timestamp": 1779266730.4476447
+      },
+      {
+        "chunk_number": 190,
+        "size": 89,
+        "data": "nt_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获取\"}}\n\n",
+        "timestamp": 1779266730.448469
+      },
+      {
+        "chunk_number": 191,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"数据\"}}\n\n",
+        "timestamp": 1779266730.4489756
+      },
+      {
+        "chunk_number": 192,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\"}}\n\n",
+        "timestamp": 1779266730.5056472
+      },
+      {
+        "chunk_number": 193,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"例如\"}}\n\n",
+        "timestamp": 1779266730.5066235
+      },
+      {
+        "chunk_number": 194,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266730.589545
+      },
+      {
+        "chunk_number": 195,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"微博\"}}\n\n",
+        "timestamp": 1779266730.5931146
+      },
+      {
+        "chunk_number": 196,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"热搜\"}}\n\n",
+        "timestamp": 1779266730.5984597
+      },
+      {
+        "chunk_number": 197,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"、\"}}\n\n",
+        "timestamp": 1779266730.6067514
+      },
+      {
+        "chunk_number": 198,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"百度\"}}\n\n",
+        "timestamp": 1779266730.7125082
+      },
+      {
+        "chunk_number": 199,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"热搜\"}}\n\n",
+        "timestamp": 1779266730.7133894
+      },
+      {
+        "chunk_number": 200,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"等\"}}\n\n",
+        "timestamp": 1779266730.793501
+      },
+      {
+        "chunk_number": 201,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"都有\"}}\n\n",
+        "timestamp": 1779266730.8041875
+      },
+      {
+        "chunk_number": 202,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"公开\"}}\n\n",
+        "timestamp": 1779266730.8605118
+      },
+      {
+        "chunk_number": 203,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的\"}}\n\n",
+        "timestamp": 1779266730.8732727
+      },
+      {
+        "chunk_number": 204,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"API\"}}\n\n",
+        "timestamp": 1779266730.8739736
+      },
+      {
+        "chunk_number": 205,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"或者\"}}\n\n",
+        "timestamp": 1779266730.8761878
+      },
+      {
+        "chunk_number": 206,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"可以\"}}\n\n",
+        "timestamp": 1779266730.9445007
+      },
+      {
+        "chunk_number": 207,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"爬\"}}\n\n",
+        "timestamp": 1779266730.9450135
+      },
+      {
+        "chunk_number": 208,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"取\"}}\n\n",
+        "timestamp": 1779266731.0272348
+      },
+      {
+        "chunk_number": 209,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的数据\"}}\n\n",
+        "timestamp": 1779266731.027997
+      },
+      {
+        "chunk_number": 210,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"。\\n\\n\"}}\n\n",
+        "timestamp": 1779266731.109694
+      },
+      {
+        "chunk_number": 211,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"不过\"}}\n\n",
+        "timestamp": 1779266731.1130462
+      },
+      {
+        "chunk_number": 212,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266731.1159058
+      },
+      {
+        "chunk_number": 213,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"让我\"}}\n\n",
+        "timestamp": 1779266731.11829
+      },
+      {
+        "chunk_number": 214,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"先\"}}\n\n",
+        "timestamp": 1779266731.1806834
+      },
+      {
+        "chunk_number": 215,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"向\"}}\n\n",
+        "timestamp": 1779266731.1826634
+      },
+      {
+        "chunk_number": 216,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"用户\"}}\n\n",
+        "timestamp": 1779266731.260304
+      },
+      {
+        "chunk_number": 217,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"说明\"}}\n\n",
+        "timestamp": 1779266731.2654111
+      },
+      {
+        "chunk_number": 218,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"当前\"}}\n\n",
+        "timestamp": 1779266731.2738578
+      },
+      {
+        "chunk_number": 219,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的情况\"}}\n\n",
+        "timestamp": 1779266731.3405318
+      },
+      {
+        "chunk_number": 220,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"，\"}}\n\n",
+        "timestamp": 1779266731.3479717
+      },
+      {
+        "chunk_number": 221,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"看看\"}}\n\n",
+        "timestamp": 1779266731.3555112
+      },
+      {
+        "chunk_number": 222,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"他们\"}}\n\n",
+        "timestamp": 1779266731.41992
+      },
+      {
+        "chunk_number": 223,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"是否\"}}\n\n",
+        "timestamp": 1779266731.5100992
+      },
+      {
+        "chunk_number": 224,
+        "size": 136,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"：\\n\"}}\n\n",
+        "timestamp": 1779266731.5107155
+      },
+      {
+        "chunk_number": 225,
+        "size": 150,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"1\"}}\n\nevent: content_blo",
+        "timestamp": 1779266731.5946183
+      },
+      {
+        "chunk_number": 226,
+        "size": 114,
+        "data": "ck_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266731.595266
+      },
+      {
+        "chunk_number": 227,
+        "size": 266,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" \"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"想\"}}\n\n",
+        "timestamp": 1779266731.595835
+      },
+      {
+        "chunk_number": 228,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"要\"}}\n\n",
+        "timestamp": 1779266731.596593
+      },
+      {
+        "chunk_number": 229,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"帮助\"}}\n\n",
+        "timestamp": 1779266731.6671245
+      },
+      {
+        "chunk_number": 230,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"设置\"}}\n\n",
+        "timestamp": 1779266731.6676521
+      },
+      {
+        "chunk_number": 231,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"这些\"}}\n\n",
+        "timestamp": 1779266731.6711986
+      },
+      {
+        "chunk_number": 232,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"工具\"}}\n\n",
+        "timestamp": 1779266731.6830595
+      },
+      {
+        "chunk_number": 233,
+        "size": 133,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"\\n\"}}\n\n",
+        "timestamp": 1779266731.6838062
+      },
+      {
+        "chunk_number": 234,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"2\"}}\n\n",
+        "timestamp": 1779266731.6845095
+      },
+      {
+        "chunk_number": 235,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \".\"}}\n\n",
+        "timestamp": 1779266731.9472563
+      },
+      {
+        "chunk_number": 236,
+        "size": 138,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \" 或者\"}}\n\n",
+        "timestamp": 1779266731.9478219
+      },
+      {
+        "chunk_number": 237,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"可以\"}}\n\n",
+        "timestamp": 1779266731.9483652
+      },
+      {
+        "chunk_number": 238,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"接受\"}}\n\n",
+        "timestamp": 1779266731.9558403
+      },
+      {
+        "chunk_number": 239,
+        "size": 134,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"我\"}}\n\n",
+        "timestamp": 1779266732.1103063
+      },
+      {
+        "chunk_number": 240,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"提供\"}}\n\n",
+        "timestamp": 1779266732.1108289
+      },
+      {
+        "chunk_number": 241,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"一些\"}}\n\n",
+        "timestamp": 1779266732.1114037
+      },
+      {
+        "chunk_number": 242,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"手动\"}}\n\n",
+        "timestamp": 1779266733.1747932
+      },
+      {
+        "chunk_number": 243,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"获取\"}}\n\n",
+        "timestamp": 1779266733.256137
+      },
+      {
+        "chunk_number": 244,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"热点\"}}\n\n",
+        "timestamp": 1779266733.256686
+      },
+      {
+        "chunk_number": 245,
+        "size": 137,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"信息\"}}\n\n",
+        "timestamp": 1779266733.2570972
+      },
+      {
+        "chunk_number": 246,
+        "size": 140,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 0, \"delta\": {\"type\": \"thinking_delta\", \"thinking\": \"的方法\"}}\n\n",
+        "timestamp": 1779266733.3289866
+      },
+      {
+        "chunk_number": 247,
+        "size": 201,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 0}\n\nevent: content_block_start\ndata: {\"type\": \"content_block_start\", \"index\": 1, \"content_block\": {\"type\": \"text\", \"text\": \"\"}}\n\n",
+        "timestamp": 1779266733.335407
+      },
+      {
+        "chunk_number": 248,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"看起来\"}}\n\n",
+        "timestamp": 1779266733.3513174
+      },
+      {
+        "chunk_number": 249,
+        "size": 255,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"我\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"目前\"}}\n\n",
+        "timestamp": 1779266733.4314656
+      },
+      {
+        "chunk_number": 250,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"可\"}}\n\n",
+        "timestamp": 1779266733.5080168
+      },
+      {
+        "chunk_number": 251,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"用的\"}}\n\n",
+        "timestamp": 1779266733.508731
+      },
+      {
+        "chunk_number": 252,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"搜索\"}}\n\n",
+        "timestamp": 1779266733.5092614
+      },
+      {
+        "chunk_number": 253,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"工具\"}}\n\n",
+        "timestamp": 1779266733.6203554
+      },
+      {
+        "chunk_number": 254,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"都\"}}\n\n",
+        "timestamp": 1779266733.6209104
+      },
+      {
+        "chunk_number": 255,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"遇到了\"}}\n\n",
+        "timestamp": 1779266733.6588411
+      },
+      {
+        "chunk_number": 256,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"问题\"}}\n\n",
+        "timestamp": 1779266733.659389
+      },
+      {
+        "chunk_number": 257,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\\n\\n\"}}\n\n",
+        "timestamp": 1779266733.7058918
+      },
+      {
+        "chunk_number": 258,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266733.7068229
+      },
+      {
+        "chunk_number": 259,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"工具\"}}\n\n",
+        "timestamp": 1779266733.7559578
+      },
+      {
+        "chunk_number": 260,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"状态\"}}\n\n",
+        "timestamp": 1779266733.904763
+      },
+      {
+        "chunk_number": 261,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266733.9052074
+      },
+      {
+        "chunk_number": 262,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\\n\"}}\n\n",
+        "timestamp": 1779266733.9141927
+      },
+      {
+        "chunk_number": 263,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"❌\"}}\n\n",
+        "timestamp": 1779266733.9154966
+      },
+      {
+        "chunk_number": 264,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779266733.9160004
+      },
+      {
+        "chunk_number": 265,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"web\"}}\n\n",
+        "timestamp": 1779266733.9164822
+      },
+      {
+        "chunk_number": 266,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"_search\"}}\n\n",
+        "timestamp": 1779266733.9168074
+      },
+      {
+        "chunk_number": 267,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266733.9174218
+      },
+      {
+        "chunk_number": 268,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" -\"}}\n\n",
+        "timestamp": 1779266733.9176762
+      },
+      {
+        "chunk_number": 269,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" Kim\"}}\n\n",
+        "timestamp": 1779266733.9371595
+      },
+      {
+        "chunk_number": 270,
+        "size": 251,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"i\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" API\"}}\n\n",
+        "timestamp": 1779266734.0065618
+      },
+      {
+        "chunk_number": 271,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266734.010105
+      },
+      {
+        "chunk_number": 272,
+        "size": 252,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"认\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"证\"}}\n\n",
+        "timestamp": 1779266734.1099608
+      },
+      {
+        "chunk_number": 273,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"失败\"}}\n\n",
+        "timestamp": 1779266734.1103866
+      },
+      {
+        "chunk_number": 274,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779266734.110809
+      },
+      {
+        "chunk_number": 275,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"40\"}}\n\n",
+        "timestamp": 1779266734.2049363
+      },
+      {
+        "chunk_number": 276,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"1\"}}\n\n",
+        "timestamp": 1779266734.2055066
+      },
+      {
+        "chunk_number": 277,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"错误\"}}\n\n",
+        "timestamp": 1779266734.2069876
+      },
+      {
+        "chunk_number": 278,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\"}}\n\n",
+        "timestamp": 1779266734.2989554
+      },
+      {
+        "chunk_number": 279,
+        "size": 252,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"❌\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779266734.2999365
+      },
+      {
+        "chunk_number": 280,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"aut\"}}\n\n",
+        "timestamp": 1779266734.300694
+      },
+      {
+        "chunk_number": 281,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"og\"}}\n\n",
+        "timestamp": 1779266734.384716
+      },
+      {
+        "chunk_number": 282,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"lm\"}}\n\n",
+        "timestamp": 1779266734.3855352
+      },
+      {
+        "chunk_number": 283,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-web\"}}\n\n",
+        "timestamp": 1779266734.3862295
+      },
+      {
+        "chunk_number": 284,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"search\"}}\n\n",
+        "timestamp": 1779266734.3869371
+      },
+      {
+        "chunk_number": 285,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266734.387715
+      },
+      {
+        "chunk_number": 286,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" -\"}}\n\n",
+        "timestamp": 1779266734.3884857
+      },
+      {
+        "chunk_number": 287,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 本\"}}\n\n",
+        "timestamp": 1779266734.4726324
+      },
+      {
+        "chunk_number": 288,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"地\"}}\n\n",
+        "timestamp": 1779266734.4739387
+      },
+      {
+        "chunk_number": 289,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"token\"}}\n\n",
+        "timestamp": 1779266734.4744675
+      },
+      {
+        "chunk_number": 290,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"服务\"}}\n\n",
+        "timestamp": 1779266734.4757335
+      },
+      {
+        "chunk_number": 291,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"未\"}}\n\n",
+        "timestamp": 1779266734.4765196
+      },
+      {
+        "chunk_number": 292,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"运行\"}}\n\n",
+        "timestamp": 1779266734.7465484
+      },
+      {
+        "chunk_number": 293,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779266734.747399
+      },
+      {
+        "chunk_number": 294,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"需要\"}}\n\n",
+        "timestamp": 1779266734.7479603
+      },
+      {
+        "chunk_number": 295,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"启动\"}}\n\n",
+        "timestamp": 1779266734.7488017
+      },
+      {
+        "chunk_number": 296,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" `\"}}\n\n",
+        "timestamp": 1779266734.7494524
+      },
+      {
+        "chunk_number": 297,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"http\"}}\n\n",
+        "timestamp": 1779266734.7501519
+      },
+      {
+        "chunk_number": 298,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"://\"}}\n\n",
+        "timestamp": 1779266734.7509139
+      },
+      {
+        "chunk_number": 299,
+        "size": 250,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"127\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\n",
+        "timestamp": 1779266734.7515147
+      },
+      {
+        "chunk_number": 300,
+        "size": 248,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"0\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\n",
+        "timestamp": 1779266734.752278
+      },
+      {
+        "chunk_number": 301,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"0\"}}\n\n",
+        "timestamp": 1779266734.7555063
+      },
+      {
+        "chunk_number": 302,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\n",
+        "timestamp": 1779266734.7563136
+      },
+      {
+        "chunk_number": 303,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"1\"}}\n\n",
+        "timestamp": 1779266734.7955475
+      },
+      {
+        "chunk_number": 304,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \":\"}}\n\n",
+        "timestamp": 1779266734.7963378
+      },
+      {
+        "chunk_number": 305,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"5\"}}\n\n",
+        "timestamp": 1779266734.7969432
+      },
+      {
+        "chunk_number": 306,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"36\"}}\n\n",
+        "timestamp": 1779266734.79767
+      },
+      {
+        "chunk_number": 307,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"99\"}}\n\n",
+        "timestamp": 1779266735.5091975
+      },
+      {
+        "chunk_number": 308,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"`\"}}\n\n",
+        "timestamp": 1779266735.5105746
+      },
+      {
+        "chunk_number": 309,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\"}}\n\n",
+        "timestamp": 1779266735.5113318
+      },
+      {
+        "chunk_number": 310,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"⚠\"}}\n\n",
+        "timestamp": 1779266735.5118809
+      },
+      {
+        "chunk_number": 311,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"️\"}}\n\n",
+        "timestamp": 1779266739.686195
+      },
+      {
+        "chunk_number": 312,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" **\"}}\n\n",
+        "timestamp": 1779266739.6887627
+      },
+      {
+        "chunk_number": 313,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"aut\"}}\n\n",
+        "timestamp": 1779266739.6894095
+      },
+      {
+        "chunk_number": 314,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"og\"}}\n\n",
+        "timestamp": 1779266739.689952
+      },
+      {
+        "chunk_number": 315,
+        "size": 256,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"lm\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-browser\"}}\n\n",
+        "timestamp": 1779266739.6924684
+      },
+      {
+        "chunk_number": 316,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-agent\"}}\n\n",
+        "timestamp": 1779266739.7576973
+      },
+      {
+        "chunk_number": 317,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266739.7584786
+      },
+      {
+        "chunk_number": 318,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" -\"}}\n\n",
+        "timestamp": 1779266739.759205
+      },
+      {
+        "chunk_number": 319,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266739.7598128
+      },
+      {
+        "chunk_number": 320,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"需\"}}\n\n",
+        "timestamp": 1779266739.7704837
+      },
+      {
+        "chunk_number": 321,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"要\"}}\n\n",
+        "timestamp": 1779266739.8673694
+      },
+      {
+        "chunk_number": 322,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"复杂\"}}\n\n",
+        "timestamp": 1779266739.8701317
+      },
+      {
+        "chunk_number": 323,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"的前\"}}\n\n",
+        "timestamp": 1779266739.880391
+      },
+      {
+        "chunk_number": 324,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"置\"}}\n\n",
+        "timestamp": 1779266739.8817964
+      },
+      {
+        "chunk_number": 325,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"设置\"}}\n\n",
+        "timestamp": 1779266739.882698
+      },
+      {
+        "chunk_number": 326,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779266739.8831878
+      },
+      {
+        "chunk_number": 327,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"安装\"}}\n\n",
+        "timestamp": 1779266739.9441092
+      },
+      {
+        "chunk_number": 328,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"浏览器\"}}\n\n",
+        "timestamp": 1779266739.9449794
+      },
+      {
+        "chunk_number": 329,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"扩展\"}}\n\n",
+        "timestamp": 1779266739.9457893
+      },
+      {
+        "chunk_number": 330,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"、\"}}\n\n",
+        "timestamp": 1779266739.9554517
+      },
+      {
+        "chunk_number": 331,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"配置\"}}\n\n",
+        "timestamp": 1779266739.9563124
+      },
+      {
+        "chunk_number": 332,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"M\"}}\n\n",
+        "timestamp": 1779266739.9569738
+      },
+      {
+        "chunk_number": 333,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"CP\"}}\n\n",
+        "timestamp": 1779266740.0370116
+      },
+      {
+        "chunk_number": 334,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"服务器\"}}\n\n",
+        "timestamp": 1779266740.0587459
+      },
+      {
+        "chunk_number": 335,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"等\"}}\n\n",
+        "timestamp": 1779266740.0598154
+      },
+      {
+        "chunk_number": 336,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"）\\n\\n\"}}\n\n",
+        "timestamp": 1779266740.0604756
+      },
+      {
+        "chunk_number": 337,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266740.0611582
+      },
+      {
+        "chunk_number": 338,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"我\"}}\n\n",
+        "timestamp": 1779266740.0618715
+      },
+      {
+        "chunk_number": 339,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"建议\"}}\n\n",
+        "timestamp": 1779266740.1364875
+      },
+      {
+        "chunk_number": 340,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"有以下\"}}\n\n",
+        "timestamp": 1779266740.137504
+      },
+      {
+        "chunk_number": 341,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"几种\"}}\n\n",
+        "timestamp": 1779266740.2270913
+      },
+      {
+        "chunk_number": 342,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方案\"}}\n\n",
+        "timestamp": 1779266740.2278779
+      },
+      {
+        "chunk_number": 343,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266740.2516003
+      },
+      {
+        "chunk_number": 344,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\\n\\n\"}}\n\n",
+        "timestamp": 1779266740.2524183
+      },
+      {
+        "chunk_number": 345,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266740.253241
+      },
+      {
+        "chunk_number": 346,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方案\"}}\n\n",
+        "timestamp": 1779266740.6121953
+      },
+      {
+        "chunk_number": 347,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"1\"}}\n\n",
+        "timestamp": 1779266740.6130342
+      },
+      {
+        "chunk_number": 348,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266740.6138358
+      },
+      {
+        "chunk_number": 349,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"快速\"}}\n\n",
+        "timestamp": 1779266740.6142995
+      },
+      {
+        "chunk_number": 350,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"手动\"}}\n\n",
+        "timestamp": 1779266740.614812
+      },
+      {
+        "chunk_number": 351,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"查询\"}}\n\n",
+        "timestamp": 1779266740.6152842
+      },
+      {
+        "chunk_number": 352,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266740.6158278
+      },
+      {
+        "chunk_number": 353,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266740.777728
+      },
+      {
+        "chunk_number": 354,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"🔍\"}}\n\n",
+        "timestamp": 1779266740.8126645
+      },
+      {
+        "chunk_number": 355,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779266741.3985627
+      },
+      {
+        "chunk_number": 356,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"我可以\"}}\n\n",
+        "timestamp": 1779266741.3995333
+      },
+      {
+        "chunk_number": 357,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"帮你\"}}\n\n",
+        "timestamp": 1779266741.4003198
+      },
+      {
+        "chunk_number": 358,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"直接\"}}\n\n",
+        "timestamp": 1779266741.4011164
+      },
+      {
+        "chunk_number": 359,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"访问\"}}\n\n",
+        "timestamp": 1779266741.52695
+      },
+      {
+        "chunk_number": 360,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"公开\"}}\n\n",
+        "timestamp": 1779266741.5276508
+      },
+      {
+        "chunk_number": 361,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"的热\"}}\n\n",
+        "timestamp": 1779266741.573645
+      },
+      {
+        "chunk_number": 362,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"搜\"}}\n\n",
+        "timestamp": 1779266741.5767035
+      },
+      {
+        "chunk_number": 363,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"网站\"}}\n\n",
+        "timestamp": 1779266741.580342
+      },
+      {
+        "chunk_number": 364,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"获取\"}}\n\n",
+        "timestamp": 1779266741.6651945
+      },
+      {
+        "chunk_number": 365,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"数据\"}}\n\n",
+        "timestamp": 1779266741.7838585
+      },
+      {
+        "chunk_number": 366,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\\n\"}}\n\n",
+        "timestamp": 1779266741.787698
+      },
+      {
+        "chunk_number": 367,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779266741.7929416
+      },
+      {
+        "chunk_number": 368,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 微\"}}\n\n",
+        "timestamp": 1779266741.7977254
+      },
+      {
+        "chunk_number": 369,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"博\"}}\n\n",
+        "timestamp": 1779266741.872071
+      },
+      {
+        "chunk_number": 370,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热搜\"}}\n\n",
+        "timestamp": 1779266741.8742027
+      },
+      {
+        "chunk_number": 371,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266741.878894
+      },
+      {
+        "chunk_number": 372,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"https\"}}\n\n",
+        "timestamp": 1779266741.888882
+      },
+      {
+        "chunk_number": 373,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"://\"}}\n\n",
+        "timestamp": 1779266741.8895404
+      },
+      {
+        "chunk_number": 374,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"s\"}}\n\n",
+        "timestamp": 1779266741.8900025
+      },
+      {
+        "chunk_number": 375,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".we\"}}\n\n",
+        "timestamp": 1779266741.9593837
+      },
+      {
+        "chunk_number": 376,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"ibo\"}}\n\n",
+        "timestamp": 1779266741.9641225
+      },
+      {
+        "chunk_number": 377,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".com\"}}\n\n",
+        "timestamp": 1779266741.966872
+      },
+      {
+        "chunk_number": 378,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"/top\"}}\n\n",
+        "timestamp": 1779266741.9688916
+      },
+      {
+        "chunk_number": 379,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"/\"}}\n\n",
+        "timestamp": 1779266742.0489705
+      },
+      {
+        "chunk_number": 380,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"summary\"}}\n\n",
+        "timestamp": 1779266742.0655315
+      },
+      {
+        "chunk_number": 381,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779266742.135315
+      },
+      {
+        "chunk_number": 382,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779266742.1515248
+      },
+      {
+        "chunk_number": 383,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 百\"}}\n\n",
+        "timestamp": 1779266742.1524494
+      },
+      {
+        "chunk_number": 384,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"度\"}}\n\n",
+        "timestamp": 1779266742.2214987
+      },
+      {
+        "chunk_number": 385,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热搜\"}}\n\n",
+        "timestamp": 1779266742.2260628
+      },
+      {
+        "chunk_number": 386,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266742.2311728
+      },
+      {
+        "chunk_number": 387,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"https\"}}\n\n",
+        "timestamp": 1779266742.235937
+      },
+      {
+        "chunk_number": 388,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"://\"}}\n\n",
+        "timestamp": 1779266742.236804
+      },
+      {
+        "chunk_number": 389,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"top\"}}\n\n",
+        "timestamp": 1779266742.2402158
+      },
+      {
+        "chunk_number": 390,
+        "size": 256,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".baidu\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".com\"}}\n\n",
+        "timestamp": 1779266742.3400137
+      },
+      {
+        "chunk_number": 391,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"/board\"}}\n\n",
+        "timestamp": 1779266742.3408117
+      },
+      {
+        "chunk_number": 392,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779266742.4026515
+      },
+      {
+        "chunk_number": 393,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"-\"}}\n\n",
+        "timestamp": 1779266742.4052598
+      },
+      {
+        "chunk_number": 394,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266742.4089873
+      },
+      {
+        "chunk_number": 395,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"知\"}}\n\n",
+        "timestamp": 1779266742.4320703
+      },
+      {
+        "chunk_number": 396,
+        "size": 252,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"乎\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热\"}}\n\n",
+        "timestamp": 1779266742.4954104
+      },
+      {
+        "chunk_number": 397,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"榜\"}}\n\n",
+        "timestamp": 1779266742.8829322
+      },
+      {
+        "chunk_number": 398,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266742.8851094
+      },
+      {
+        "chunk_number": 399,
+        "size": 254,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"https\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"://\"}}\n\n",
+        "timestamp": 1779266742.8863518
+      },
+      {
+        "chunk_number": 400,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"www\"}}\n\n",
+        "timestamp": 1779266742.8866565
+      },
+      {
+        "chunk_number": 401,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".z\"}}\n\n",
+        "timestamp": 1779266742.8868685
+      },
+      {
+        "chunk_number": 402,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"hi\"}}\n\n",
+        "timestamp": 1779266742.8875291
+      },
+      {
+        "chunk_number": 403,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"hu\"}}\n\n",
+        "timestamp": 1779266742.887867
+      },
+      {
+        "chunk_number": 404,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".com\"}}\n\n",
+        "timestamp": 1779266742.888162
+      },
+      {
+        "chunk_number": 405,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"/h\"}}\n\n",
+        "timestamp": 1779266742.888454
+      },
+      {
+        "chunk_number": 406,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"ot\"}}\n\n",
+        "timestamp": 1779266742.8890684
+      },
+      {
+        "chunk_number": 407,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\\n\"}}\n\n",
+        "timestamp": 1779266742.8897486
+      },
+      {
+        "chunk_number": 408,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266742.890153
+      },
+      {
+        "chunk_number": 409,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方案\"}}\n\n",
+        "timestamp": 1779266742.8906808
+      },
+      {
+        "chunk_number": 410,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"2\"}}\n\n",
+        "timestamp": 1779266742.891074
+      },
+      {
+        "chunk_number": 411,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266742.8914392
+      },
+      {
+        "chunk_number": 412,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"设置\"}}\n\n",
+        "timestamp": 1779266742.9455366
+      },
+      {
+        "chunk_number": 413,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" Auto\"}}\n\n",
+        "timestamp": 1779266742.946421
+      },
+      {
+        "chunk_number": 414,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"GL\"}}\n\n",
+        "timestamp": 1779266743.0506148
+      },
+      {
+        "chunk_number": 415,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"M\"}}\n\n",
+        "timestamp": 1779266743.054236
+      },
+      {
+        "chunk_number": 416,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266743.0558124
+      },
+      {
+        "chunk_number": 417,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"工\"}}\n\n",
+        "timestamp": 1779266743.110555
+      },
+      {
+        "chunk_number": 418,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"具\"}}\n\n",
+        "timestamp": 1779266743.114988
+      },
+      {
+        "chunk_number": 419,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266743.116048
+      },
+      {
+        "chunk_number": 420,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266743.1205459
+      },
+      {
+        "chunk_number": 421,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"⚙\"}}\n\n",
+        "timestamp": 1779266743.177925
+      },
+      {
+        "chunk_number": 422,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"️\"}}\n\n",
+        "timestamp": 1779266743.1790373
+      },
+      {
+        "chunk_number": 423,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779266743.17991
+      },
+      {
+        "chunk_number": 424,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"如果你\"}}\n\n",
+        "timestamp": 1779266743.180691
+      },
+      {
+        "chunk_number": 425,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"经常\"}}\n\n",
+        "timestamp": 1779266743.2352757
+      },
+      {
+        "chunk_number": 426,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"需要\"}}\n\n",
+        "timestamp": 1779266743.2985237
+      },
+      {
+        "chunk_number": 427,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"查询\"}}\n\n",
+        "timestamp": 1779266743.3535616
+      },
+      {
+        "chunk_number": 428,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热点\"}}\n\n",
+        "timestamp": 1779266743.3576388
+      },
+      {
+        "chunk_number": 429,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"信息\"}}\n\n",
+        "timestamp": 1779266743.3645146
+      },
+      {
+        "chunk_number": 430,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"，\"}}\n\n",
+        "timestamp": 1779266743.3653548
+      },
+      {
+        "chunk_number": 431,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"我可以\"}}\n\n",
+        "timestamp": 1779266743.373094
+      },
+      {
+        "chunk_number": 432,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"帮你\"}}\n\n",
+        "timestamp": 1779266743.4981933
+      },
+      {
+        "chunk_number": 433,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\\n\"}}\n\n",
+        "timestamp": 1779266743.4990463
+      },
+      {
+        "chunk_number": 434,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"1\"}}\n\n",
+        "timestamp": 1779266743.7150443
+      },
+      {
+        "chunk_number": 435,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\n",
+        "timestamp": 1779266743.7159674
+      },
+      {
+        "chunk_number": 436,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266743.7165973
+      },
+      {
+        "chunk_number": 437,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"启\"}}\n\n",
+        "timestamp": 1779266743.7171454
+      },
+      {
+        "chunk_number": 438,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"动\"}}\n\n",
+        "timestamp": 1779266743.7180388
+      },
+      {
+        "chunk_number": 439,
+        "size": 128,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" Auto\"}}\n\n",
+        "timestamp": 1779266743.718681
+      },
+      {
+        "chunk_number": 440,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"GL\"}}\n\n",
+        "timestamp": 1779266743.7195504
+      },
+      {
+        "chunk_number": 441,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"M\"}}\n\n",
+        "timestamp": 1779266743.720305
+      },
+      {
+        "chunk_number": 442,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 的\"}}\n\n",
+        "timestamp": 1779266743.7209902
+      },
+      {
+        "chunk_number": 443,
+        "size": 637,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"本地\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" token\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 服务\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"2\"}}\n\n",
+        "timestamp": 1779266743.7217343
+      },
+      {
+        "chunk_number": 444,
+        "size": 641,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \".\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 配\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"置\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"浏览器\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"自动化\"}}\n\n",
+        "timestamp": 1779266743.7472832
+      },
+      {
+        "chunk_number": 445,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"工具\"}}\n\n",
+        "timestamp": 1779266744.124976
+      },
+      {
+        "chunk_number": 446,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\\n\"}}\n\n",
+        "timestamp": 1779266744.131222
+      },
+      {
+        "chunk_number": 447,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266744.1324174
+      },
+      {
+        "chunk_number": 448,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方案\"}}\n\n",
+        "timestamp": 1779266744.1331756
+      },
+      {
+        "chunk_number": 449,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"3\"}}\n\n",
+        "timestamp": 1779266744.1349342
+      },
+      {
+        "chunk_number": 450,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"：\"}}\n\n",
+        "timestamp": 1779266744.136123
+      },
+      {
+        "chunk_number": 451,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"稍\"}}\n\n",
+        "timestamp": 1779266744.1935248
+      },
+      {
+        "chunk_number": 452,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"后\"}}\n\n",
+        "timestamp": 1779266744.198504
+      },
+      {
+        "chunk_number": 453,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"重\"}}\n\n",
+        "timestamp": 1779266744.199967
+      },
+      {
+        "chunk_number": 454,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"试\"}}\n\n",
+        "timestamp": 1779266744.2600434
+      },
+      {
+        "chunk_number": 455,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"**\"}}\n\n",
+        "timestamp": 1779266744.2639732
+      },
+      {
+        "chunk_number": 456,
+        "size": 124,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" \"}}\n\n",
+        "timestamp": 1779266744.2664156
+      },
+      {
+        "chunk_number": 457,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"⏰\"}}\n\n",
+        "timestamp": 1779266744.3498592
+      },
+      {
+        "chunk_number": 458,
+        "size": 125,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"\\n\"}}\n\n",
+        "timestamp": 1779266744.3949506
+      },
+      {
+        "chunk_number": 459,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"web\"}}\n\n",
+        "timestamp": 1779266744.396163
+      },
+      {
+        "chunk_number": 460,
+        "size": 130,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"_search\"}}\n\n",
+        "timestamp": 1779266744.5049782
+      },
+      {
+        "chunk_number": 461,
+        "size": 127,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \" 的\"}}\n\n",
+        "timestamp": 1779266744.5060542
+      },
+      {
+        "chunk_number": 462,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"认证\"}}\n\n",
+        "timestamp": 1779266744.537205
+      },
+      {
+        "chunk_number": 463,
+        "size": 261,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"问题\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"可能是\"}}\n\n",
+        "timestamp": 1779266744.547257
+      },
+      {
+        "chunk_number": 464,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"暂\"}}\n\n",
+        "timestamp": 1779266744.6074204
+      },
+      {
+        "chunk_number": 465,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"时的\"}}\n\n",
+        "timestamp": 1779266744.6696026
+      },
+      {
+        "chunk_number": 466,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"，\"}}\n\n",
+        "timestamp": 1779266744.673006
+      },
+      {
+        "chunk_number": 467,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"可以\"}}\n\n",
+        "timestamp": 1779266744.6745412
+      },
+      {
+        "chunk_number": 468,
+        "size": 255,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"稍\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"后再\"}}\n\n",
+        "timestamp": 1779266744.7410204
+      },
+      {
+        "chunk_number": 469,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"试\"}}\n\n",
+        "timestamp": 1779266744.743801
+      },
+      {
+        "chunk_number": 470,
+        "size": 259,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"。\\n\\n\"}}\n\nevent: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"你想\"}}\n\n",
+        "timestamp": 1779266744.74709
+      },
+      {
+        "chunk_number": 471,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"选择\"}}\n\n",
+        "timestamp": 1779266744.8159227
+      },
+      {
+        "chunk_number": 472,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"哪个\"}}\n\n",
+        "timestamp": 1779266744.816729
+      },
+      {
+        "chunk_number": 473,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方案\"}}\n\n",
+        "timestamp": 1779266744.81745
+      },
+      {
+        "chunk_number": 474,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"？\"}}\n\n",
+        "timestamp": 1779266744.8180158
+      },
+      {
+        "chunk_number": 475,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"或者\"}}\n\n",
+        "timestamp": 1779266744.8196356
+      },
+      {
+        "chunk_number": 476,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"如果\"}}\n\n",
+        "timestamp": 1779266744.8751378
+      },
+      {
+        "chunk_number": 477,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方便\"}}\n\n",
+        "timestamp": 1779266744.9971888
+      },
+      {
+        "chunk_number": 478,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"的话\"}}\n\n",
+        "timestamp": 1779266745.1024206
+      },
+      {
+        "chunk_number": 479,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"，\"}}\n\n",
+        "timestamp": 1779266745.1031544
+      },
+      {
+        "chunk_number": 480,
+        "size": 135,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"你也可以\"}}\n\n",
+        "timestamp": 1779266745.1039345
+      },
+      {
+        "chunk_number": 481,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"直接\"}}\n\n",
+        "timestamp": 1779266745.1432514
+      },
+      {
+        "chunk_number": 482,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"告诉我\"}}\n\n",
+        "timestamp": 1779266745.1566284
+      },
+      {
+        "chunk_number": 483,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"需要\"}}\n\n",
+        "timestamp": 1779266745.1696098
+      },
+      {
+        "chunk_number": 484,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"关注\"}}\n\n",
+        "timestamp": 1779266745.433096
+      },
+      {
+        "chunk_number": 485,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"哪个\"}}\n\n",
+        "timestamp": 1779266745.445785
+      },
+      {
+        "chunk_number": 486,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方面的\"}}\n\n",
+        "timestamp": 1779266745.4879975
+      },
+      {
+        "chunk_number": 487,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"热点\"}}\n\n",
+        "timestamp": 1779266745.4934645
+      },
+      {
+        "chunk_number": 488,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"（\"}}\n\n",
+        "timestamp": 1779266745.5246751
+      },
+      {
+        "chunk_number": 489,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"科技\"}}\n\n",
+        "timestamp": 1779266745.5291357
+      },
+      {
+        "chunk_number": 490,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"、\"}}\n\n",
+        "timestamp": 1779266746.1398716
+      },
+      {
+        "chunk_number": 491,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"娱乐\"}}\n\n",
+        "timestamp": 1779266746.1407459
+      },
+      {
+        "chunk_number": 492,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"、\"}}\n\n",
+        "timestamp": 1779266746.1413276
+      },
+      {
+        "chunk_number": 493,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"财经\"}}\n\n",
+        "timestamp": 1779266746.1418254
+      },
+      {
+        "chunk_number": 494,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"等\"}}\n\n",
+        "timestamp": 1779266746.1423163
+      },
+      {
+        "chunk_number": 495,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"），\"}}\n\n",
+        "timestamp": 1779266746.1691632
+      },
+      {
+        "chunk_number": 496,
+        "size": 132,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"我可以\"}}\n\n",
+        "timestamp": 1779266746.1739113
+      },
+      {
+        "chunk_number": 497,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"尝试\"}}\n\n",
+        "timestamp": 1779266746.238677
+      },
+      {
+        "chunk_number": 498,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"其他\"}}\n\n",
+        "timestamp": 1779266746.2394614
+      },
+      {
+        "chunk_number": 499,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"方式\"}}\n\n",
+        "timestamp": 1779266746.3064046
+      },
+      {
+        "chunk_number": 500,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"帮你\"}}\n\n",
+        "timestamp": 1779266746.3074703
+      },
+      {
+        "chunk_number": 501,
+        "size": 129,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"获取\"}}\n\n",
+        "timestamp": 1779266746.3636756
+      },
+      {
+        "chunk_number": 502,
+        "size": 126,
+        "data": "event: content_block_delta\ndata: {\"type\": \"content_block_delta\", \"index\": 1, \"delta\": {\"type\": \"text_delta\", \"text\": \"。\"}}\n\n",
+        "timestamp": 1779266746.3687823
+      },
+      {
+        "chunk_number": 503,
+        "size": 407,
+        "data": "event: content_block_stop\ndata: {\"type\": \"content_block_stop\", \"index\": 1}\n\nevent: message_delta\ndata: {\"type\": \"message_delta\", \"delta\": {\"stop_reason\": \"end_turn\", \"stop_sequence\": null}, \"usage\": {\"input_tokens\": 7581, \"output_tokens\": 557, \"cache_read_input_tokens\": 28672, \"server_tool_use\": {\"web_search_requests\": 0}, \"service_tier\": \"standard\"}}\n\nevent: message_stop\ndata: {\"type\": \"message_stop\"}\n\n",
+        "timestamp": 1779266746.5391572
+      }
+    ]
+  },
+  "timestamp": "2026-05-20T16:45:46.547229"
+}

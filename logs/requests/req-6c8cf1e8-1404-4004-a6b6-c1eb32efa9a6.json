@@ -1,0 +1,30 @@
+{
+  "request_id": "req-6c8cf1e8-1404-4004-a6b6-c1eb32efa9a6",
+  "timestamp": "2026-05-22T14:53:29.708075",
+  "headers": {
+    "Host": "localhost:8000",
+    "Accept-Encoding": "identity",
+    "Content-Length": "814",
+    "x-api-key": "09f83c3a74fb4895a3f5d2df722aab3a.2ke3ztItzBwcvOZz",
+    "anthropic-version": "2023-06-01",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "glm-4.7",
+    "max_tokens": 1024,
+    "messages": [
+      {
+        "role": "user",
+        "content": "我的名字叫张三"
+      },
+      {
+        "role": "assistant",
+        "content": "你好，**张三**！很高兴认识你。\n\n虽然在法律案例中经常见到这个名字（哈哈），但对我来说，你是一个独一无二的朋友。有什么我可以帮你的吗？无论是聊天、解决问题，还是协助写作，都可以随时告诉我。"
+      },
+      {
+        "role": "user",
+        "content": "我刚才说我叫什么名字？"
+      }
+    ]
+  }
+}
