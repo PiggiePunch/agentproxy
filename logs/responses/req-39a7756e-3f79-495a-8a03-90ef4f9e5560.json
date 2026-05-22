@@ -1,9 +1,0 @@
-{
-  "status_code": 502,
-  "body": {
-    "error": "name 'json' is not defined",
-    "type": "proxy_error",
-    "traceback": "Traceback (most recent call last):\n  File \"/mnt/d/git/agentproxy/backend/handlers/api_handler.py\", line 308, in _handle_standard_request\n    try:\nNameError: name 'json' is not defined\n"
-  },
-  "timestamp": "2026-05-22T14:22:51.222157"
-}
