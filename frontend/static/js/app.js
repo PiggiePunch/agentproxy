@@ -531,6 +531,86 @@ function closeModal() {
 }
 
 /**
+ * 切换侧边栏 (移动端)
+ */
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('active');
+}
+
+/**
+ * 切换侧边栏收起/展开 (桌面端)
+ */
+function toggleSidebarCollapse() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
+}
+
+/**
+ * 侧边栏导航
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // 侧边栏导航点击事件
+    const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // 移除所有active状态
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            // 添加当前active状态
+            this.classList.add('active');
+
+            // 同步顶部导航
+            syncNavigation('sidebar', this);
+
+            // 移动端点击后关闭侧边栏
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        });
+    });
+
+    // 顶部导航点击事件
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach((item, index) => {
+        item.addEventListener('click', function() {
+            // 移除所有active状态
+            navItems.forEach(i => i.classList.remove('active'));
+            // 添加当前active状态
+            this.classList.add('active');
+
+            // 同步侧边栏导航
+            syncNavigation('header', this);
+        });
+    });
+});
+
+/**
+ * 同步导航状态
+ */
+function syncNavigation(source, element) {
+    const index = Array.from(element.parentElement.children).indexOf(element);
+
+    if (source === 'sidebar') {
+        // 更新顶部导航
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        if (navItems[index]) {
+            navItems[index].classList.add('active');
+        }
+    } else {
+        // 更新侧边栏导航
+        const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+        sidebarItems.forEach(item => item.classList.remove('active'));
+        if (sidebarItems[index]) {
+            sidebarItems[index].classList.add('active');
+        }
+    }
+}
+
+/**
  * 清空指标数据
  */
 async function clearMetrics() {
