@@ -1167,40 +1167,19 @@ body {
 
 /* Page Content Switching - display controlled by JS only */
 
-/* Trace Page */
+/* Trace Page - 对话故事流设计 */
+
 .trace-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    position: relative;
     overflow: hidden;
 }
 
-.trace-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), #667eea);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.trace-card:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: translateY(-2px);
-}
-
-.trace-card:hover::before {
-    transform: scaleX(1);
-}
-
+/* 卡片头部：用户对话入口 */
 .trace-card-header {
     display: flex;
     align-items: center;
@@ -1208,67 +1187,98 @@ body {
     padding: 16px 20px;
     cursor: pointer;
     transition: background 0.2s ease;
+    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(102, 126, 234, 0.08) 100%);
+    border-bottom: 1px solid var(--border);
 }
 
 .trace-card-header:hover {
-    background: var(--surface-hover);
+    background: linear-gradient(135deg, rgba(0, 100, 200, 0.15) 0%, rgba(102, 126, 234, 0.12) 100%);
 }
 
-.trace-card-summary {
+.trace-header-left {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    min-width: 0;
+    flex: 1;
 }
 
-.trace-badge {
+.trace-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary) 0%, #667eea 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 100, 200, 0.3);
+}
+
+.trace-header-content {
+    min-width: 0;
+}
+
+.trace-header-query {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 400px;
+}
+
+.trace-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+.trace-header-time {
+    color: var(--text-muted);
+}
+
+.trace-header-stats {
+    display: flex;
+    gap: 8px;
+}
+
+.trace-stat {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 10px;
-    border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
 }
 
-.trace-badge-id {
-    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(102, 126, 234, 0.15) 100%);
-    color: var(--primary);
-    border: 1px solid rgba(0, 100, 200, 0.2);
-    font-family: 'Consolas', 'Monaco', monospace;
+.trace-stat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
 }
 
-.trace-badge-model {
-    background: var(--success-light);
-    color: var(--success);
-    border: 1px solid rgba(0, 168, 84, 0.2);
+.trace-stat-dot.model { background: var(--success); }
+.trace-stat-dot.tool { background: var(--warning); }
+
+.trace-stat.model { color: var(--success); }
+.trace-stat.tool { color: var(--warning); }
+
+.trace-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
-.trace-badge-tool {
-    background: var(--warning-light);
-    color: var(--warning);
-    border: 1px solid rgba(255, 154, 0, 0.2);
-}
-
-.trace-badge-query {
-    background: var(--surface-hover);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.trace-duration {
-    font-size: 14px;
+.trace-header-duration {
+    font-size: 16px;
     font-weight: 600;
-    color: var(--text-primary);
-}
-
-.trace-time {
-    font-size: 13px;
-    color: var(--text-muted);
+    color: var(--primary);
     font-family: 'Consolas', 'Monaco', monospace;
 }
 
@@ -1279,12 +1289,12 @@ body {
     width: 28px;
     height: 28px;
     border-radius: 6px;
-    background: var(--surface-hover);
+    background: rgba(255, 255, 255, 0.8);
     transition: all 0.2s ease;
 }
 
 .trace-expand-icon:hover {
-    background: var(--primary-light);
+    background: white;
 }
 
 .trace-expand-icon svg {
@@ -1294,178 +1304,213 @@ body {
     transition: transform 0.3s ease;
 }
 
+/* 瀑布流 timeline */
 .trace-card-body {
-    border-top: 1px solid var(--border);
-    padding: 20px;
+    padding: 20px 20px 16px;
 }
 
-.trace-summary-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
+.trace-waterfall {
+    position: relative;
+}
+
+.trace-waterfall::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--border-light) 0%, var(--border) 50%, var(--border-light) 100%);
+    border-radius: 1px;
+}
+
+/* 每个步骤：带左边线的卡片块 */
+.trace-event {
+    position: relative;
+    margin-left: 32px;
+    margin-bottom: 12px;
     padding: 12px 16px;
-    background: var(--surface-hover);
     border-radius: 8px;
-    flex-wrap: wrap;
+    border-left: 3px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s ease;
 }
 
-.trace-summary-item {
+.trace-event:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.trace-event.type-run {
+    border-left-color: var(--primary);
+    background: linear-gradient(90deg, var(--primary-light) 0%, var(--surface) 40%);
+}
+
+.trace-event.type-model {
+    border-left-color: var(--success);
+    background: linear-gradient(90deg, var(--success-light) 0%, var(--surface) 40%);
+}
+
+.trace-event.type-tool {
+    border-left-color: var(--warning);
+    background: linear-gradient(90deg, var(--warning-light) 0%, var(--surface) 40%);
+}
+
+/* 步骤圆点（左侧竖线上的节点） */
+.trace-event::before {
+    content: '';
+    position: absolute;
+    left: -35px;
+    top: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: white;
+    z-index: 1;
+}
+
+.trace-event.type-run::before {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.trace-event.type-model::before {
+    border-color: var(--success);
+    background: var(--success-light);
+}
+
+.trace-event.type-tool::before {
+    border-color: var(--warning);
+    background: var(--warning-light);
+}
+
+/* 步骤头部行 */
+.trace-event-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
 }
 
-.trace-summary-label {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.trace-summary-value {
+.trace-event-title {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
-}
-
-.trace-timeline {
-    position: relative;
-}
-
-.trace-step {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
 }
 
-.trace-step:hover {
-    background: var(--surface-hover);
-}
-
-.trace-step-indent {
-    position: relative;
-    width: 24px;
-    height: 24px;
+.trace-event-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
     flex-shrink: 0;
 }
 
-.trace-step.depth-1 .trace-step-indent::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: -10px;
-    bottom: -10px;
-    width: 2px;
-    background: var(--border);
-}
-
-.trace-step.depth-1 .trace-step-indent::after {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    width: 12px;
-    height: 2px;
-    background: var(--border);
-}
-
-.trace-step-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 16px;
-}
-
-.trace-step-icon.type-run {
-    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(102, 126, 234, 0.15) 100%);
+.trace-event-tag.type-run {
+    background: var(--primary-light);
     color: var(--primary);
 }
 
-.trace-step-icon.type-model {
+.trace-event-tag.type-model {
     background: var(--success-light);
     color: var(--success);
 }
 
-.trace-step-icon.type-tool {
+.trace-event-tag.type-tool {
     background: var(--warning-light);
     color: var(--warning);
 }
 
-.trace-step-icon svg {
-    width: 16px;
-    height: 16px;
-}
-
-.trace-step-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.trace-step-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
+.trace-event-name {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
 }
 
-.trace-step-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 2px;
-}
-
-.trace-step-offset {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-family: 'Consolas', 'Monaco', monospace;
-}
-
-.trace-step-duration {
+.trace-event-time {
     font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
+    font-family: 'Consolas', 'Monaco', monospace;
+    flex-shrink: 0;
 }
 
-.trace-step-expand {
+/* 步骤关键信息（直接展示，不需要额外展开） */
+.trace-event-key-info {
+    margin-top: 8px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-.trace-step-expand svg {
-    width: 14px;
-    height: 14px;
+.trace-key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 4px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+}
+
+.trace-key-item-label {
     color: var(--text-muted);
+}
+
+.trace-key-item-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* 步骤可展开详情 */
+.trace-event-detail-toggle {
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.trace-event-detail-toggle:hover {
+    background: var(--primary-light);
+    border-color: rgba(0, 100, 200, 0.2);
+}
+
+.trace-event-detail-toggle svg {
+    width: 12px;
+    height: 12px;
     transition: transform 0.3s ease;
 }
 
-.trace-step-detail {
-    padding: 12px 20px;
-    margin: 4px 0 8px 52px;
+.trace-event-detail {
+    margin-top: 8px;
+    padding: 12px;
     background: #f6f8fa;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid #d0d7de;
 }
 
 .trace-detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
 }
 
 .trace-detail-item {
@@ -1475,70 +1520,246 @@ body {
 }
 
 .trace-detail-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
 .trace-detail-value {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-primary);
     font-family: 'Consolas', 'Monaco', monospace;
 }
 
 .trace-detail-full {
-    margin-top: 12px;
-    padding: 12px;
+    margin-top: 10px;
+    padding: 10px;
     background: var(--surface);
-    border-radius: 6px;
+    border-radius: 4px;
     border: 1px solid var(--border);
 }
 
 .trace-detail-full-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     font-weight: 500;
 }
 
 .trace-detail-full-content {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
-    max-height: 200px;
+    max-height: 160px;
     overflow-y: auto;
     font-family: 'Consolas', 'Monaco', monospace;
 }
 
-.trace-progress-bar {
+/* 时间轴甘特图 */
+.trace-gantt-wrap {
+    margin-bottom: 20px;
+}
+
+.trace-gantt-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.trace-gantt-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.trace-gantt-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.trace-gantt-legend-dot.ai { background: var(--success); }
+.trace-gantt-legend-dot.tool { background: var(--warning); }
+.trace-gantt-legend-dot.idle {
+    background: repeating-linear-gradient(-45deg, #faf5ee, #faf5ee 2px, #f0e8d8 2px, #f0e8d8 3px);
+    border: 1px solid #e0d5c0;
+}
+
+.trace-gantt {
+    position: relative;
+    height: 32px;
+    background: repeating-linear-gradient(-45deg, #faf5ee, #faf5ee 3px, #f0e8d8 3px, #f0e8d8 5px);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e0d5c0;
+}
+
+.trace-gantt-segment {
+    position: absolute;
+    top: 2px;
+    height: 28px;
+    border-radius: 4px;
+    min-width: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+}
+
+.trace-gantt-segment:hover {
+    opacity: 0.85;
+}
+
+.trace-gantt-segment.type-model {
+    background: var(--success);
+}
+
+.trace-gantt-segment.type-tool {
+    background: var(--warning);
+}
+
+.trace-gantt-segment.type-run {
+    background: var(--primary);
+}
+
+/* 标注行（上方）：间隔等待 */
+.trace-gantt-annotations-above {
     position: relative;
     height: 24px;
-    background: var(--surface-hover);
-    border-radius: 4px;
-    margin-bottom: 16px;
-    overflow: hidden;
+    margin-bottom: 4px;
 }
 
-.trace-progress-segment {
+/* 标注行（下方）：步骤耗时 */
+.trace-gantt-annotations {
+    position: relative;
+    height: 32px;
+    margin-top: 4px;
+}
+
+.trace-gantt-annotation {
     position: absolute;
-    top: 4px;
-    height: 16px;
+    top: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+}
+
+/* 上方标注：连接线向下 */
+.trace-gantt-annotations-above .trace-gantt-annotation {
+    flex-direction: column-reverse;
+}
+
+.trace-gantt-annotation::before {
+    content: '';
+    width: 1px;
+    height: 6px;
+    background: var(--border-light);
+}
+
+.trace-gantt-annotation-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
     border-radius: 3px;
-    min-width: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'Consolas', 'Monaco', monospace;
+    white-space: nowrap;
 }
 
-.trace-progress-segment.type-model {
-    background: linear-gradient(90deg, var(--success), rgba(0, 168, 84, 0.7));
+.trace-gantt-annotation-text.type-model {
+    background: var(--success-light);
+    color: var(--success);
 }
 
-.trace-progress-segment.type-tool {
-    background: linear-gradient(90deg, var(--warning), rgba(255, 154, 0, 0.7));
+.trace-gantt-annotation-text.type-tool {
+    background: var(--warning-light);
+    color: var(--warning);
 }
 
-.trace-progress-segment.type-run {
-    background: linear-gradient(90deg, var(--primary), rgba(102, 126, 234, 0.7));
+.trace-gantt-annotation-text.type-run {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.trace-gantt-annotation-text.type-idle {
+    background: rgba(200, 180, 140, 0.12);
+    color: #8a7a5a;
+}
+
+/* 统计摘要条 */
+.trace-stats-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.trace-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--surface-hover);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+}
+
+.trace-stat-card-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.trace-stat-card-icon.model {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.trace-stat-card-icon.tool {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.trace-stat-card-icon.token {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.trace-stat-card-icon.time {
+    background: linear-gradient(135deg, var(--primary-light), rgba(102, 126, 234, 0.15));
+    color: var(--primary);
+}
+
+.trace-stat-card-icon svg {
+    width: 12px;
+    height: 12px;
+}
+
+.trace-stat-card-text {
+    font-size: 13px;
+}
+
+.trace-stat-card-label {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.trace-stat-card-value {
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 /* Placeholder pages */

@@ -622,16 +622,11 @@ async function refreshTraces() {
     }
 }
 
-/**
- * 清空追踪数据
- */
 async function clearTraces() {
     if (confirm('确定要清空所有追踪数据吗？')) {
         try {
             const response = await fetch('/traces', { method: 'DELETE' });
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             refreshTraces();
         } catch (error) {
             alert('清空追踪数据失败: ' + error.message);
@@ -639,278 +634,216 @@ async function clearTraces() {
     }
 }
 
-/**
- * 渲染追踪列表
- */
 function renderTraceList(traces) {
     const container = document.getElementById('tracesContainer');
     if (!traces || traces.length === 0) {
-        container.innerHTML = `
-            <div class="loading-state">
-                <div style="color: #4E5969;">暂无追踪记录</div>
-            </div>
-        `;
+        container.innerHTML = '<div class="loading-state"><div style="color: #4E5969;">暂无追踪记录</div></div>';
         return;
     }
-
     container.innerHTML = traces.map(t => generateTraceCard(t)).join('');
 }
 
 /**
- * 生成追踪卡片
+ * 生成追踪卡片 — 对话故事流设计
  */
 function generateTraceCard(trace) {
-    const traceId = trace.trace_id || trace.storage_id || '';
-    const shortId = traceId.length > 8 ? traceId.substring(0, 8) + '...' : traceId;
-    const duration = formatDuration(trace.duration_seconds || 0);
-    const startTime = trace.started_at ? new Date(trace.started_at).toLocaleString('zh-CN', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    }) : '';
-
     const summary = trace.summary || {};
+    const steps = trace.steps || [];
+    const runStep = steps.find(s => s.type === 'run');
+    const detail = runStep?.detail || {};
+    const query = detail.query || '';
+    const duration = formatDuration(trace.duration_seconds || 0);
+    const startTime = trace.started_at ? formatStartTime(trace.started_at) : '';
+
     const modelCalls = summary.model_calls || 0;
     const toolCalls = summary.tool_calls || 0;
 
-    // 从 steps 中提取 query
-    const runStep = (trace.steps || []).find(s => s.type === 'run');
-    const query = runStep && runStep.detail ? (runStep.detail.query || '') : '';
-    const shortQuery = query.length > 30 ? query.substring(0, 30) + '...' : query;
-
-    const stepsHtml = generateTimeline(trace.steps || [], trace.duration_seconds || 0);
+    const waterfallHtml = generateWaterfall(steps, trace.duration_seconds || 0);
+    const ganttHtml = generateGantt(steps, trace.duration_seconds || 0);
 
     return `
-        <div class="trace-card">
-            <div class="trace-card-header" onclick="toggleTraceExpand(this)">
-                <div class="trace-card-summary">
-                    <span class="trace-badge trace-badge-id">${shortId}</span>
-                    ${shortQuery ? `<span class="trace-badge trace-badge-query">${shortQuery}</span>` : ''}
-                    <span class="trace-badge trace-badge-model">${modelCalls} 模型</span>
-                    <span class="trace-badge trace-badge-tool">${toolCalls} 工具</span>
-                    <span class="trace-duration">${duration}</span>
-                    <span class="trace-time">${startTime}</span>
-                </div>
-                <div class="trace-expand-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
+    <div class="trace-card">
+        <div class="trace-card-header" onclick="toggleTraceExpand(this)">
+            <div class="trace-header-left">
+                <div class="trace-header-avatar">Q</div>
+                <div class="trace-header-content">
+                    <div class="trace-header-query">${escapeHtml(query || '对话追踪 #' + (trace.trace_id || '').substring(0,8))}</div>
+                    <div class="trace-header-meta">
+                        <span class="trace-header-time">${startTime}</span>
+                        <span class="trace-header-stats">
+                            <span class="trace-stat model"><span class="trace-stat-dot model"></span>${modelCalls}次模型调用</span>
+                            <span class="trace-stat tool"><span class="trace-stat-dot tool"></span>${toolCalls}次工具调用</span>
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="trace-card-body" style="display: none;">
-                <div class="trace-summary-bar">
-                    <div class="trace-summary-item">
-                        <span class="trace-summary-label">模型调用</span>
-                        <span class="trace-summary-value">${modelCalls}</span>
-                    </div>
-                    <div class="trace-summary-item">
-                        <span class="trace-summary-label">工具调用</span>
-                        <span class="trace-summary-value">${toolCalls}</span>
-                    </div>
-                    <div class="trace-summary-item">
-                        <span class="trace-summary-label">Token输入</span>
-                        <span class="trace-summary-value">${formatTokenCount(summary.tokens_in || 0)}</span>
-                    </div>
-                    <div class="trace-summary-item">
-                        <span class="trace-summary-label">Token输出</span>
-                        <span class="trace-summary-value">${formatTokenCount(summary.tokens_out || 0)}</span>
-                    </div>
-                    <div class="trace-summary-item">
-                        <span class="trace-summary-label">模型耗时</span>
-                        <span class="trace-summary-value">${formatDuration(summary.model_time_seconds || 0)}</span>
-                    </div>
-                </div>
-                <div class="trace-progress-bar">
-                    ${generateProgressBar(trace.steps || [], trace.duration_seconds || 0)}
-                </div>
-                <div class="trace-timeline">
-                    ${stepsHtml}
+            <div class="trace-header-right">
+                <span class="trace-header-duration">${duration}</span>
+                <div class="trace-expand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                 </div>
             </div>
         </div>
-    `;
-}
-
-/**
- * 生成进度条
- */
-function generateProgressBar(steps, totalDuration) {
-    if (totalDuration <= 0) return '';
-    return steps.map(step => {
-        const leftPct = ((step.offset_seconds || 0) / totalDuration * 100).toFixed(1);
-        const widthPct = ((step.duration_seconds || 0) / totalDuration * 100).toFixed(1);
-        const typeClass = `type-${step.type}`;
-        return `<div class="trace-progress-segment ${typeClass}" style="left: ${leftPct}%; width: ${Math.max(widthPct, 0.5)}%;"></div>`;
-    }).join('');
-}
-
-/**
- * 生成 Timeline 步骤列表
- */
-function generateTimeline(steps, totalDuration) {
-    if (!steps || steps.length === 0) return '<div style="color: #86909C; text-align: center; padding: 20px;">无步骤数据</div>';
-
-    let html = '';
-    for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        const depth = step.depth || 0;
-        const depthClass = `depth-${depth}`;
-
-        const iconSvg = getStepIcon(step.type);
-        const offset = formatDuration(step.offset_seconds || 0, true);
-        const duration = formatDuration(step.duration_seconds || 0);
-        const name = step.name || '';
-
-        const isLast = (i === steps.length - 1) || (steps[i + 1] && steps[i + 1].depth === 0);
-        const connector = depth > 0 ? (isLast ? '└──' : '├──') : '';
-
-        const detailHtml = generateStepDetail(step);
-
-        html += `
-            <div class="trace-step ${depthClass}" onclick="toggleStepDetail(this)">
-                <div class="trace-step-indent"></div>
-                <div class="trace-step-icon type-${step.type}">
-                    ${iconSvg}
-                </div>
-                <div class="trace-step-info">
-                    <span class="trace-step-name">${connector ? connector + ' ' : ''}${name}</span>
-                    <div class="trace-step-meta">
-                        <span class="trace-step-offset">${offset}</span>
-                        <span class="trace-step-duration">${duration}</span>
+        <div class="trace-card-body" style="display: none;">
+            <div class="trace-stats-bar">
+                <div class="trace-stat-card">
+                    <div class="trace-stat-card-icon model"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4"/></svg></div>
+                    <div class="trace-stat-card-text">
+                        <span class="trace-stat-card-label">模型调用</span>
+                        <span class="trace-stat-card-value">${modelCalls}</span>
                     </div>
                 </div>
-                <div class="trace-step-expand">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
+                <div class="trace-stat-card">
+                    <div class="trace-stat-card-icon tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                    <div class="trace-stat-card-text">
+                        <span class="trace-stat-card-label">工具调用</span>
+                        <span class="trace-stat-card-value">${toolCalls}</span>
+                    </div>
+                </div>
+                <div class="trace-stat-card">
+                    <div class="trace-stat-card-icon token"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/></svg></div>
+                    <div class="trace-stat-card-text">
+                        <span class="trace-stat-card-label">Token</span>
+                        <span class="trace-stat-card-value">in ${formatTokenCount(summary.tokens_in)} / out ${formatTokenCount(summary.tokens_out)}</span>
+                    </div>
+                </div>
+                <div class="trace-stat-card">
+                    <div class="trace-stat-card-icon time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    <div class="trace-stat-card-text">
+                        <span class="trace-stat-card-label">模型耗时</span>
+                        <span class="trace-stat-card-value">${formatDuration(summary.model_time_seconds || 0)}</span>
+                    </div>
                 </div>
             </div>
-            <div class="trace-step-detail" style="display: none;">
-                ${detailHtml}
+            <div class="trace-gantt-wrap">${ganttHtml}</div>
+            <div class="trace-waterfall">${waterfallHtml}</div>
+        </div>
+    </div>`;
+}
+
+/**
+ * 甘特图时间轴
+ */
+function generateGantt(steps, totalDuration) {
+    if (totalDuration <= 0) return '';
+
+    // 只取子步骤（depth > 0）
+    const childSteps = steps.filter(s => s.depth > 0);
+    let segmentsHtml = '';
+    let stepAnnotationsHtml = '';
+    let idleAnnotationsHtml = '';
+
+    const tagMap = {model: 'AI', tool: '工具', run: '主'};
+
+    for (const step of childSteps) {
+        const offset = step.offset_seconds || 0;
+        const duration = step.duration_seconds || 0;
+        const leftPct = (offset / totalDuration * 100).toFixed(1);
+        const widthPct = (duration / totalDuration * 100).toFixed(1);
+        const typeClass = `type-${step.type}`;
+        const labelMap = {model: 'AI思考', tool: step.name || '工具', run: '主流程'};
+        const label = labelMap[step.type] || '';
+        segmentsHtml += `<div class="trace-gantt-segment ${typeClass}" style="left:${leftPct}%;width:${Math.max(widthPct,0.5)}%;" title="${label} ${formatDuration(duration)}"></div>`;
+
+        const centerPct = ((offset + duration / 2) / totalDuration * 100).toFixed(1);
+        const tag = tagMap[step.type] || '';
+        stepAnnotationsHtml += `<div class="trace-gantt-annotation" style="left:${centerPct}%"><span class="trace-gantt-annotation-text ${typeClass}">${tag} ${formatDuration(duration)}</span></div>`;
+    }
+
+    // 计算间隔等待时间 → 标注在上方
+    let prevEnd = 0;
+    const gaps = [];
+    for (const step of childSteps) {
+        const offset = step.offset_seconds || 0;
+        if (offset > prevEnd + 0.01) {
+            gaps.push({start: prevEnd, duration: offset - prevEnd});
+        }
+        prevEnd = (step.offset_seconds || 0) + (step.duration_seconds || 0);
+    }
+    if (totalDuration > prevEnd + 0.01) {
+        gaps.push({start: prevEnd, duration: totalDuration - prevEnd});
+    }
+
+    for (const gap of gaps) {
+        const centerPct = ((gap.start + gap.duration / 2) / totalDuration * 100).toFixed(1);
+        idleAnnotationsHtml += `<div class="trace-gantt-annotation" style="left:${centerPct}%"><span class="trace-gantt-annotation-text type-idle">间隔 ${formatDuration(gap.duration)}</span></div>`;
+    }
+
+    return `
+    <div class="trace-gantt-legend">
+        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot ai"></span>AI思考</span>
+        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot tool"></span>工具调用</span>
+        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot idle"></span>间隔等待</span>
+    </div>
+    ${idleAnnotationsHtml ? `<div class="trace-gantt-annotations-above">${idleAnnotationsHtml}</div>` : ''}
+    <div class="trace-gantt">${segmentsHtml}</div>
+    ${stepAnnotationsHtml ? `<div class="trace-gantt-annotations">${stepAnnotationsHtml}</div>` : ''}`;
+}
+
+/**
+ * 瀑布流步骤生成
+ */
+function generateWaterfall(steps, totalDuration) {
+    if (!steps || steps.length === 0) return '<div style="color:#86909C;text-align:center;padding:20px;">无步骤数据</div>';
+    let html = '';
+    for (const step of steps) {
+        const d = step.detail || {};
+        const duration = formatDuration(step.duration_seconds || 0);
+
+        // 标签文字
+        const tagMap = {run: '主流程', model: 'AI 思考', tool: '工具调用'};
+        const tag = tagMap[step.type] || step.type;
+
+        // 关键信息（直接显示在步骤卡片上）
+        let keyInfoHtml = '';
+        if (step.type === 'run') {
+            keyInfoHtml = `
+                <span class="trace-key-item"><span class="trace-key-item-label">Token</span><span class="trace-key-item-value">in ${formatTokenCount(d.tokens_in)} / out ${formatTokenCount(d.tokens_out)}</span></span>
+                <span class="trace-key-item"><span class="trace-key-item-label">缓存</span><span class="trace-key-item-value">${formatTokenCount(d.tokens_cache)}</span></span>`;
+            if (d.query) keyInfoHtml += `<span class="trace-key-item"><span class="trace-key-item-label">用户问</span><span class="trace-key-item-value">${escapeHtml(d.query.length > 40 ? d.query.substring(0,40)+'...' : d.query)}</span></span>`;
+        } else if (step.type === 'model') {
+            keyInfoHtml = `
+                <span class="trace-key-item"><span class="trace-key-item-label">TTFT</span><span class="trace-key-item-value">${formatDuration(d.ttft_seconds || 0)}</span></span>
+                <span class="trace-key-item"><span class="trace-key-item-label">流量</span><span class="trace-key-item-value">${formatBytes(d.bytes_request || 0)} / ${formatBytes(d.bytes_response || 0)}</span></span>`;
+        } else if (step.type === 'tool') {
+            const mainKey = d.command ? '命令' : d.file ? '文件' : d.skill ? '技能' : '';
+            const mainVal = d.command || d.file || d.skill || '';
+            const shortVal = mainVal.length > 50 ? mainVal.substring(0,50)+'...' : mainVal;
+            if (mainKey) keyInfoHtml += `<span class="trace-key-item"><span class="trace-key-item-label">${mainKey}</span><span class="trace-key-item-value">${escapeHtml(shortVal)}</span></span>`;
+            if (d.result_summary) {
+                const shortResult = String(d.result_summary).substring(0, 50) + (String(d.result_summary).length > 50 ? '...' : '');
+                keyInfoHtml += `<span class="trace-key-item"><span class="trace-key-item-label">结果</span><span class="trace-key-item-value">${escapeHtml(shortResult)}</span></span>`;
+            }
+        }
+
+        // 详情展开按钮
+        let detailToggleHtml = '';
+        const hasDeepDetail = step.type === 'tool' && (d.command || d.result_summary) ||
+                             step.type === 'run' && (d.reply_summary || d.query);
+        if (hasDeepDetail) {
+            detailToggleHtml = `<div class="trace-event-detail-toggle" onclick="toggleTraceDetail(this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                查看详情
             </div>
-        `;
+            <div class="trace-event-detail" style="display:none;">${generateStepDetail(step)}</div>`;
+        }
+
+        html += `
+        <div class="trace-event type-${step.type}">
+            <div class="trace-event-header">
+                <div class="trace-event-title">
+                    <span class="trace-event-tag type-${step.type}">${tag}</span>
+                    <span class="trace-event-name">${escapeHtml(step.name || '')}</span>
+                </div>
+                <span class="trace-event-time">${duration}</span>
+            </div>
+            <div class="trace-event-key-info">${keyInfoHtml}</div>
+            ${detailToggleHtml}
+        </div>`;
     }
     return html;
 }
 
-/**
- * 获取步骤图标
- */
-function getStepIcon(type) {
-    if (type === 'run') {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>`;
-    } else if (type === 'model') {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>`;
-    } else if (type === 'tool') {
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
-    }
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`;
-}
-
-/**
- * 生成步骤详情
- */
-function generateStepDetail(step) {
-    const detail = step.detail || {};
-    let gridHtml = '';
-    let fullHtml = '';
-
-    if (step.type === 'run') {
-        gridHtml = `
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">Token输入</span>
-                <span class="trace-detail-value">${formatTokenCount(detail.tokens_in || 0)}</span>
-            </div>
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">Token输出</span>
-                <span class="trace-detail-value">${formatTokenCount(detail.tokens_out || 0)}</span>
-            </div>
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">Token缓存</span>
-                <span class="trace-detail-value">${formatTokenCount(detail.tokens_cache || 0)}</span>
-            </div>
-        `;
-        if (detail.query) {
-            fullHtml += `
-                <div class="trace-detail-full">
-                    <div class="trace-detail-full-label">用户查询</div>
-                    <div class="trace-detail-full-content">${escapeHtml(detail.query)}</div>
-                </div>
-            `;
-        }
-        if (detail.reply_summary) {
-            fullHtml += `
-                <div class="trace-detail-full">
-                    <div class="trace-detail-full-label">模型回复</div>
-                    <div class="trace-detail-full-content">${escapeHtml(detail.reply_summary)}</div>
-                </div>
-            `;
-        }
-    } else if (step.type === 'model') {
-        gridHtml = `
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">TTFT</span>
-                <span class="trace-detail-value">${formatDuration(detail.ttft_seconds || 0)}</span>
-            </div>
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">请求大小</span>
-                <span class="trace-detail-value">${formatBytes(detail.bytes_request || 0)}</span>
-            </div>
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">响应大小</span>
-                <span class="trace-detail-value">${formatBytes(detail.bytes_response || 0)}</span>
-            </div>
-            <div class="trace-detail-item">
-                <span class="trace-detail-label">上下文查询</span>
-                <span class="trace-detail-value">${detail.in_context_query_chars || 0} chars</span>
-            </div>
-        `;
-    } else if (step.type === 'tool') {
-        // 通用工具详情
-        const toolFields = Object.entries(detail).filter(([k, v]) => v && k !== 'result_summary');
-        gridHtml = toolFields.map(([key, value]) => {
-            const labelMap = {
-                'file': '文件路径',
-                'command': '执行命令',
-                'skill': '技能名称',
-                'url': 'URL'
-            };
-            const label = labelMap[key] || key;
-            let displayValue = String(value);
-            if (displayValue.length > 60) displayValue = displayValue.substring(0, 60) + '...';
-            return `
-                <div class="trace-detail-item">
-                    <span class="trace-detail-label">${label}</span>
-                    <span class="trace-detail-value">${escapeHtml(displayValue)}</span>
-                </div>
-            `;
-        }).join('');
-
-        if (detail.result_summary) {
-            let resultText = String(detail.result_summary);
-            if (resultText.length > 500) resultText = resultText.substring(0, 500) + '...';
-            fullHtml += `
-                <div class="trace-detail-full">
-                    <div class="trace-detail-full-label">执行结果</div>
-                    <div class="trace-detail-full-content">${escapeHtml(resultText)}</div>
-                </div>
-            `;
-        }
-    }
-
-    return `
-        <div class="trace-detail-grid">
-            ${gridHtml}
-        </div>
-        ${fullHtml}
-    `;
-}
-
-/**
- * 展开/收起对话卡片
- */
 function toggleTraceExpand(headerEl) {
     const card = headerEl.closest('.trace-card');
     const body = card.querySelector('.trace-card-body');
@@ -920,16 +853,57 @@ function toggleTraceExpand(headerEl) {
     icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
 }
 
-/**
- * 展开/收起步骤详情
- */
-function toggleStepDetail(stepEl) {
-    const detail = stepEl.nextElementSibling;
-    if (!detail || !detail.classList.contains('trace-step-detail')) return;
-    const icon = stepEl.querySelector('.trace-step-expand svg');
+function toggleTraceDetail(toggleEl) {
+    const detail = toggleEl.nextElementSibling;
+    if (!detail) return;
+    const icon = toggleEl.querySelector('svg');
     const isExpanded = detail.style.display !== 'none';
     detail.style.display = isExpanded ? 'none' : 'block';
     icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
+    toggleEl.childNodes[1].textContent = isExpanded ? ' 查看详情' : ' 收起详情';
+}
+
+function generateStepDetail(step) {
+    const detail = step.detail || {};
+    let gridHtml = '';
+    let fullHtml = '';
+
+    if (step.type === 'run') {
+        gridHtml = [
+            ['Token输入', formatTokenCount(detail.tokens_in || 0)],
+            ['Token输出', formatTokenCount(detail.tokens_out || 0)],
+            ['Token缓存', formatTokenCount(detail.tokens_cache || 0)],
+        ].map(([l,v]) => `<div class="trace-detail-item"><span class="trace-detail-label">${l}</span><span class="trace-detail-value">${v}</span></div>`).join('');
+        if (detail.query) fullHtml += `<div class="trace-detail-full"><div class="trace-detail-full-label">用户查询</div><div class="trace-detail-full-content">${escapeHtml(detail.query)}</div></div>`;
+        if (detail.reply_summary) fullHtml += `<div class="trace-detail-full"><div class="trace-detail-full-label">模型回复</div><div class="trace-detail-full-content">${escapeHtml(detail.reply_summary)}</div></div>`;
+    } else if (step.type === 'model') {
+        gridHtml = [
+            ['TTFT', formatDuration(detail.ttft_seconds || 0)],
+            ['请求大小', formatBytes(detail.bytes_request || 0)],
+            ['响应大小', formatBytes(detail.bytes_response || 0)],
+            ['上下文长度', (detail.in_context_query_chars || 0) + ' chars'],
+        ].map(([l,v]) => `<div class="trace-detail-item"><span class="trace-detail-label">${l}</span><span class="trace-detail-value">${v}</span></div>`).join('');
+    } else if (step.type === 'tool') {
+        const labelMap = {command: '执行命令', file: '文件路径', skill: '技能名称', url: 'URL'};
+        const fields = Object.entries(detail).filter(([k]) => k !== 'result_summary');
+        gridHtml = fields.map(([k,v]) => {
+            const label = labelMap[k] || k;
+            const val = String(v).length > 80 ? String(v).substring(0,80)+'...' : String(v);
+            return `<div class="trace-detail-item"><span class="trace-detail-label">${label}</span><span class="trace-detail-value">${escapeHtml(val)}</span></div>`;
+        }).join('');
+        if (detail.result_summary) {
+            const r = String(detail.result_summary).length > 500 ? String(detail.result_summary).substring(0,500)+'...' : String(detail.result_summary);
+            fullHtml += `<div class="trace-detail-full"><div class="trace-detail-full-label">执行结果</div><div class="trace-detail-full-content">${escapeHtml(r)}</div></div>`;
+        }
+    }
+    return `<div class="trace-detail-grid">${gridHtml}</div>${fullHtml}`;
+}
+
+function formatStartTime(isoStr) {
+    try {
+        const d = new Date(isoStr);
+        return d.toLocaleString('zh-CN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    } catch { return isoStr; }
 }
 
 /**
