@@ -14,6 +14,7 @@ from backend.handlers.base import BaseAPIHandler
 from backend.services.log_service import LogService
 from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
+from backend.services.trace_service import TraceService
 from backend.utils.logger import log_request_info, log_response_info
 from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call
 
@@ -22,6 +23,7 @@ from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call
 log_service = LogService()
 metrics_service = MetricsService()
 proxy_service = ProxyService()
+trace_service = TraceService()
 
 # 全局状态
 session_start_time = datetime.now()
@@ -62,6 +64,10 @@ class APIHandler(BaseAPIHandler):
             self._handle_get_metrics()
         elif path == "/metrics/summary":
             self._handle_get_metrics_summary()
+        elif path == "/traces":
+            self._handle_get_traces()
+        elif path.startswith("/traces/"):
+            self._handle_get_trace(path)
         elif path == "/v1/models":
             self._handle_models_forward(headers)
         else:
@@ -103,6 +109,8 @@ class APIHandler(BaseAPIHandler):
         elif path == "/v1/messages":
             self._handle_anthropic_messages(request_id, headers, body_data,
                                            request_received_time, inter_request_gap)
+        elif path == "/traces":
+            self._handle_save_trace(body_data)
         else:
             self._send_json_response(404, {"error": "Not found"})
 
@@ -120,6 +128,8 @@ class APIHandler(BaseAPIHandler):
 
         if path == "/metrics":
             self._handle_clear_metrics()
+        elif path == "/traces":
+            self._handle_clear_traces()
         else:
             self._send_json_response(404, {"error": "Not found"})
 
@@ -244,6 +254,36 @@ class APIHandler(BaseAPIHandler):
             request_counter = 0
             session_start_time = datetime.now()
         self._send_json_response(200, {"status": "ok", "message": "性能数据已清除"})
+
+    def _handle_save_trace(self, body_data):
+        """POST /traces - 保存一条追踪记录"""
+        if not isinstance(body_data, dict):
+            self._send_json_response(400, {"error": "Request body must be a JSON object"})
+            return
+        if 'steps' not in body_data or not isinstance(body_data['steps'], list):
+            self._send_json_response(400, {"error": "'steps' must be a non-empty array"})
+            return
+        storage_id = trace_service.save_trace(body_data)
+        self._send_json_response(201, {"status": "ok", "storage_id": storage_id})
+
+    def _handle_get_traces(self):
+        """GET /traces - 获取所有追踪记录列表"""
+        traces = trace_service.get_traces()
+        self._send_json_response(200, {"traces": traces, "total": len(traces)})
+
+    def _handle_get_trace(self, path):
+        """GET /traces/<id> - 获取单条追踪记录"""
+        storage_id = path.split("/traces/")[1]
+        trace = trace_service.get_trace(storage_id)
+        if trace is None:
+            self._send_json_response(404, {"error": f"Trace not found: {storage_id}"})
+        else:
+            self._send_json_response(200, trace)
+
+    def _handle_clear_traces(self):
+        """DELETE /traces - 清空所有追踪记录"""
+        trace_service.clear_traces()
+        self._send_json_response(200, {"status": "ok", "message": "追踪数据已清除"})
 
     def _handle_models_forward(self, headers: dict):
         """处理模型列表转发"""

@@ -97,3 +97,30 @@ class ResponseLog:
             "timestamp": self.timestamp,
             "body": self.body
         }
+
+
+class ConversationTrace:
+    """对话追踪模型"""
+
+    def __init__(self, storage_id: str, trace_data: dict):
+        self.storage_id = storage_id
+        self.trace_id = trace_data.get('trace_id', '')
+        self.agent_id = trace_data.get('agent_id', '')
+        self.started_at = trace_data.get('started_at', '')
+        self.duration_seconds = trace_data.get('duration_seconds', 0)
+        self.steps = trace_data.get('steps', [])
+        self.summary = trace_data.get('summary', {})
+        self.received_at = datetime.now().isoformat()
+
+    def to_dict(self) -> Dict[str, Any]:
+        """转换为字典格式"""
+        return {
+            "storage_id": self.storage_id,
+            "trace_id": self.trace_id,
+            "agent_id": self.agent_id,
+            "started_at": self.started_at,
+            "duration_seconds": self.duration_seconds,
+            "steps": self.steps,
+            "summary": self.summary,
+            "received_at": self.received_at
+        }

@@ -30,6 +30,7 @@ class Config:
     REQUESTS_DIR = LOGS_DIR / "requests"
     RESPONSES_DIR = LOGS_DIR / "responses"
     METRICS_DIR = LOGS_DIR / "metrics"
+    TRACES_DIR = LOGS_DIR / "traces"
 
     @classmethod
     def init_directories(cls):
@@ -39,6 +40,7 @@ class Config:
             cls.REQUESTS_DIR.mkdir(exist_ok=True)
             cls.RESPONSES_DIR.mkdir(exist_ok=True)
             cls.METRICS_DIR.mkdir(exist_ok=True)
+            cls.TRACES_DIR.mkdir(exist_ok=True)
             print(f"✓ 日志目录初始化成功: {cls.LOGS_DIR}")
             return True
         except PermissionError as e:

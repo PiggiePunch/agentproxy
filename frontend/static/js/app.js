@@ -7,15 +7,47 @@
 let responseTimeChart = null;
 let timeDistributionChart = null;
 let autoRefreshInterval = null;
+let traceAutoRefreshInterval = null;
 
 // 分页状态
 let currentPage = 1;
 let pageSize = 10;  // 默认每页10条
 let allMetrics = [];  // 存储所有metrics数据
 
+// Trace数据
+let allTraces = [];
+
+// 当前页签
+let currentPageName = 'overview';
+
 // Chart.js 默认配置
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
 Chart.defaults.color = '#4E5969';
+
+/**
+ * 页签切换
+ */
+function switchPage(pageName) {
+    // 隐藏所有page-content divs
+    document.querySelectorAll('.page-content').forEach(p => {
+        p.style.display = 'none';
+    });
+    // 隐藏概览页
+    const overview = document.getElementById('page-overview');
+    if (overview) overview.style.display = 'none';
+
+    // 显示选中的页签
+    const target = document.getElementById('page-' + pageName);
+    if (target) {
+        target.style.display = 'block';
+    }
+    currentPageName = pageName;
+
+    // 切换到追踪页签时刷新数据
+    if (pageName === 'trace') {
+        refreshTraces();
+    }
+}
 
 /**
  * 初始化图表
@@ -439,9 +471,6 @@ function updatePagination(totalItems) {
     nextBtn.disabled = currentPage === totalPages;
 }
 
-/**
- * 切换到上一页
- */
 function goToPrevPage() {
     if (currentPage > 1) {
         currentPage--;
@@ -449,9 +478,6 @@ function goToPrevPage() {
     }
 }
 
-/**
- * 切换到下一页
- */
 function goToNextPage() {
     const totalPages = Math.ceil(allMetrics.length / pageSize);
     if (currentPage < totalPages) {
@@ -460,9 +486,6 @@ function goToNextPage() {
     }
 }
 
-/**
- * 改变每页显示数量
- */
 function changePageSize(newSize) {
     pageSize = parseInt(newSize);
     currentPage = 1;
@@ -522,9 +545,6 @@ async function showLogModal(type, requestId) {
     }
 }
 
-/**
- * 关闭模态框
- */
 function closeModal() {
     const modal = document.getElementById('logModal');
     modal.style.display = 'none';
@@ -541,73 +561,9 @@ function toggleSidebar() {
     overlay.classList.toggle('active');
 }
 
-/**
- * 切换侧边栏收起/展开 (桌面端)
- */
 function toggleSidebarCollapse() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('collapsed');
-}
-
-/**
- * 侧边栏导航
- */
-document.addEventListener('DOMContentLoaded', function() {
-    // 侧边栏导航点击事件
-    const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
-    sidebarItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // 移除所有active状态
-            sidebarItems.forEach(i => i.classList.remove('active'));
-            // 添加当前active状态
-            this.classList.add('active');
-
-            // 同步顶部导航
-            syncNavigation('sidebar', this);
-
-            // 移动端点击后关闭侧边栏
-            if (window.innerWidth <= 768) {
-                toggleSidebar();
-            }
-        });
-    });
-
-    // 顶部导航点击事件
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach((item, index) => {
-        item.addEventListener('click', function() {
-            // 移除所有active状态
-            navItems.forEach(i => i.classList.remove('active'));
-            // 添加当前active状态
-            this.classList.add('active');
-
-            // 同步侧边栏导航
-            syncNavigation('header', this);
-        });
-    });
-});
-
-/**
- * 同步导航状态
- */
-function syncNavigation(source, element) {
-    const index = Array.from(element.parentElement.children).indexOf(element);
-
-    if (source === 'sidebar') {
-        // 更新顶部导航
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => item.classList.remove('active'));
-        if (navItems[index]) {
-            navItems[index].classList.add('active');
-        }
-    } else {
-        // 更新侧边栏导航
-        const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
-        sidebarItems.forEach(item => item.classList.remove('active'));
-        if (sidebarItems[index]) {
-            sidebarItems[index].classList.add('active');
-        }
-    }
 }
 
 /**
@@ -620,7 +576,6 @@ async function clearMetrics() {
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-            const result = await response.json();
             refreshData();
             alert('指标数据已清空');
         } catch (error) {
@@ -640,9 +595,6 @@ function showErrorBanner(message) {
     }
 }
 
-/**
- * 隐藏错误横幅
- */
 function hideErrorBanner() {
     const errorBanner = document.getElementById('errorBanner');
     if (errorBanner) {
@@ -650,9 +602,414 @@ function hideErrorBanner() {
     }
 }
 
-// 事件监听器设置
+// ===================== Trace 相关功能 =====================
+
+/**
+ * 刷新追踪数据
+ */
+async function refreshTraces() {
+    try {
+        const response = await fetch('/traces');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        allTraces = data.traces || [];
+        document.getElementById('traceCount').textContent = data.total || 0;
+        renderTraceList(allTraces);
+    } catch (error) {
+        console.error('获取追踪数据失败:', error);
+    }
+}
+
+/**
+ * 清空追踪数据
+ */
+async function clearTraces() {
+    if (confirm('确定要清空所有追踪数据吗？')) {
+        try {
+            const response = await fetch('/traces', { method: 'DELETE' });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            refreshTraces();
+        } catch (error) {
+            alert('清空追踪数据失败: ' + error.message);
+        }
+    }
+}
+
+/**
+ * 渲染追踪列表
+ */
+function renderTraceList(traces) {
+    const container = document.getElementById('tracesContainer');
+    if (!traces || traces.length === 0) {
+        container.innerHTML = `
+            <div class="loading-state">
+                <div style="color: #4E5969;">暂无追踪记录</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = traces.map(t => generateTraceCard(t)).join('');
+}
+
+/**
+ * 生成追踪卡片
+ */
+function generateTraceCard(trace) {
+    const traceId = trace.trace_id || trace.storage_id || '';
+    const shortId = traceId.length > 8 ? traceId.substring(0, 8) + '...' : traceId;
+    const duration = formatDuration(trace.duration_seconds || 0);
+    const startTime = trace.started_at ? new Date(trace.started_at).toLocaleString('zh-CN', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }) : '';
+
+    const summary = trace.summary || {};
+    const modelCalls = summary.model_calls || 0;
+    const toolCalls = summary.tool_calls || 0;
+
+    // 从 steps 中提取 query
+    const runStep = (trace.steps || []).find(s => s.type === 'run');
+    const query = runStep && runStep.detail ? (runStep.detail.query || '') : '';
+    const shortQuery = query.length > 30 ? query.substring(0, 30) + '...' : query;
+
+    const stepsHtml = generateTimeline(trace.steps || [], trace.duration_seconds || 0);
+
+    return `
+        <div class="trace-card">
+            <div class="trace-card-header" onclick="toggleTraceExpand(this)">
+                <div class="trace-card-summary">
+                    <span class="trace-badge trace-badge-id">${shortId}</span>
+                    ${shortQuery ? `<span class="trace-badge trace-badge-query">${shortQuery}</span>` : ''}
+                    <span class="trace-badge trace-badge-model">${modelCalls} 模型</span>
+                    <span class="trace-badge trace-badge-tool">${toolCalls} 工具</span>
+                    <span class="trace-duration">${duration}</span>
+                    <span class="trace-time">${startTime}</span>
+                </div>
+                <div class="trace-expand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="trace-card-body" style="display: none;">
+                <div class="trace-summary-bar">
+                    <div class="trace-summary-item">
+                        <span class="trace-summary-label">模型调用</span>
+                        <span class="trace-summary-value">${modelCalls}</span>
+                    </div>
+                    <div class="trace-summary-item">
+                        <span class="trace-summary-label">工具调用</span>
+                        <span class="trace-summary-value">${toolCalls}</span>
+                    </div>
+                    <div class="trace-summary-item">
+                        <span class="trace-summary-label">Token输入</span>
+                        <span class="trace-summary-value">${formatTokenCount(summary.tokens_in || 0)}</span>
+                    </div>
+                    <div class="trace-summary-item">
+                        <span class="trace-summary-label">Token输出</span>
+                        <span class="trace-summary-value">${formatTokenCount(summary.tokens_out || 0)}</span>
+                    </div>
+                    <div class="trace-summary-item">
+                        <span class="trace-summary-label">模型耗时</span>
+                        <span class="trace-summary-value">${formatDuration(summary.model_time_seconds || 0)}</span>
+                    </div>
+                </div>
+                <div class="trace-progress-bar">
+                    ${generateProgressBar(trace.steps || [], trace.duration_seconds || 0)}
+                </div>
+                <div class="trace-timeline">
+                    ${stepsHtml}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 生成进度条
+ */
+function generateProgressBar(steps, totalDuration) {
+    if (totalDuration <= 0) return '';
+    return steps.map(step => {
+        const leftPct = ((step.offset_seconds || 0) / totalDuration * 100).toFixed(1);
+        const widthPct = ((step.duration_seconds || 0) / totalDuration * 100).toFixed(1);
+        const typeClass = `type-${step.type}`;
+        return `<div class="trace-progress-segment ${typeClass}" style="left: ${leftPct}%; width: ${Math.max(widthPct, 0.5)}%;"></div>`;
+    }).join('');
+}
+
+/**
+ * 生成 Timeline 步骤列表
+ */
+function generateTimeline(steps, totalDuration) {
+    if (!steps || steps.length === 0) return '<div style="color: #86909C; text-align: center; padding: 20px;">无步骤数据</div>';
+
+    let html = '';
+    for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        const depth = step.depth || 0;
+        const depthClass = `depth-${depth}`;
+
+        const iconSvg = getStepIcon(step.type);
+        const offset = formatDuration(step.offset_seconds || 0, true);
+        const duration = formatDuration(step.duration_seconds || 0);
+        const name = step.name || '';
+
+        const isLast = (i === steps.length - 1) || (steps[i + 1] && steps[i + 1].depth === 0);
+        const connector = depth > 0 ? (isLast ? '└──' : '├──') : '';
+
+        const detailHtml = generateStepDetail(step);
+
+        html += `
+            <div class="trace-step ${depthClass}" onclick="toggleStepDetail(this)">
+                <div class="trace-step-indent"></div>
+                <div class="trace-step-icon type-${step.type}">
+                    ${iconSvg}
+                </div>
+                <div class="trace-step-info">
+                    <span class="trace-step-name">${connector ? connector + ' ' : ''}${name}</span>
+                    <div class="trace-step-meta">
+                        <span class="trace-step-offset">${offset}</span>
+                        <span class="trace-step-duration">${duration}</span>
+                    </div>
+                </div>
+                <div class="trace-step-expand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="trace-step-detail" style="display: none;">
+                ${detailHtml}
+            </div>
+        `;
+    }
+    return html;
+}
+
+/**
+ * 获取步骤图标
+ */
+function getStepIcon(type) {
+    if (type === 'run') {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>`;
+    } else if (type === 'model') {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>`;
+    } else if (type === 'tool') {
+        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
+    }
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>`;
+}
+
+/**
+ * 生成步骤详情
+ */
+function generateStepDetail(step) {
+    const detail = step.detail || {};
+    let gridHtml = '';
+    let fullHtml = '';
+
+    if (step.type === 'run') {
+        gridHtml = `
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">Token输入</span>
+                <span class="trace-detail-value">${formatTokenCount(detail.tokens_in || 0)}</span>
+            </div>
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">Token输出</span>
+                <span class="trace-detail-value">${formatTokenCount(detail.tokens_out || 0)}</span>
+            </div>
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">Token缓存</span>
+                <span class="trace-detail-value">${formatTokenCount(detail.tokens_cache || 0)}</span>
+            </div>
+        `;
+        if (detail.query) {
+            fullHtml += `
+                <div class="trace-detail-full">
+                    <div class="trace-detail-full-label">用户查询</div>
+                    <div class="trace-detail-full-content">${escapeHtml(detail.query)}</div>
+                </div>
+            `;
+        }
+        if (detail.reply_summary) {
+            fullHtml += `
+                <div class="trace-detail-full">
+                    <div class="trace-detail-full-label">模型回复</div>
+                    <div class="trace-detail-full-content">${escapeHtml(detail.reply_summary)}</div>
+                </div>
+            `;
+        }
+    } else if (step.type === 'model') {
+        gridHtml = `
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">TTFT</span>
+                <span class="trace-detail-value">${formatDuration(detail.ttft_seconds || 0)}</span>
+            </div>
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">请求大小</span>
+                <span class="trace-detail-value">${formatBytes(detail.bytes_request || 0)}</span>
+            </div>
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">响应大小</span>
+                <span class="trace-detail-value">${formatBytes(detail.bytes_response || 0)}</span>
+            </div>
+            <div class="trace-detail-item">
+                <span class="trace-detail-label">上下文查询</span>
+                <span class="trace-detail-value">${detail.in_context_query_chars || 0} chars</span>
+            </div>
+        `;
+    } else if (step.type === 'tool') {
+        // 通用工具详情
+        const toolFields = Object.entries(detail).filter(([k, v]) => v && k !== 'result_summary');
+        gridHtml = toolFields.map(([key, value]) => {
+            const labelMap = {
+                'file': '文件路径',
+                'command': '执行命令',
+                'skill': '技能名称',
+                'url': 'URL'
+            };
+            const label = labelMap[key] || key;
+            let displayValue = String(value);
+            if (displayValue.length > 60) displayValue = displayValue.substring(0, 60) + '...';
+            return `
+                <div class="trace-detail-item">
+                    <span class="trace-detail-label">${label}</span>
+                    <span class="trace-detail-value">${escapeHtml(displayValue)}</span>
+                </div>
+            `;
+        }).join('');
+
+        if (detail.result_summary) {
+            let resultText = String(detail.result_summary);
+            if (resultText.length > 500) resultText = resultText.substring(0, 500) + '...';
+            fullHtml += `
+                <div class="trace-detail-full">
+                    <div class="trace-detail-full-label">执行结果</div>
+                    <div class="trace-detail-full-content">${escapeHtml(resultText)}</div>
+                </div>
+            `;
+        }
+    }
+
+    return `
+        <div class="trace-detail-grid">
+            ${gridHtml}
+        </div>
+        ${fullHtml}
+    `;
+}
+
+/**
+ * 展开/收起对话卡片
+ */
+function toggleTraceExpand(headerEl) {
+    const card = headerEl.closest('.trace-card');
+    const body = card.querySelector('.trace-card-body');
+    const icon = headerEl.querySelector('.trace-expand-icon svg');
+    const isExpanded = body.style.display !== 'none';
+    body.style.display = isExpanded ? 'none' : 'block';
+    icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
+}
+
+/**
+ * 展开/收起步骤详情
+ */
+function toggleStepDetail(stepEl) {
+    const detail = stepEl.nextElementSibling;
+    if (!detail || !detail.classList.contains('trace-step-detail')) return;
+    const icon = stepEl.querySelector('.trace-step-expand svg');
+    const isExpanded = detail.style.display !== 'none';
+    detail.style.display = isExpanded ? 'none' : 'block';
+    icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
+}
+
+/**
+ * 格式化时间
+ */
+function formatDuration(seconds, isOffset) {
+    if (!seconds || seconds === 0) {
+        return isOffset ? '+0ms' : '0ms';
+    }
+    if (seconds < 1) {
+        const ms = Math.round(seconds * 1000);
+        return isOffset ? `+${ms}ms` : `${ms}ms`;
+    }
+    if (seconds < 60) {
+        const rounded = seconds.toFixed(1);
+        return isOffset ? `+${rounded}s` : `${rounded}s`;
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.round(seconds % 60);
+    return isOffset ? `+${mins}m${secs}s` : `${mins}m${secs}s`;
+}
+
+/**
+ * 格式化Token数量
+ */
+function formatTokenCount(count) {
+    if (!count || count === 0) return '0';
+    if (count >= 1000) return (count / 1000).toFixed(1) + 'k';
+    return String(count);
+}
+
+/**
+ * 格式化字节数
+ */
+function formatBytes(bytes) {
+    if (!bytes || bytes === 0) return '0B';
+    if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+    if (bytes >= 1024) return (bytes / 1024).toFixed(1) + 'KB';
+    return bytes + 'B';
+}
+
+/**
+ * HTML转义
+ */
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ===================== 事件监听器 =====================
+
 document.addEventListener('DOMContentLoaded', function() {
-    // 自动刷新开关
+    // 侧边栏导航点击事件
+    const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            const pageName = this.getAttribute('data-page');
+            syncNavigation('sidebar', this);
+            switchPage(pageName);
+
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        });
+    });
+
+    // 顶部导航点击事件
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            navItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            const pageName = this.getAttribute('data-page');
+            syncNavigation('header', this);
+            switchPage(pageName);
+        });
+    });
+
+    // 自动刷新开关 (概览)
     const toggle = document.getElementById('autoRefreshToggle');
     toggle.addEventListener('click', function() {
         this.classList.toggle('active');
@@ -660,6 +1017,17 @@ document.addEventListener('DOMContentLoaded', function() {
             autoRefreshInterval = setInterval(refreshData, 2000);
         } else {
             clearInterval(autoRefreshInterval);
+        }
+    });
+
+    // 自动刷新开关 (追踪)
+    const traceToggle = document.getElementById('traceAutoRefreshToggle');
+    traceToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        if (this.classList.contains('active')) {
+            traceAutoRefreshInterval = setInterval(refreshTraces, 5000);
+        } else {
+            clearInterval(traceAutoRefreshInterval);
         }
     });
 
@@ -687,11 +1055,29 @@ document.addEventListener('DOMContentLoaded', function() {
             autoRefreshInterval = setInterval(refreshData, 2000);
         } else {
             showErrorBanner('代理服务器未启动 - 请先启动代理服务器后刷新此页面');
-
-            // 每5秒尝试重新连接
             setTimeout(() => {
                 window.location.reload();
             }, 5000);
         }
     });
 });
+
+/**
+ * 同步导航状态
+ */
+function syncNavigation(source, element) {
+    const pageName = element.getAttribute('data-page');
+    const index = Array.from(element.parentElement.children).indexOf(element);
+
+    if (source === 'sidebar') {
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        const targetNavItem = document.querySelector(`.nav-item[data-page="${pageName}"]`);
+        if (targetNavItem) targetNavItem.classList.add('active');
+    } else {
+        const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+        sidebarItems.forEach(item => item.classList.remove('active'));
+        const targetSidebarItem = document.querySelector(`.sidebar-nav-item[data-page="${pageName}"]`);
+        if (targetSidebarItem) targetSidebarItem.classList.add('active');
+    }
+}
