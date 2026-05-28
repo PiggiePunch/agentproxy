@@ -13,6 +13,7 @@ let traceAutoRefreshInterval = null;
 let currentPage = 1;
 let pageSize = 10;  // 默认每页10条
 let allMetrics = [];  // 存储所有metrics数据
+let lastMetricsHash = '';  // 用于检测数据变化，避免无意义的DOM重建
 
 // Trace数据
 let allTraces = [];
@@ -20,9 +21,7 @@ let allTraces = [];
 // 当前页签
 let currentPageName = 'overview';
 
-// Chart.js 默认配置
-Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
-Chart.defaults.color = '#4E5969';
+// Chart.js 默认配置（移至initCharts中设置，避免defer加载时Chart未定义）
 
 /**
  * 页签切换
@@ -66,6 +65,9 @@ function getThemeColors() {
 }
 
 function initCharts() {
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+    Chart.defaults.color = '#4E5969';
+
     const colors = getThemeColors();
     const ctx1 = document.getElementById('responseTimeChart').getContext('2d');
     responseTimeChart = new Chart(ctx1, {
@@ -379,10 +381,18 @@ function updateTable(metrics) {
             </tr>
         `;
         updatePagination(0);
+        lastMetricsHash = '';
         return;
     }
 
     allMetrics = metrics.slice(-100).reverse();
+
+    // 检测数据是否变化，避免无变化时重建DOM
+    const currentHash = allMetrics.map(m => m.request_id + ':' + m.status_code + ':' + (m.total_time || 0)).join('|');
+    if (currentHash === lastMetricsHash && currentPage === Math.ceil(allMetrics.length / pageSize || 1)) {
+        return;
+    }
+    lastMetricsHash = currentHash;
 
     const totalPages = Math.ceil(allMetrics.length / pageSize);
     if (currentPage > totalPages && totalPages > 0) {
@@ -556,6 +566,44 @@ async function showLogModal(type, requestId) {
         logContent.innerHTML = `<pre class="json-content">${highlightedJson}</pre>`;
     } catch (error) {
         logContent.textContent = `获取日志失败: ${error.message}`;
+    }
+}
+
+/**
+ * 复制日志内容
+ */
+async function copyLogContent() {
+    const logContent = document.getElementById('logContent');
+    // 获取纯文本内容（去掉 HTML 高亮标签）
+    const text = logContent.innerText || logContent.textContent;
+    try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.querySelector('.modal-copy-btn');
+        const label = btn.querySelector('span');
+        label.textContent = '已复制';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            label.textContent = '复制';
+            btn.classList.remove('copied');
+        }, 2000);
+    } catch (error) {
+        // 降级方案
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const btn = document.querySelector('.modal-copy-btn');
+        const label = btn.querySelector('span');
+        label.textContent = '已复制';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            label.textContent = '复制';
+            btn.classList.remove('copied');
+        }, 2000);
     }
 }
 
@@ -1059,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggle.addEventListener('click', function() {
         this.classList.toggle('active');
         if (this.classList.contains('active')) {
-            autoRefreshInterval = setInterval(refreshData, 2000);
+            autoRefreshInterval = setInterval(refreshData, 5000);
         } else {
             clearInterval(autoRefreshInterval);
         }
@@ -1097,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isServerUp) {
             initCharts();
             refreshData();
-            autoRefreshInterval = setInterval(refreshData, 2000);
+            autoRefreshInterval = setInterval(refreshData, 5000);
         } else {
             showErrorBanner('代理服务器未启动 - 请先启动代理服务器后刷新此页面');
             setTimeout(() => {

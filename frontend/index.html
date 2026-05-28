@@ -6,8 +6,8 @@
     <title>OpenClaw 控制台</title>
 
     <!-- 本地资源 -->
-    <link rel="stylesheet" href="/static/css/style.css?v=18">
-    <script src="/static/js/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css?v=19">
+    <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 <body>
     <!-- Top Header -->
@@ -473,7 +473,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <span class="modal-title" id="modalTitle">日志详情</span>
-                <button class="modal-close" onclick="closeModal()">×</button>
+                <div class="modal-header-actions">
+                    <button class="modal-copy-btn" onclick="copyLogContent()" title="复制内容">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span>复制</span>
+                    </button>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
             </div>
             <div class="modal-body">
                 <pre id="logContent"></pre>
@@ -482,6 +491,6 @@
     </div>
 
     <!-- 前端逻辑 -->
-    <script src="/static/js/app.js?v=18"></script></script>
+    <script src="/static/js/app.js?v=19"></script>
 </body>
 </html>

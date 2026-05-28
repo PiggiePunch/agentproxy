@@ -61,7 +61,7 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 10px 0 rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 8px 20px 0 rgba(0, 0, 0, 0.35);
-    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-bg: rgba(15, 23, 42, 0.92);
     --card-border: rgba(255, 255, 255, 0.08);
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
     --gantt-idle-1: #1c2541;
@@ -73,7 +73,7 @@
     --modal-border: rgba(255, 255, 255, 0.08);
     --btn-bg: rgba(255, 255, 255, 0.05);
     --btn-bg-hover: rgba(255, 255, 255, 0.08);
-    --surface-translucent: rgba(255, 255, 255, 0.03);
+    --surface-translucent: rgba(15, 23, 42, 0.85);
     --surface-semi: rgba(255, 255, 255, 0.05);
     --surface-light: rgba(255, 255, 255, 0.03);
     --table-border: rgba(255, 255, 255, 0.06);
@@ -93,8 +93,7 @@ body {
 /* Top Header */
 .top-header {
     background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--card-border);
+        border-bottom: 1px solid var(--card-border);
     height: 56px;
     display: flex;
     align-items: center;
@@ -239,8 +238,7 @@ body {
 .sidebar {
     width: 240px;
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border-right: 1px solid var(--card-border);
+        border-right: 1px solid var(--card-border);
     padding: 24px 0;
     position: sticky;
     top: 56px;
@@ -398,8 +396,7 @@ body {
 /* Action Bar */
 .action-bar {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 16px 20px;
     margin-bottom: 20px;
@@ -540,8 +537,7 @@ body {
 
 .metric-card {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -649,8 +645,7 @@ body {
 
 .chart-card {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 20px;
     box-shadow: var(--card-shadow);
@@ -694,8 +689,7 @@ body {
 /* Requests Table */
 .requests-section {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 20px;
     box-shadow: var(--card-shadow);
@@ -841,8 +835,7 @@ body {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 2000;
+        z-index: 2000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -860,8 +853,7 @@ body {
 
 .modal-content {
     background: var(--modal-bg);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
+        border-radius: 16px;
     max-width: 900px;
     width: 90%;
     max-height: 85vh;
@@ -898,6 +890,45 @@ body {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--btn-bg);
+    color: var(--text-secondary);
+    font-family: inherit;
+}
+
+.modal-copy-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.modal-copy-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: rgba(0, 100, 200, 0.3);
+}
+
+.modal-copy-btn.copied {
+    background: var(--success-light);
+    color: var(--success);
+    border-color: rgba(0, 168, 84, 0.3);
 }
 
 .modal-title {
@@ -1025,8 +1056,7 @@ body {
     align-items: center;
     padding: 16px 20px;
     background: var(--surface-translucent);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--card-border);
+        border-top: 1px solid var(--card-border);
     gap: 20px;
 }
 
@@ -1221,8 +1251,7 @@ body {
 
 .trace-card {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
+        border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 16px;
     box-shadow: var(--card-shadow);
@@ -1815,8 +1844,7 @@ body {
 /* Settings Page */
 .settings-section {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--card-border);
+        border: 1px solid var(--card-border);
     border-radius: 12px;
     box-shadow: var(--card-shadow);
     overflow: hidden;
@@ -1976,6 +2004,18 @@ body {
 
 [data-theme="dark"] .modal-close:hover {
     color: var(--text-secondary);
+}
+
+[data-theme="dark"] .modal-copy-btn {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .modal-copy-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: rgba(0, 100, 200, 0.3);
 }
 
 [data-theme="dark"] .sidebar-collapse-btn {
