@@ -6,7 +6,7 @@
     <title>OpenClaw 控制台</title>
 
     <!-- 本地资源 -->
-    <link rel="stylesheet" href="/static/css/style.css?v=11">
+    <link rel="stylesheet" href="/static/css/style.css?v=18">
     <script src="/static/js/chart.umd.min.js"></script>
 </head>
 <body>
@@ -27,8 +27,6 @@
             </div>
             <div class="header-nav">
                 <div class="nav-item active" data-page="overview">概览</div>
-                <div class="nav-item" data-page="monitoring">监控</div>
-                <div class="nav-item" data-page="logs">日志</div>
                 <div class="nav-item" data-page="trace">追踪</div>
                 <div class="nav-item" data-page="settings">设置</div>
             </div>
@@ -63,24 +61,6 @@
                         <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
                     </svg>
                     <span>概览</span>
-                </div>
-                <div class="sidebar-nav-item" data-page="monitoring">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                        <line x1="8" y1="21" x2="16" y2="21"/>
-                        <line x1="12" y1="17" x2="12" y2="21"/>
-                    </svg>
-                    <span>监控</span>
-                </div>
-                <div class="sidebar-nav-item" data-page="logs">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    <span>日志</span>
                 </div>
                 <div class="sidebar-nav-item" data-page="trace">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -403,37 +383,6 @@
                 </div>
             </div>
 
-            <!-- Monitoring Page (placeholder) -->
-            <div id="page-monitoring" class="page-content" style="display: none;">
-                <div class="placeholder-page">
-                    <div class="placeholder-content">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                            <line x1="8" y1="21" x2="16" y2="21"/>
-                            <line x1="12" y1="17" x2="12" y2="21"/>
-                        </svg>
-                        <h2>监控</h2>
-                        <p>监控功能开发中...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Logs Page (placeholder) -->
-            <div id="page-logs" class="page-content" style="display: none;">
-                <div class="placeholder-page">
-                    <div class="placeholder-content">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                        </svg>
-                        <h2>日志</h2>
-                        <p>日志功能开发中...</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Trace Page -->
             <div id="page-trace" class="page-content" style="display: none;">
                 <!-- Page Header -->
@@ -486,14 +435,31 @@
 
             <!-- Settings Page (placeholder) -->
             <div id="page-settings" class="page-content" style="display: none;">
-                <div class="placeholder-page">
-                    <div class="placeholder-content">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-4 0 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09"/>
-                        </svg>
-                        <h2>设置</h2>
-                        <p>设置功能开发中...</p>
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">设置</h1>
+                    <p class="page-description">自定义控制台外观和偏好</p>
+                </div>
+                <!-- Settings Section -->
+                <div class="settings-section">
+                    <div class="settings-item">
+                        <div class="settings-item-left">
+                            <div class="settings-item-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="settings-item-title">外观主题</span>
+                                <span class="settings-item-desc">选择深色或浅色界面风格</span>
+                            </div>
+                        </div>
+                        <div class="settings-item-right">
+                            <div class="theme-switcher">
+                                <button class="theme-btn" data-theme="light">浅色</button>
+                                <button class="theme-btn" data-theme="dark">深色</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -516,6 +482,6 @@
     </div>
 
     <!-- 前端逻辑 -->
-    <script src="/static/js/app.js?v=11"></script></script>
+    <script src="/static/js/app.js?v=18"></script></script>
 </body>
 </html>

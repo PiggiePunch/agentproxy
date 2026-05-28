@@ -52,7 +52,21 @@ function switchPage(pageName) {
 /**
  * 初始化图表
  */
+function getThemeColors() {
+    const style = getComputedStyle(document.documentElement);
+    return {
+        textPrimary: style.getPropertyValue('--text-primary').trim(),
+        textSecondary: style.getPropertyValue('--text-secondary').trim(),
+        textMuted: style.getPropertyValue('--text-muted').trim(),
+        border: style.getPropertyValue('--border').trim(),
+        surface: style.getPropertyValue('--surface').trim(),
+        success: style.getPropertyValue('--success').trim(),
+        primary: style.getPropertyValue('--primary').trim(),
+    };
+}
+
 function initCharts() {
+    const colors = getThemeColors();
     const ctx1 = document.getElementById('responseTimeChart').getContext('2d');
     responseTimeChart = new Chart(ctx1, {
         type: 'line',
@@ -69,7 +83,7 @@ function initCharts() {
                 pointRadius: 0,
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: '#0064C8',
-                pointHoverBorderColor: '#FFFFFF',
+                pointHoverBorderColor: colors.surface,
                 pointHoverBorderWidth: 2
             }, {
                 label: '模型耗时',
@@ -82,7 +96,7 @@ function initCharts() {
                 pointRadius: 0,
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: '#00A854',
-                pointHoverBorderColor: '#FFFFFF',
+                pointHoverBorderColor: colors.surface,
                 pointHoverBorderWidth: 2
             }]
         },
@@ -105,14 +119,14 @@ function initCharts() {
                             size: 13,
                             weight: '400'
                         },
-                        color: '#1D2129'
+                        color: colors.textPrimary
                     }
                 },
                 tooltip: {
-                    backgroundColor: '#FFFFFF',
-                    titleColor: '#1D2129',
-                    bodyColor: '#4E5969',
-                    borderColor: '#E5E6EB',
+                    backgroundColor: colors.surface,
+                    titleColor: colors.textPrimary,
+                    bodyColor: colors.textSecondary,
+                    borderColor: colors.border,
                     borderWidth: 1,
                     padding: 12,
                     displayColors: true,
@@ -141,20 +155,20 @@ function initCharts() {
                         font: {
                             size: 12
                         },
-                        color: '#86909C'
+                        color: colors.textMuted
                     }
                 },
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: '#E5E6EB',
+                        color: colors.border,
                         drawBorder: false
                     },
                     ticks: {
                         font: {
                             size: 12
                         },
-                        color: '#86909C',
+                        color: colors.textMuted,
                         callback: function(value) {
                             return value + 'ms';
                         }
@@ -192,10 +206,10 @@ function initCharts() {
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: '#FFFFFF',
-                    titleColor: '#1D2129',
-                    bodyColor: '#4E5969',
-                    borderColor: '#E5E6EB',
+                    backgroundColor: colors.surface,
+                    titleColor: colors.textPrimary,
+                    bodyColor: colors.textSecondary,
+                    borderColor: colors.border,
                     borderWidth: 1,
                     padding: 12,
                     cornerRadius: 4,
@@ -217,20 +231,20 @@ function initCharts() {
                             size: 13,
                             weight: '500'
                         },
-                        color: '#1D2129'
+                        color: colors.textPrimary
                     }
                 },
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: '#E5E6EB',
+                        color: colors.border,
                         drawBorder: false
                     },
                     ticks: {
                         font: {
                             size: 12
                         },
-                        color: '#86909C',
+                        color: colors.textMuted,
                         callback: function(value) {
                             return value + 'ms';
                         }
@@ -823,7 +837,7 @@ function generateWaterfall(steps, totalDuration) {
         if (hasDeepDetail) {
             detailToggleHtml = `<div class="trace-event-detail-toggle" onclick="toggleTraceDetail(this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                查看详情
+                <span class="trace-detail-toggle-label"> 查看详情</span>
             </div>
             <div class="trace-event-detail" style="display:none;">${generateStepDetail(step)}</div>`;
         }
@@ -860,7 +874,9 @@ function toggleTraceDetail(toggleEl) {
     const isExpanded = detail.style.display !== 'none';
     detail.style.display = isExpanded ? 'none' : 'block';
     icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
-    toggleEl.childNodes[1].textContent = isExpanded ? ' 查看详情' : ' 收起详情';
+    // 用专门的数据节点来保存文字，避免 childNodes 索引漂移
+    const labelSpan = toggleEl.querySelector('.trace-detail-toggle-label');
+    if (labelSpan) labelSpan.textContent = isExpanded ? ' 查看详情' : ' 收起详情';
 }
 
 function generateStepDetail(step) {
@@ -952,9 +968,64 @@ function escapeHtml(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// ===================== 主题切换 =====================
+
+function initTheme() {
+    const saved = localStorage.getItem('openclaw-theme') || 'light';
+    setTheme(saved);
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('openclaw-theme', theme);
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+    });
+    // 更新 Chart.js 图表颜色
+    updateChartTheme(theme);
+}
+
+function updateChartTheme(theme) {
+    const colors = getThemeColors();
+
+    Chart.defaults.color = colors.textSecondary;
+
+    if (responseTimeChart) {
+        responseTimeChart.options.scales.x.ticks.color = colors.textMuted;
+        responseTimeChart.options.scales.y.ticks.color = colors.textMuted;
+        responseTimeChart.options.scales.y.grid.color = colors.border;
+        responseTimeChart.options.plugins.legend.labels.color = colors.textPrimary;
+        responseTimeChart.options.plugins.tooltip.backgroundColor = colors.surface;
+        responseTimeChart.options.plugins.tooltip.titleColor = colors.textPrimary;
+        responseTimeChart.options.plugins.tooltip.bodyColor = colors.textSecondary;
+        responseTimeChart.options.plugins.tooltip.borderColor = colors.border;
+        responseTimeChart.update();
+    }
+    if (timeDistributionChart) {
+        timeDistributionChart.options.scales.x.ticks.color = colors.textPrimary;
+        timeDistributionChart.options.scales.y.ticks.color = colors.textMuted;
+        timeDistributionChart.options.scales.y.grid.color = colors.border;
+        timeDistributionChart.options.plugins.tooltip.backgroundColor = colors.surface;
+        timeDistributionChart.options.plugins.tooltip.titleColor = colors.textPrimary;
+        timeDistributionChart.options.plugins.tooltip.bodyColor = colors.textSecondary;
+        timeDistributionChart.options.plugins.tooltip.borderColor = colors.border;
+        timeDistributionChart.update();
+    }
+}
+
 // ===================== 事件监听器 =====================
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化主题
+    initTheme();
+
+    // 主题切换按钮
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            setTheme(this.getAttribute('data-theme'));
+        });
+    });
+
     // 侧边栏导航点击事件
     const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
     sidebarItems.forEach(item => {
