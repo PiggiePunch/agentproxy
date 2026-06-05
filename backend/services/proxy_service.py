@@ -68,8 +68,26 @@ class ProxyService:
         else:
             ConnClass = http.client.HTTPConnection
 
-        # 构建完整路径
-        full_path = parsed.path + path
+        # 构建完整路径（智能处理各种配置格式）
+        base_path = parsed.path.rstrip("/")
+        endpoint_path = path
+
+        # 情况1: base_path 已包含完整 endpoint（如 /v1/chat/completions）
+        # 例如: https://api.bigmodel.cn/v1/chat/completions -> 直接使用 base_path
+        if base_path.endswith('/chat/completions') and endpoint_path == '/v1/chat/completions':
+            full_path = base_path
+        elif base_path.endswith('/v1/messages') and endpoint_path == '/v1/messages':
+            full_path = base_path
+        # 情况2: base_path 以版本号结尾（如 /v1, /v2, /api/paas/v4）
+        # 例如: https://api.moonshot.cn/v1 + /v1/chat/completions -> /v1/chat/completions
+        else:
+            import re
+            if re.search(r'(/v\d+|/api/paas/v\d+)$', base_path) and endpoint_path.startswith('/v1'):
+                endpoint_path = endpoint_path[3:]  # 去掉 "/v1"
+            full_path = base_path + endpoint_path
+            if not full_path.startswith('/'):
+                full_path = '/' + full_path
+
         if parsed.query:
             full_path += "?" + parsed.query
 

@@ -57,7 +57,9 @@ class StreamHandler:
         target_url = get_api_url("openai")
         parsed = urlparse(target_url)
         port = parsed.port if parsed.port else (443 if parsed.scheme == 'https' else 80)
-        full_path = parsed.path.rstrip('/') + '/chat/completions'
+        
+        # 智能构建路径（与 proxy_service.py 保持一致）
+        full_path = self._build_stream_path(parsed, "/v1/chat/completions")
 
         # 发送响应头
         self._send_stream_headers()
@@ -118,7 +120,9 @@ class StreamHandler:
         target_url = get_api_url("anthropic")
         parsed = urlparse(target_url)
         port = parsed.port if parsed.port else (443 if parsed.scheme == 'https' else 80)
-        full_path = parsed.path.rstrip('/') + '/v1/messages'
+        
+        # 智能构建路径（与 proxy_service.py 保持一致）
+        full_path = self._build_stream_path(parsed, "/v1/messages")
 
         # 发送响应头
         self._send_stream_headers()
@@ -528,3 +532,27 @@ class StreamHandler:
                 time.sleep(0.5)
         except Exception as e:
             print(f"⚠️  关闭写端时出错：{e}")
+
+    def _build_stream_path(self, parsed, endpoint_path: str) -> str:
+        """智能构建流式请求路径（与 proxy_service.py 保持一致）"""
+        import re
+        base_path = parsed.path.rstrip("/")
+
+        # 情况1: base_path 已包含完整 endpoint
+        if base_path.endswith('/chat/completions') and endpoint_path == '/v1/chat/completions':
+            return base_path
+        elif base_path.endswith('/v1/messages') and endpoint_path == '/v1/messages':
+            return base_path
+
+        # 情况2: base_path 以版本号结尾，去掉 endpoint 的 /v1 前缀
+        if re.search(r'(/v\d+|/api/paas/v\d+)$', base_path) and endpoint_path.startswith('/v1'):
+            endpoint_path = endpoint_path[3:]  # 去掉 "/v1"
+
+        full_path = base_path + endpoint_path
+        if not full_path.startswith('/'):
+            full_path = '/' + full_path
+
+        if parsed.query:
+            full_path += "?" + parsed.query
+
+        return full_path
