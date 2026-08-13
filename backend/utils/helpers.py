@@ -2,8 +2,10 @@
 辅助函数模块
 提供各种辅助功能函数
 """
+import http.client
+import socket
 from urllib.parse import urlparse
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 
 
 def detect_api_type(path: str) -> str:
@@ -74,3 +76,43 @@ def calculate_time_metrics(start_time: float, end_time: float) -> Dict[str, floa
         "duration_seconds": duration,
         "duration_ms": duration * 1000
     }
+
+
+def classify_proxy_exception(e: BaseException, context: str) -> Tuple[int, str, str]:
+    """
+    将代理抛出的异常按"发生在哪条 socket / 哪个阶段"统一分类。
+
+    context 取值:
+      "client_write"      —— 代理往客户端 socket 写数据时出错（sendall / wfile.write）
+      "upstream_read"     —— 代理从上游 socket 读响应体时出错（response.read1）
+      "upstream_connect"  —— 代理与上游建链/发请求/读状态行时出错（conn.request / getresponse / read）
+
+    分类规则（与 RFC 7231 §6.6 对齐）:
+      客户端断开              → 499 client_disconnected  (NGINX 事实约定，非 RFC)
+      上游超时                → 504 upstream_timeout
+      上游通信异常/中途断      → 502 upstream_comm_error
+      代理自身代码异常        → 500 proxy_internal
+
+    返回: (status_code, type, failed_at)
+    """
+    if context == "client_write":
+        # 往客户端写时任何连接级/超时异常都视为客户端断开
+        if isinstance(e, (ConnectionError, socket.timeout, TimeoutError)):
+            return 499, "client_disconnected", "client_write"
+
+    elif context == "upstream_read":
+        if isinstance(e, (socket.timeout, TimeoutError)):
+            return 504, "upstream_timeout", "upstream_read"
+        if isinstance(e, (http.client.IncompleteRead,
+                         ConnectionError,
+                         http.client.BadStatusLine)):
+            return 502, "upstream_comm_error", "upstream_read"
+
+    elif context == "upstream_connect":
+        if isinstance(e, (socket.timeout, TimeoutError)):
+            return 504, "upstream_timeout", "upstream_connect"
+        if isinstance(e, (ConnectionError, http.client.BadStatusLine)):
+            return 502, "upstream_comm_error", "upstream_connect"
+
+    # 其余一律视为代理自身内部异常
+    return 500, "proxy_internal", context

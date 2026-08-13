@@ -7,13 +7,14 @@ import json
 import ssl
 import socket
 import time
+import traceback
 from urllib.parse import urlparse
 
 from backend.config import Config
 from backend.services.log_service import LogService
 from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
-from backend.utils.helpers import get_api_url, detect_tool_call
+from backend.utils.helpers import get_api_url, detect_tool_call, classify_proxy_exception
 
 
 class StreamHandler:
@@ -48,6 +49,8 @@ class StreamHandler:
         self.input_tokens = 0
         self.output_tokens = 0
         self.usage_buffer = ""  # 用于收集usage信息的buffer
+        # 失败分类信息（None 表示尚未失败）；由内部 catch 设置后由外层统一落库
+        self._failure_info = None
 
     def handle_openai_stream(self):
         """处理OpenAI格式的流式请求"""
@@ -89,25 +92,40 @@ class StreamHandler:
                 print(f"❌ 上游返回错误状态码：{response.status}")
                 self.request_handler.wfile.write(f"data: {json.dumps({'error': error_msg})}\n\n".encode('utf-8'))
 
-                # 记录失败的流式请求
-                self._save_failed_stream_metrics(response.status, {"error": error_msg, "type": "upstream_error"})
+                # 上游返回非 200 —— 记录真实上游状态码
+                self._save_failed_stream_metrics(
+                    response.status,
+                    {"error": error_msg, "type": "upstream_error"},
+                    failed_at="upstream_status")
                 return
 
             print(f"✅ 上游响应状态：{response.status}")
 
-            # 流式读取并转发
+            # 流式读取并转发（内部 catch 会把失败写入 self._failure_info）
             self._stream_openai_response(response)
 
-            # 保存指标（成功情况下status_code为200）
-            self._save_stream_metrics(200)
+            # 落库：失败则按分类记录，否则记 200 成功
+            if self._failure_info is not None:
+                self._save_failed_stream_metrics(
+                    self._failure_info["status_code"],
+                    {"error": self._failure_info["error"],
+                     "type": self._failure_info["type"],
+                     "traceback": self._failure_info["traceback"]},
+                    failed_at=self._failure_info["failed_at"])
+            else:
+                # 保存指标（成功情况下status_code为200）
+                self._save_stream_metrics(200)
 
         except Exception as e:
             print(f"\n❌ 流式转发异常：{e}")
-            import traceback
             traceback.print_exc()
 
-            # 记录异常失败的流式请求
-            self._save_failed_stream_metrics(502, {"error": str(e), "type": "proxy_exception", "traceback": traceback.format_exc()})
+            # 建链/发请求/读状态行阶段异常 —— 按上游通信上下文分类
+            status, type_, failed_at = classify_proxy_exception(e, "upstream_connect")
+            self._save_failed_stream_metrics(
+                status,
+                {"error": str(e), "type": type_, "traceback": traceback.format_exc()},
+                failed_at=failed_at)
         finally:
             conn.close()
             self._cleanup_connection()
@@ -154,25 +172,40 @@ class StreamHandler:
                     f"event: error\ndata: {json.dumps({'type': 'error', 'error': {'message': error_msg}})}\n\n".encode('utf-8')
                 )
 
-                # 记录失败的流式请求
-                self._save_failed_stream_metrics(response.status, {"error": error_msg, "type": "upstream_error"})
+                # 上游返回非 200 —— 记录真实上游状态码
+                self._save_failed_stream_metrics(
+                    response.status,
+                    {"error": error_msg, "type": "upstream_error"},
+                    failed_at="upstream_status")
                 return
 
             print(f"✅ 上游响应状态：{response.status}")
 
-            # 流式读取并转发
+            # 流式读取并转发（内部 catch 会把失败写入 self._failure_info）
             self._stream_anthropic_response(response)
 
-            # 保存指标（成功情况下status_code为200）
-            self._save_stream_metrics(200)
+            # 落库：失败则按分类记录，否则记 200 成功
+            if self._failure_info is not None:
+                self._save_failed_stream_metrics(
+                    self._failure_info["status_code"],
+                    {"error": self._failure_info["error"],
+                     "type": self._failure_info["type"],
+                     "traceback": self._failure_info["traceback"]},
+                    failed_at=self._failure_info["failed_at"])
+            else:
+                # 保存指标（成功情况下status_code为200）
+                self._save_stream_metrics(200)
 
         except Exception as e:
             print(f"\n❌ Anthropic 流式转发异常：{e}")
-            import traceback
             traceback.print_exc()
 
-            # 记录异常失败的流式请求
-            self._save_failed_stream_metrics(502, {"error": str(e), "type": "proxy_exception", "traceback": traceback.format_exc()})
+            # 建链/发请求/读状态行阶段异常 —— 按上游通信上下文分类
+            status, type_, failed_at = classify_proxy_exception(e, "upstream_connect")
+            self._save_failed_stream_metrics(
+                status,
+                {"error": str(e), "type": type_, "traceback": traceback.format_exc()},
+                failed_at=failed_at)
         finally:
             conn.close()
             self._cleanup_connection()
@@ -216,8 +249,11 @@ class StreamHandler:
                 # 保存chunk数据用于日志记录
                 self.stream_chunks.append(chunk.decode('utf-8', errors='ignore'))
 
-                # 转发给客户端
+                # 转发给客户端（失败时会把分类写入 self._failure_info）
                 self._forward_chunk_to_client(chunk)
+                if self._failure_info is not None:
+                    # 客户端已断开，停止转发
+                    break
 
                 # 检测流结束标记
                 if b'[DONE]' in chunk:
@@ -226,9 +262,14 @@ class StreamHandler:
                         print(f"\n📦 检测到流结束标记 [DONE]")
 
         except http.client.IncompleteRead as e:
-            print(f"\n⚠️  不完整读取：已接收 {e.partial} 字节")
-        except (ConnectionResetError, BrokenPipeError) as e:
-            print(f"\n⚠️  客户端连接中断：{e}")
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
+        except (ConnectionError, http.client.BadStatusLine) as e:
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取异常：{e}")
+        except (socket.timeout, TimeoutError) as e:
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取超时：{e}")
 
     def _stream_anthropic_response(self, response):
         """流式传输Anthropic响应"""
@@ -265,11 +306,21 @@ class StreamHandler:
                         self.stream_complete_time = time.time()
                         print(f"\n📦 检测到 message_stop 事件")
 
-                # 转发给客户端
+                # 转发给客户端（失败时会把分类写入 self._failure_info）
                 self._forward_chunk_to_client(chunk)
+                if self._failure_info is not None:
+                    # 客户端已断开，停止转发
+                    break
 
-        except Exception as e:
-            print(f"\n❌ 流式读取异常：{e}")
+        except http.client.IncompleteRead as e:
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
+        except (ConnectionError, http.client.BadStatusLine) as e:
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取异常：{e}")
+        except (socket.timeout, TimeoutError) as e:
+            self._record_failure(e, "upstream_read")
+            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取超时：{e}")
 
     def _extract_usage_from_openai_chunk(self, chunk: bytes):
         """从OpenAI chunk中提取usage信息"""
@@ -417,9 +468,21 @@ class StreamHandler:
                 self.request_handler.wfile.flush()
 
             print(f"✓ 转发数据块 #{self.chunk_count}: {len(chunk)} bytes (累计: {self.total_bytes} bytes)")
-        except (ConnectionResetError, BrokenPipeError) as e:
-            print(f"\n⚠️  客户端连接中断：{e}")
-            raise
+        except (ConnectionError, socket.timeout, TimeoutError) as e:
+            # 客户端断开：覆盖 ConnectionAbortedError / ConnectionResetError / BrokenPipeError / 超时
+            self._record_failure(e, "client_write")
+            print(f"\n⚠️  [{self._failure_info['type']}] 客户端断开连接：{e}")
+
+    def _record_failure(self, e: BaseException, context: str):
+        """分类并记录失败信息到 self._failure_info（不落库，由外层统一落库）"""
+        status, type_, failed_at = classify_proxy_exception(e, context)
+        self._failure_info = {
+            "status_code": status,
+            "type": type_,
+            "failed_at": failed_at,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
     def _save_stream_metrics(self, status_code: int = 200):
         """保存流式性能指标"""
@@ -479,7 +542,7 @@ class StreamHandler:
         print(f"   总字节数：{self.total_bytes}")
         print("="*80 + "\n")
 
-    def _save_failed_stream_metrics(self, status_code: int, error_data: dict):
+    def _save_failed_stream_metrics(self, status_code: int, error_data: dict, failed_at: str = "stream_setup"):
         """保存失败的流式请求指标"""
         response_complete_time = time.time()
 
@@ -512,7 +575,7 @@ class StreamHandler:
             "status_code": status_code,
             "error": error_data,
             "timestamp": time.time(),
-            "failed_at": "stream_setup"
+            "failed_at": failed_at
         }
         self.log_service.save_response_log(self.request_id, response_data, status_code)
 

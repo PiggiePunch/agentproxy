@@ -5,6 +5,7 @@ API请求处理器
 import json
 import time
 import threading
+import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -16,7 +17,7 @@ from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
 from backend.services.trace_service import TraceService
 from backend.utils.logger import log_request_info, log_response_info
-from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call
+from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call, classify_proxy_exception
 
 
 # 全局服务实例
@@ -297,7 +298,8 @@ class APIHandler(BaseAPIHandler):
 
         except Exception as e:
             print(f"❌ 转发请求失败：{e}")
-            self._send_json_response(502, {"error": str(e)})
+            status, type_, failed_at = classify_proxy_exception(e, "upstream_connect")
+            self._send_json_response(status, {"error": str(e), "type": type_, "failed_at": failed_at})
 
     def _handle_chat_completions(self, request_id: str, headers: dict, body_data: dict,
                                 request_received_time: float, inter_request_gap: Optional[float]):
@@ -397,25 +399,28 @@ class APIHandler(BaseAPIHandler):
 
         except Exception as e:
             print(f"❌ 转发请求失败：{e}")
-            import traceback
             traceback.print_exc()
+
+            # 按上游通信上下文分类（forward_request 含 request/getresponse/read）
+            status, type_, failed_at = classify_proxy_exception(e, "upstream_connect")
 
             # 记录失败的请求
             response_received_time = time.time()
             error_response = {
                 "error": str(e),
-                "type": "proxy_error",
-                "traceback": traceback.format_exc()
+                "type": type_,
+                "traceback": traceback.format_exc(),
+                "failed_at": failed_at
             }
 
             # 保存错误响应日志
-            log_service.save_response_log(request_id, error_response, 502)
+            log_service.save_response_log(request_id, error_response, status)
 
             # 即使失败也要记录指标
             metrics = proxy_service.calculate_metrics(
                 request_received_time, forward_start_time, response_received_time,
-                inter_request_gap, 502, False, 0, 0, endpoint, "POST", api_type, is_stream
+                inter_request_gap, status, False, 0, 0, endpoint, "POST", api_type, is_stream
             )
             metrics_service.save_metrics(request_id, metrics)
 
-            self._send_json_response(502, {"error": str(e)})
+            self._send_json_response(status, error_response)
