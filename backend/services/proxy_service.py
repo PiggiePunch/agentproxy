@@ -7,6 +7,8 @@ import json
 import ssl
 import time
 import socket
+import gzip
+import zlib
 from urllib.parse import urlparse
 from typing import Tuple, Optional, Dict, Any
 
@@ -24,7 +26,8 @@ class ProxyService:
     def prepare_forward_headers(self, headers_dict: dict, api_type: str = "openai") -> dict:
         """准备转发请求头"""
         forward_headers = {}
-        skip_headers = ['host', 'content-length', 'transfer-encoding']
+        # accept-encoding 必须剥离：代理需解析响应体，不能让上游 gzip 压缩
+        skip_headers = ['host', 'content-length', 'transfer-encoding', 'accept-encoding']
 
         custom_headers = []
 
@@ -104,10 +107,46 @@ class ProxyService:
             # 读取响应体
             response_body = response.read()
 
+            # 防御性解压：正常路径已剥离 accept-encoding，上游理应不压缩；
+            # 但部分上游会无视协商强行压缩，这里按 Content-Encoding 兜底解压
+            content_encoding = response.getheader('Content-Encoding')
+            if content_encoding:
+                response_body = self._decompress_body(content_encoding, response_body)
+
             return response, response_body
 
         finally:
             conn.close()
+
+    @staticmethod
+    def _decompress_body(content_encoding: str, body: bytes) -> bytes:
+        """按 Content-Encoding 解压响应体（防御性，正常路径不应触发）"""
+        enc = (content_encoding or '').lower().strip()
+        if not enc or enc == 'identity':
+            return body
+        try:
+            if enc == 'gzip':
+                return gzip.decompress(body)
+            if enc == 'deflate':
+                # deflate 可能是 zlib 包装，也可能是 raw deflate
+                try:
+                    return zlib.decompress(body)
+                except zlib.error:
+                    return zlib.decompress(body, -zlib.MAX_WBITS)
+            if enc == 'br':
+                try:
+                    import brotli
+                except ImportError:
+                    print("[proxy] response is brotli-compressed but brotli package not installed; returning raw")
+                    return body
+                try:
+                    return brotli.decompress(body)
+                except Exception as e:
+                    print(f"[proxy] brotli decompress failed: {e}; returning raw")
+                    return body
+        except Exception as e:
+            print(f"[proxy] decompress {enc} failed: {e}; returning raw")
+        return body
 
     def extract_token_usage(self, response_body: dict, request_body: dict = None) -> tuple:
         """提取token使用量"""

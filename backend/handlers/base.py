@@ -36,7 +36,8 @@ class BaseAPIHandler(BaseHTTPRequestHandler):
 
         if headers:
             for key, value in headers.items():
-                if key.lower() not in ['content-type', 'content-length', 'transfer-encoding']:
+                # content-encoding 必须丢弃：body 已解压/重序列化为明文，再带 gzip 头会让客户端误判
+                if key.lower() not in ['content-type', 'content-length', 'transfer-encoding', 'content-encoding']:
                     self.send_header(key, value)
 
         response_body = json.dumps(data, ensure_ascii=False).encode('utf-8')
