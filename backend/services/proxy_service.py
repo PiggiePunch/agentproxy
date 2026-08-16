@@ -48,7 +48,7 @@ class ProxyService:
         forward_headers["Host"] = parsed.netloc
 
         if custom_headers:
-            print(f"📋 转发 {len(custom_headers)} 个自定义/扩展请求头:")
+            print(f"转发 {len(custom_headers)} 个自定义/扩展请求头:")
             for header in custom_headers:
                 print(header)
 
@@ -154,9 +154,18 @@ class ProxyService:
         output_tokens = 0
 
         if isinstance(response_body, dict):
-            usage = response_body.get('usage', {})
-            input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
-            output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
+            usage = response_body.get('usage') or {}
+            if isinstance(usage, dict):
+                if usage.get('prompt_tokens') is not None:
+                    # OpenAI格式：prompt_tokens 已包含缓存部分（cached_tokens 是其子集）
+                    input_tokens = usage.get('prompt_tokens') or 0
+                else:
+                    # Anthropic格式：input_tokens 只是未命中缓存的部分，
+                    # 加上缓存写入/读取才是模型实际接收的完整上下文
+                    input_tokens = (usage.get('input_tokens') or 0) + \
+                                   (usage.get('cache_creation_input_tokens') or 0) + \
+                                   (usage.get('cache_read_input_tokens') or 0)
+                output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
 
         return input_tokens, output_tokens
 

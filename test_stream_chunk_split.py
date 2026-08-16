@@ -2,10 +2,12 @@
 """
 流式解析修复验证脚本（无第三方依赖，直接运行: python test_stream_chunk_split.py）
 
-验证三个修复点：
+验证四个修复点：
 1. TTFB：time_to_first_byte 应在上游首字节真实到达后才打点（能反映出上游的首字节延迟）
 2. 跨 chunk：usage/首token 的 SSE 事件被拆分到多个 TCP chunk（含 UTF-8 多字节字符中间切断）时不漏检
-3. Anthropic：input_tokens 从 message_start 事件提取，output_tokens 从 message_delta 提取
+3. Anthropic：input_tokens 从 message_start 事件提取，output_tokens 从 message_delta 事件提取
+4. Anthropic 输入token = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
+   （agent 预置提示词走缓存，只取 input_tokens 会严重少算；流式/非流式均验证）
 
 原理：
 - 启动一个"假上游"SSE 服务器：先延迟 FIRST_BYTE_DELAY 秒再吐第一个字节，
@@ -27,6 +29,7 @@ import urllib.request
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 PROXY_PORT = 18090
 UPSTREAM_PORT = 18091
@@ -35,7 +38,12 @@ FRAG_DELAY = 0.05         # 片段间间隔（秒），确保事件被拆到不�
 
 EXPECTED_OPENAI_INPUT = 123
 EXPECTED_OPENAI_OUTPUT = 45
-EXPECTED_ANTHROPIC_INPUT = 77
+# Anthropic 输入侧：非缓存输入 77 + 缓存写入 15411 + 缓存读取 200
+# （agent 预置系统提示词通常走 cache_creation/cache_read，必须三项相加）
+ANTHROPIC_INPUT_BASE = 77
+ANTHROPIC_CACHE_WRITE = 15411
+ANTHROPIC_CACHE_READ = 200
+EXPECTED_ANTHROPIC_INPUT = ANTHROPIC_INPUT_BASE + ANTHROPIC_CACHE_WRITE + ANTHROPIC_CACHE_READ
 EXPECTED_ANTHROPIC_OUTPUT = 88
 
 
@@ -68,10 +76,16 @@ def build_openai_fragments():
 
 
 def build_anthropic_fragments():
-    """Anthropic 格式 SSE，message_start/首token/message_delta 事件均被切开"""
+    """Anthropic 格式 SSE，message_start/首token/message_delta 事件均被切开
+
+    usage 模拟真实上游（如 GLM/dashscope Anthropic 兼容端点）：
+    message_start 带完整输入侧分解（含缓存），message_delta 也带完整 usage。
+    """
     e_start = ('event: message_start\n'
                'data: {"type":"message_start","message":{"id":"msg_test","type":"message","role":"assistant",'
-               '"content":[],"model":"claude-test","usage":{"input_tokens":%d,"output_tokens":1}}}\n\n') % EXPECTED_ANTHROPIC_INPUT
+               '"content":[],"model":"claude-test","usage":{"input_tokens":%d,'
+               '"cache_creation_input_tokens":%d,"cache_read_input_tokens":%d,"output_tokens":1}}}\n\n') % (
+        ANTHROPIC_INPUT_BASE, ANTHROPIC_CACHE_WRITE, ANTHROPIC_CACHE_READ)
     e_block_start = ('event: content_block_start\n'
                      'data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}\n\n')
     e_delta = ('event: content_block_delta\n'
@@ -79,20 +93,19 @@ def build_anthropic_fragments():
     e_block_stop = 'event: content_block_stop\ndata: {"type":"content_block_stop","index":0}\n\n'
     e_msg_delta = ('event: message_delta\n'
                    'data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},'
-                   '"usage":{"output_tokens":%d}}\n\n') % EXPECTED_ANTHROPIC_OUTPUT
+                   '"usage":{"input_tokens":%d,"cache_creation_input_tokens":%d,'
+                   '"cache_read_input_tokens":%d,"output_tokens":%d}}\n\n') % (
+        ANTHROPIC_INPUT_BASE, ANTHROPIC_CACHE_WRITE, ANTHROPIC_CACHE_READ, EXPECTED_ANTHROPIC_OUTPUT)
     e_stop = 'event: message_stop\ndata: {"type":"message_stop"}\n\n'
 
     b_start = e_start.encode('utf-8')
-    cut_start = len(('event: message_start\ndata: {"type":"message_start","message":{"id":"msg_test",'
-                     '"type":"message","role":"assistant","content":[],"model":"claude-test",'
-                     '"usage":{"input_to').encode('utf-8'))
+    cut_start = b_start.index(b'cache_creation_input_tokens') + 8  # 缓存字段名中间切开
 
     b_delta = e_delta.encode('utf-8')
     cut_delta = b_delta.index('你好'.encode('utf-8')) + 1  # UTF-8 多字节字符中间切开
 
     b_md = e_msg_delta.encode('utf-8')
-    cut_md = len(('event: message_delta\ndata: {"type":"message_delta","delta":{"stop_reason":"end_turn",'
-                  '"stop_sequence":null},"usage":{"output_to').encode('utf-8'))
+    cut_md = b_md.index(b'output_tokens') + 5  # usage JSON 切开
 
     return [
         b_start[:cut_start],
@@ -173,20 +186,42 @@ def find_metric(metrics, api_type):
 # ============= 主流程 =============
 
 def main():
+    # 输出含emoji/特殊符号，Windows GBK控制台下会编码崩溃，强制UTF-8
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
     failures = []
 
     def check(name, cond, detail=""):
         if cond:
-            print(f"  ✓ {name}")
+            print(f"  [PASS] {name}")
         else:
-            print(f"  ✗ {name} {detail}")
+            print(f"  [FAIL] {name} {detail}")
             failures.append(name)
+
+    # ---- 非流式 token 提取（单测，无需启动服务）----
+    from backend.services.proxy_service import ProxyService
+    ps = ProxyService()
+
+    print("[非流式 usage 提取]")
+    # 真实上游返回的 Anthropic usage（agent 预置提示词走缓存写入）
+    real_usage = {"cache_creation": {"ephemeral_5m_input_tokens": 15411}, "output_tokens": 30,
+                  "cache_creation_input_tokens": 15411, "input_tokens": 6,
+                  "cache_read_input_tokens": 0, "prompt_tokens_details": {"cached_tokens": 0}}
+    inp, out = ps.extract_token_usage({"usage": real_usage})
+    check("Anthropic usage 输入=6+15411+0（含缓存）", inp == 15417 and out == 30, f"(实际 {inp}/{out})")
+    # 真实非流式样例：缓存为0时结果即 input_tokens 本身
+    real_nonstream = {"cache_creation_input_tokens": 0, "cache_read_input_tokens": 0,
+                      "input_tokens": 19, "output_tokens": 584,
+                      "prompt_tokens_details": {"cached_tokens": 0}}
+    inp3, out3 = ps.extract_token_usage({"usage": real_nonstream})
+    check("Anthropic 非流式样例 输入=19 输出=584", inp3 == 19 and out3 == 584, f"(实际 {inp3}/{out3})")
+    # OpenAI 格式：prompt_tokens 本身已含缓存部分
+    inp2, out2 = ps.extract_token_usage({"usage": {"prompt_tokens": 100, "completion_tokens": 20,
+                                                   "prompt_tokens_details": {"cached_tokens": 80}}})
+    check("OpenAI usage 直接取 prompt_tokens", inp2 == 100 and out2 == 20, f"(实际 {inp2}/{out2})")
 
     upstream = http.server.ThreadingHTTPServer(('127.0.0.1', UPSTREAM_PORT), FakeUpstreamHandler)
     threading.Thread(target=upstream.serve_forever, daemon=True).start()
-
-    # 代理启动信息含emoji，Windows GBK控制台下会因编码崩溃，强制UTF-8
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
     env = os.environ.copy()
     env['PYTHONIOENCODING'] = 'utf-8'
@@ -201,7 +236,7 @@ def main():
                              stdout=proxy_log, stderr=subprocess.STDOUT)
     try:
         if not wait_for_proxy():
-            print("❌ 代理启动失败")
+            print("代理启动失败")
             proxy_log.seek(0)
             print(proxy_log.read().decode('utf-8', errors='ignore')[-3000:])
             sys.exit(1)
@@ -252,7 +287,7 @@ def main():
             check("找到 Anthropic 流式指标", False)
         else:
             check("找到 Anthropic 流式指标", True)
-            check(f"input_tokens == {EXPECTED_ANTHROPIC_INPUT}（来自 message_start）",
+            check(f"input_tokens == {EXPECTED_ANTHROPIC_INPUT}（input+缓存写入+缓存读取，message_delta完整usage未覆盖message_start值）",
                   m_anthropic['input_tokens'] == EXPECTED_ANTHROPIC_INPUT, f"(实际 {m_anthropic['input_tokens']})")
             check(f"output_tokens == {EXPECTED_ANTHROPIC_OUTPUT}（来自 message_delta，事件被拆分仍可提取）",
                   m_anthropic['output_tokens'] == EXPECTED_ANTHROPIC_OUTPUT, f"(实际 {m_anthropic['output_tokens']})")
@@ -263,12 +298,12 @@ def main():
                   f"(实际 {m_anthropic['time_to_first_byte']:.3f}s)")
 
         if failures:
-            print(f"\n❌ {len(failures)} 项检查未通过: {failures}")
+            print(f"\n{len(failures)} 项检查未通过: {failures}")
             print("\n----- 代理输出（尾部）-----")
             proxy_log.seek(0)
             print(proxy_log.read().decode('utf-8', errors='ignore')[-4000:])
             sys.exit(1)
-        print("\n✅ 全部检查通过")
+        print("\n全部检查通过")
 
     finally:
         proxy.terminate()

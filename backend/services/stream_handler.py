@@ -61,7 +61,7 @@ class StreamHandler:
 
     def handle_openai_stream(self):
         """处理OpenAI格式的流式请求"""
-        print("\n🌊 检测到流式请求 (stream=true)")
+        print("\n检测到流式请求 (stream=true)")
 
         request_body = json.dumps(self.body_data).encode('utf-8')
         target_url = get_api_url("openai")
@@ -86,7 +86,7 @@ class StreamHandler:
             )
 
         try:
-            print("🔗 建立流式连接：客户端 ↔ 代理 ↔ 大模型")
+            print("建立流式连接：客户端 <-> 代理 <-> 大模型")
 
             # 发送请求
             conn.request("POST", full_path, body=request_body, headers=self.forward_headers)
@@ -96,7 +96,7 @@ class StreamHandler:
 
             if response.status != 200:
                 error_msg = response.read().decode('utf-8')
-                print(f"❌ 上游返回错误状态码：{response.status}")
+                print(f"上游返回错误状态码：{response.status}")
                 self.request_handler.wfile.write(f"data: {json.dumps({'error': error_msg})}\n\n".encode('utf-8'))
 
                 # 上游返回非 200 —— 记录真实上游状态码
@@ -106,7 +106,7 @@ class StreamHandler:
                     failed_at="upstream_status")
                 return
 
-            print(f"✅ 上游响应状态：{response.status}")
+            print(f"上游响应状态：{response.status}")
 
             # 流式读取并转发（内部 catch 会把失败写入 self._failure_info）
             self._stream_openai_response(response)
@@ -124,7 +124,7 @@ class StreamHandler:
                 self._save_stream_metrics(200)
 
         except Exception as e:
-            print(f"\n❌ 流式转发异常：{e}")
+            print(f"\n流式转发异常：{e}")
             traceback.print_exc()
 
             # 建链/发请求/读状态行阶段异常 —— 按上游通信上下文分类
@@ -139,7 +139,7 @@ class StreamHandler:
 
     def handle_anthropic_stream(self):
         """处理Anthropic格式的流式请求"""
-        print("\n🌊 开始 Anthropic 流式转发（透传模式）")
+        print("\n开始 Anthropic 流式转发（透传模式）")
 
         request_body = json.dumps(self.body_data).encode('utf-8')
         target_url = get_api_url("anthropic")
@@ -164,7 +164,7 @@ class StreamHandler:
             )
 
         try:
-            print("🔗 建立流式连接：客户端 ↔ 代理 ↔ Anthropic 上游")
+            print("建立流式连接：客户端 <-> 代理 <-> Anthropic 上游")
 
             # 发送请求
             conn.request("POST", full_path, body=request_body, headers=self.forward_headers)
@@ -174,7 +174,7 @@ class StreamHandler:
 
             if response.status != 200:
                 error_msg = response.read().decode('utf-8')
-                print(f"❌ 上游返回错误状态码：{response.status}")
+                print(f"上游返回错误状态码：{response.status}")
                 self.request_handler.wfile.write(
                     f"event: error\ndata: {json.dumps({'type': 'error', 'error': {'message': error_msg}})}\n\n".encode('utf-8')
                 )
@@ -186,7 +186,7 @@ class StreamHandler:
                     failed_at="upstream_status")
                 return
 
-            print(f"✅ 上游响应状态：{response.status}")
+            print(f"上游响应状态：{response.status}")
 
             # 流式读取并转发（内部 catch 会把失败写入 self._failure_info）
             self._stream_anthropic_response(response)
@@ -204,7 +204,7 @@ class StreamHandler:
                 self._save_stream_metrics(200)
 
         except Exception as e:
-            print(f"\n❌ Anthropic 流式转发异常：{e}")
+            print(f"\nAnthropic 流式转发异常：{e}")
             traceback.print_exc()
 
             # 建链/发请求/读状态行阶段异常 —— 按上游通信上下文分类
@@ -225,7 +225,7 @@ class StreamHandler:
         self.request_handler.send_header('Connection', 'close')
         self.request_handler.send_header('X-Accel-Buffering', 'no')
         self.request_handler.end_headers()
-        print("✓ 响应头已发送，开始流式传输...")
+        print("响应头已发送，开始流式传输...")
 
     def _stream_openai_response(self, response):
         """流式传输OpenAI响应"""
@@ -233,7 +233,7 @@ class StreamHandler:
             while True:
                 chunk = response.read1(4096)
                 if not chunk:
-                    print(f"\n📦 流结束：上游关闭连接")
+                    print(f"\n流结束：上游关闭连接")
                     break
 
                 # 首字节真实到达后才打点（read1 阻塞返回即代表 body 有数据到达）
@@ -260,17 +260,17 @@ class StreamHandler:
                 if b'[DONE]' in chunk:
                     if self.stream_complete_time is None:
                         self.stream_complete_time = time.time()
-                        print(f"\n📦 检测到流结束标记 [DONE]")
+                        print(f"\n检测到流结束标记 [DONE]")
 
         except http.client.IncompleteRead as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
+            print(f"\n[{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
         except (ConnectionError, http.client.BadStatusLine) as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取异常：{e}")
+            print(f"\n[{self._failure_info['type']}] 上游读取异常：{e}")
         except (socket.timeout, TimeoutError) as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取超时：{e}")
+            print(f"\n[{self._failure_info['type']}] 上游读取超时：{e}")
 
     def _stream_anthropic_response(self, response):
         """流式传输Anthropic响应"""
@@ -278,7 +278,7 @@ class StreamHandler:
             while True:
                 chunk = response.read1(4096)
                 if not chunk:
-                    print(f"\n📦 Anthropic 流结束")
+                    print(f"\nAnthropic 流结束")
                     break
 
                 # 首字节真实到达后才打点（read1 阻塞返回即代表 body 有数据到达）
@@ -299,7 +299,7 @@ class StreamHandler:
                 if b'event: message_stop' in chunk:
                     if self.stream_complete_time is None:
                         self.stream_complete_time = time.time()
-                        print(f"\n📦 检测到 message_stop 事件")
+                        print(f"\n检测到 message_stop 事件")
 
                 # 转发给客户端（失败时会把分类写入 self._failure_info）
                 self._forward_chunk_to_client(chunk)
@@ -309,13 +309,13 @@ class StreamHandler:
 
         except http.client.IncompleteRead as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
+            print(f"\n[{self._failure_info['type']}] 不完整读取：已接收 {getattr(e, 'partial', '?')} 字节")
         except (ConnectionError, http.client.BadStatusLine) as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取异常：{e}")
+            print(f"\n[{self._failure_info['type']}] 上游读取异常：{e}")
         except (socket.timeout, TimeoutError) as e:
             self._record_failure(e, "upstream_read")
-            print(f"\n⚠️  [{self._failure_info['type']}] 上游读取超时：{e}")
+            print(f"\n[{self._failure_info['type']}] 上游读取超时：{e}")
 
     def _drain_complete_events(self, chunk: bytes) -> list:
         """将chunk累积进内部缓冲区，按SSE空行分隔切出完整事件返回
@@ -359,7 +359,7 @@ class StreamHandler:
                         self.input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
                         self.output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
                         self._usage_finalized = True
-                        print(f"\n✓ 检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
+                        print(f"\n检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
 
                 # 检测首token
                 if not self.has_first_token:
@@ -368,8 +368,26 @@ class StreamHandler:
                         if delta.get('content'):
                             self.first_token_time = time.time()
                             self.has_first_token = True
-                            print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
+                            print(f"\n首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
                             break
+
+    @staticmethod
+    def _sum_anthropic_input_tokens(usage: dict, fallback: int) -> int:
+        """计算Anthropic输入token总数 = input_tokens + 缓存写入 + 缓存读取
+
+        usage中的 input_tokens 只统计未命中缓存的部分，agent 的预置系统提示词
+        通常走 cache_creation_input_tokens / cache_read_input_tokens，
+        三项相加才是模型实际接收的完整上下文。
+        若 usage 中没有任何输入侧字段（如标准 message_delta 只带 output_tokens），
+        保留 fallback（已有值）。多个事件都上报时取最大值，防止被不完整值覆盖。
+        """
+        base = usage.get('input_tokens') or 0
+        cache_write = usage.get('cache_creation_input_tokens') or 0
+        cache_read = usage.get('cache_read_input_tokens') or 0
+        total = base + cache_write + cache_read
+        if total == 0:
+            return fallback
+        return max(total, fallback)
 
     def _parse_anthropic_chunk(self, chunk: bytes):
         """从Anthropic chunk中提取usage并检测首token（跨chunk缓冲）
@@ -404,14 +422,14 @@ class StreamHandler:
                     if current_event == 'message_start':
                         usage = data.get('message', {}).get('usage') or {}
                         if usage:
-                            self.input_tokens = usage.get('input_tokens', self.input_tokens)
-                            print(f"\n✓ 检测到token使用(message_start): 输入={self.input_tokens}")
+                            self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
+                            print(f"\n检测到token使用(message_start): 输入={self.input_tokens}")
                     elif current_event == 'message_delta' and isinstance(data.get('usage'), dict):
                         usage = data['usage']
-                        self.input_tokens = usage.get('input_tokens', self.input_tokens)
+                        self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
                         self.output_tokens = usage.get('output_tokens', self.output_tokens)
                         self._usage_finalized = True
-                        print(f"\n✓ 检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}")
+                        print(f"\n检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}")
 
                 # 检测首token
                 if not self.has_first_token and current_event == 'content_block_delta':
@@ -420,7 +438,7 @@ class StreamHandler:
                        (delta.get('type') == 'thinking_delta' and delta.get('thinking', '')):
                         self.first_token_time = time.time()
                         self.has_first_token = True
-                        print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
+                        print(f"\n首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
 
     def _forward_chunk_to_client(self, chunk: bytes):
         """转发数据块给客户端"""
@@ -431,11 +449,11 @@ class StreamHandler:
                 self.request_handler.wfile.write(chunk)
                 self.request_handler.wfile.flush()
 
-            print(f"✓ 转发数据块 #{self.chunk_count}: {len(chunk)} bytes (累计: {self.total_bytes} bytes)")
+            print(f"转发数据块 #{self.chunk_count}: {len(chunk)} bytes (累计: {self.total_bytes} bytes)")
         except (ConnectionError, socket.timeout, TimeoutError) as e:
             # 客户端断开：覆盖 ConnectionAbortedError / ConnectionResetError / BrokenPipeError / 超时
             self._record_failure(e, "client_write")
-            print(f"\n⚠️  [{self._failure_info['type']}] 客户端断开连接：{e}")
+            print(f"\n[{self._failure_info['type']}] 客户端断开连接：{e}")
 
     def _record_failure(self, e: BaseException, context: str):
         """分类并记录失败信息到 self._failure_info（不落库，由外层统一落库）"""
@@ -495,13 +513,13 @@ class StreamHandler:
         }
         self.log_service.save_response_log(self.request_id, response_data, status_code)
 
-        print(f"\n📁 已保存流式响应: {self.chunk_count} 个数据块，总大小 {self.total_bytes} 字节")
-        print(f"📊 Token统计: 输入={self.input_tokens}, 输出={self.output_tokens}")
+        print(f"\n已保存流式响应: {self.chunk_count} 个数据块，总大小 {self.total_bytes} 字节")
+        print(f"Token统计: 输入={self.input_tokens}, 输出={self.output_tokens}")
         print("\n" + "="*80)
         if status_code == 200:
-            print(f"✅ 流式转发完成")
+            print(f"流式转发完成")
         else:
-            print(f"❌ 流式请求失败 (状态码: {status_code})")
+            print(f"流式请求失败 (状态码: {status_code})")
         print(f"   总数据块：{self.chunk_count}")
         print(f"   总字节数：{self.total_bytes}")
         print("="*80 + "\n")
@@ -543,22 +561,22 @@ class StreamHandler:
         }
         self.log_service.save_response_log(self.request_id, response_data, status_code)
 
-        print(f"\n📁 已保存失败的流式请求 (状态码: {status_code})")
+        print(f"\n已保存失败的流式请求 (状态码: {status_code})")
         print(f"   错误类型: {error_data.get('type', 'unknown')}")
         print("="*80 + "\n")
 
     def _cleanup_connection(self):
         """清理连接"""
-        print("✓ 上游连接已关闭")
-        print(f"✓ 总计发送 {self.total_bytes} 字节给客户端")
+        print("上游连接已关闭")
+        print(f"总计发送 {self.total_bytes} 字节给客户端")
 
         try:
             if hasattr(self.request_handler.connection, 'shutdown'):
                 self.request_handler.connection.shutdown(socket.SHUT_WR)
-                print("✓ 已关闭连接写端，发送 EOF 给客户端")
+                print("已关闭连接写端，发送 EOF 给客户端")
                 time.sleep(0.5)
         except Exception as e:
-            print(f"⚠️  关闭写端时出错：{e}")
+            print(f"关闭写端时出错：{e}")
 
     def _build_stream_path(self, parsed, endpoint_path: str) -> str:
         """智能构建流式请求路径（与 proxy_service.py 保持一致）"""
