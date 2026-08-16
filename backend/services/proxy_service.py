@@ -174,7 +174,9 @@ class ProxyService:
                          status_code: int = 200, has_tool_call: bool = False,
                          input_tokens: int = 0, output_tokens: int = 0,
                          endpoint: str = "", method: str = "POST",
-                         api_type: str = "", stream: bool = False) -> dict:
+                         api_type: str = "", stream: bool = False,
+                         session_id: Optional[str] = None,
+                         session_source: Optional[str] = None) -> dict:
         """计算性能指标"""
         return {
             "request_received_time": request_received_time,
@@ -192,5 +194,7 @@ class ProxyService:
             "status_code": status_code,
             "has_tool_call": has_tool_call,
             "input_tokens": input_tokens,
-            "output_tokens": output_tokens
+            "output_tokens": output_tokens,
+            "session_id": session_id,
+            "session_source": session_source
         }

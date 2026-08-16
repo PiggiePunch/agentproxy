@@ -6,7 +6,7 @@
     <title>AgentProxy 控制台</title>
 
     <!-- 本地资源 -->
-    <link rel="stylesheet" href="/static/css/style.css?v=19">
+    <link rel="stylesheet" href="/static/css/style.css?v=20">
     <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -333,12 +333,19 @@
                             </svg>
                             最近请求记录
                         </div>
+                        <div class="session-filter-bar">
+                            <span class="session-count" id="sessionCount"></span>
+                            <select id="sessionFilter" title="按会话过滤请求">
+                                <option value="">全部会话</option>
+                            </select>
+                        </div>
                     </div>
                     <div id="requestsTableContainer">
                         <table class="requests-table">
                             <thead>
                                 <tr>
                                     <th>时间戳</th>
+                                    <th>会话</th>
                                     <th>请求类型</th>
                                     <th>工具调用</th>
                                     <th>状态码</th>
@@ -353,7 +360,7 @@
                             </thead>
                             <tbody id="requestsTableBody">
                                 <tr>
-                                    <td colspan="11">
+                                    <td colspan="12">
                                         <div class="loading-state">
                                             <div class="spinner"></div>
                                             <div>加载指标数据中...</div>
@@ -491,6 +498,6 @@
     </div>
 
     <!-- 前端逻辑 -->
-    <script src="/static/js/app.js?v=19"></script>
+    <script src="/static/js/app.js?v=20"></script>
 </body>
 </html>

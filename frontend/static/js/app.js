@@ -15,6 +15,13 @@ let pageSize = 10;  // 默认每页10条
 let allMetrics = [];  // 存储所有metrics数据
 let lastMetricsHash = '';  // 用于检测数据变化，避免无意义的DOM重建
 
+// 会话过滤状态（'' = 全部会话，'__none__' = 无会话，其他为会话ID）
+let sessionFilter = '';
+
+// 会话配色（AntV category10 色板），同一会话ID固定映射同一颜色
+const SESSION_COLORS = ['#5B8FF9', '#5AD8A6', '#F6BD16', '#E86452', '#6DC8EC',
+                        '#945FB9', '#FF9845', '#1E9493', '#FF99C3', '#61DDAA'];
+
 // Trace数据
 let allTraces = [];
 
@@ -332,6 +339,7 @@ async function refreshData() {
         document.getElementById('successRate').textContent = (summary.success_rate || 0).toFixed(1);
 
         updateCharts(data.metrics);
+        updateSessionFilterOptions(data.metrics);
         updateTable(data.metrics);
 
         hideErrorBanner();
@@ -365,17 +373,36 @@ function updateCharts(metrics) {
 }
 
 /**
- * 更新表格
+ * 更新表格（数据接收入口，刷新时调用）
  */
 function updateTable(metrics) {
-    const tableBody = document.getElementById('requestsTableBody');
+    allMetrics = (metrics || []).slice(-100).reverse();
+    renderTable();
+}
 
-    if (!metrics || metrics.length === 0) {
+/**
+ * 按当前会话过滤条件筛选
+ */
+function filterMetricsBySession(metrics) {
+    if (!sessionFilter) return metrics;
+    if (sessionFilter === '__none__') return metrics.filter(m => !m.session_id);
+    return metrics.filter(m => m.session_id === sessionFilter);
+}
+
+/**
+ * 渲染表格（会话过滤 + 分页 + 行生成）
+ */
+function renderTable() {
+    const tableBody = document.getElementById('requestsTableBody');
+    const filteredMetrics = filterMetricsBySession(allMetrics);
+
+    if (filteredMetrics.length === 0) {
+        const emptyText = allMetrics.length === 0 ? '暂无请求记录' : '无符合过滤条件的请求记录';
         tableBody.innerHTML = `
             <tr>
-                <td colspan="11">
+                <td colspan="12">
                     <div class="loading-state">
-                        <div style="color: #4E5969;">暂无请求记录</div>
+                        <div style="color: #4E5969;">${emptyText}</div>
                     </div>
                 </td>
             </tr>
@@ -385,27 +412,25 @@ function updateTable(metrics) {
         return;
     }
 
-    allMetrics = metrics.slice(-100).reverse();
-
     // 检测数据是否变化，避免无变化时重建DOM
-    const currentHash = allMetrics.map(m => m.request_id + ':' + m.status_code + ':' + (m.total_time || 0)).join('|');
-    if (currentHash === lastMetricsHash && currentPage === Math.ceil(allMetrics.length / pageSize || 1)) {
+    const currentHash = sessionFilter + '|' + filteredMetrics.map(m => m.request_id + ':' + m.status_code + ':' + (m.total_time || 0)).join('|');
+    if (currentHash === lastMetricsHash) {
         return;
     }
     lastMetricsHash = currentHash;
 
-    const totalPages = Math.ceil(allMetrics.length / pageSize);
+    const totalPages = Math.ceil(filteredMetrics.length / pageSize);
     if (currentPage > totalPages && totalPages > 0) {
         currentPage = totalPages;
     }
 
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const pageMetrics = allMetrics.slice(startIndex, endIndex);
+    const pageMetrics = filteredMetrics.slice(startIndex, endIndex);
 
     tableBody.innerHTML = pageMetrics.map(m => generateTableRow(m)).join('');
 
-    updatePagination(allMetrics.length);
+    updatePagination(filteredMetrics.length);
 }
 
 /**
@@ -448,10 +473,11 @@ function generateTableRow(m) {
 
     return `
         <tr>
-            <td>
+            <td ${m.session_id ? `style="box-shadow: inset 3px 0 0 ${sessionColor(m.session_id)}"` : ''}>
                 <span class="latency-indicator ${latencyClass}"></span>
                 <span class="timestamp">${timestamp}</span>
             </td>
+            <td>${generateSessionCell(m)}</td>
             <td>
                 <span class="badge ${m.stream ? 'badge-stream' : 'badge-standard'}">
                     ${m.stream ? '流式传输' : '标准请求'}
@@ -498,22 +524,114 @@ function updatePagination(totalItems) {
 function goToPrevPage() {
     if (currentPage > 1) {
         currentPage--;
-        updateTable(allMetrics);
+        lastMetricsHash = '';
+        renderTable();
     }
 }
 
 function goToNextPage() {
-    const totalPages = Math.ceil(allMetrics.length / pageSize);
+    const totalPages = Math.ceil(filterMetricsBySession(allMetrics).length / pageSize);
     if (currentPage < totalPages) {
         currentPage++;
-        updateTable(allMetrics);
+        lastMetricsHash = '';
+        renderTable();
     }
 }
 
 function changePageSize(newSize) {
     pageSize = parseInt(newSize);
     currentPage = 1;
-    updateTable(allMetrics);
+    lastMetricsHash = '';
+    renderTable();
+}
+
+/**
+ * 设置会话过滤条件（空字符串 = 全部会话）
+ */
+function setSessionFilter(value) {
+    sessionFilter = value;
+    currentPage = 1;
+    lastMetricsHash = '';
+    document.getElementById('sessionFilter').value = value;
+    renderTable();
+}
+
+/**
+ * 会话固定配色：按会话ID哈希映射色板，同一会话颜色稳定
+ */
+function sessionColor(sessionId) {
+    let h = 0;
+    for (let i = 0; i < sessionId.length; i++) {
+        h = (h * 31 + sessionId.charCodeAt(i)) >>> 0;
+    }
+    return SESSION_COLORS[h % SESSION_COLORS.length];
+}
+
+/**
+ * HTML转义（会话ID来自客户端请求头，属不可信输入）
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * 生成会话单元格内容
+ * 实线徽章 = 请求头携带；虚线徽章 = 消息链自动推断；点击徽章可切换过滤
+ */
+function generateSessionCell(m) {
+    if (!m.session_id) {
+        return '<span class="session-none">-</span>';
+    }
+    const color = sessionColor(m.session_id);
+    const sid = escapeHtml(m.session_id);
+    const label = m.session_id.length > 16 ? escapeHtml(m.session_id.slice(0, 16)) + '&hellip;' : sid;
+    const sourceText = m.session_source === 'header' ? '来自请求头' : '自动推断';
+    const styleCls = m.session_source === 'inferred' ? ' badge-session-inferred' : '';
+    return `<span class="badge badge-session${styleCls}" data-session="${sid}" ` +
+        `style="color:${color};border-color:${color};background:${color}1a" ` +
+        `title="会话: ${sid}（${sourceText}）&#10;点击筛选该会话">${label}</span>`;
+}
+
+/**
+ * 更新会话过滤器下拉选项（保持当前选中项）
+ */
+function updateSessionFilterOptions(metrics) {
+    const counts = new Map();
+    let noneCount = 0;
+    (metrics || []).forEach(m => {
+        if (m.session_id) {
+            counts.set(m.session_id, (counts.get(m.session_id) || 0) + 1);
+        } else {
+            noneCount++;
+        }
+    });
+
+    const select = document.getElementById('sessionFilter');
+    const options = ['<option value="">全部会话</option>'];
+    counts.forEach((n, sid) => {
+        const label = sid.length > 28 ? sid.slice(0, 28) + '…' : sid;
+        options.push(`<option value="${escapeHtml(sid)}">${escapeHtml(label)} (${n})</option>`);
+    });
+    if (noneCount > 0) {
+        options.push(`<option value="__none__">无会话 (${noneCount})</option>`);
+    }
+    select.innerHTML = options.join('');
+
+    // 恢复之前的选中项；会话已不存在时重置为全部
+    if (sessionFilter && (sessionFilter === '__none__' ? noneCount > 0 : counts.has(sessionFilter))) {
+        select.value = sessionFilter;
+    } else {
+        sessionFilter = '';
+        select.value = '';
+    }
+
+    document.getElementById('sessionCount').textContent =
+        counts.size > 0 ? `共 ${counts.size} 个会话` : '';
 }
 
 /**
@@ -1129,6 +1247,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('nextPage').addEventListener('click', goToNextPage);
     document.getElementById('pageSize').addEventListener('change', function(e) {
         changePageSize(e.target.value);
+    });
+
+    // 会话过滤器
+    document.getElementById('sessionFilter').addEventListener('change', function(e) {
+        setSessionFilter(e.target.value);
+    });
+
+    // 点击会话徽章切换过滤（事件委托，避免对不可信会话ID生成内联事件）
+    document.getElementById('requestsTableBody').addEventListener('click', function(e) {
+        const badge = e.target.closest('.badge-session');
+        if (!badge) return;
+        const sid = badge.getAttribute('data-session');
+        setSessionFilter(sessionFilter === sid ? '' : sid);
     });
 
     // 模态框外部点击关闭

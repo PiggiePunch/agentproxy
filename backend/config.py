@@ -17,6 +17,9 @@ class Config:
     SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
     SERVER_PORT = int(os.getenv("SERVER_PORT", "8000"))
 
+    # 会话识别配置：上层应用通过该请求头携带会话ID，未携带时按消息链自动推断
+    SESSION_HEADER = os.getenv("SESSION_HEADER", "X-Session-Id")
+
     # 日志配置
     VERBOSE_LOGGING = os.getenv("VERBOSE_LOGGING", "true").lower() == "true"
     LOG_RETENTION_DAYS = int(os.getenv("LOG_RETENTION_DAYS", "3"))

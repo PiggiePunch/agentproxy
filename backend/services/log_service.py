@@ -19,7 +19,8 @@ class LogService:
         self.responses_dir = Config.RESPONSES_DIR
         self.metrics_dir = Config.METRICS_DIR
 
-    def save_request_log(self, request_id: str, headers: dict, body: dict) -> bool:
+    def save_request_log(self, request_id: str, headers: dict, body: dict,
+                         session_id: str = None) -> bool:
         """保存请求日志"""
         try:
             filename = self.requests_dir / f"{request_id}.json"
@@ -29,6 +30,8 @@ class LogService:
                 "headers": headers,
                 "body": body
             }
+            if session_id:
+                request_data["session_id"] = session_id
             with open(filename, 'w', encoding='utf-8') as f:
                 json.dump(request_data, f, ensure_ascii=False, indent=2)
             return True

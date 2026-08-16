@@ -15,6 +15,7 @@ from backend.handlers.base import BaseAPIHandler
 from backend.services.log_service import LogService
 from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
+from backend.services.session_service import SessionService
 from backend.services.trace_service import TraceService
 from backend.utils.logger import log_request_info, log_response_info
 from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call, classify_proxy_exception
@@ -25,6 +26,7 @@ log_service = LogService()
 metrics_service = MetricsService()
 proxy_service = ProxyService()
 trace_service = TraceService()
+session_service = SessionService()
 
 # 全局状态
 session_start_time = datetime.now()
@@ -100,16 +102,21 @@ class APIHandler(BaseAPIHandler):
         # 检测 API 类型
         api_type = detect_api_type(path)
 
+        # 解析会话归属：优先请求头，缺省按消息链自动推断
+        session_id, session_source = session_service.resolve(headers, body_data)
+
         log_request_info("POST", path, headers, body_data, request_id, api_type)
-        log_service.save_request_log(request_id, headers, body_data)
+        log_service.save_request_log(request_id, headers, body_data, session_id)
 
         # 路由分发
         if path == "/v1/chat/completions":
             self._handle_chat_completions(request_id, headers, body_data,
-                                         request_received_time, inter_request_gap)
+                                         request_received_time, inter_request_gap,
+                                         session_id, session_source)
         elif path == "/v1/messages":
             self._handle_anthropic_messages(request_id, headers, body_data,
-                                           request_received_time, inter_request_gap)
+                                           request_received_time, inter_request_gap,
+                                           session_id, session_source)
         elif path == "/traces":
             self._handle_save_trace(body_data)
         else:
@@ -302,7 +309,8 @@ class APIHandler(BaseAPIHandler):
             self._send_json_response(status, {"error": str(e), "type": type_, "failed_at": failed_at})
 
     def _handle_chat_completions(self, request_id: str, headers: dict, body_data: dict,
-                                request_received_time: float, inter_request_gap: Optional[float]):
+                                request_received_time: float, inter_request_gap: Optional[float],
+                                session_id: Optional[str] = None, session_source: Optional[str] = None):
         """处理OpenAI聊天补全请求"""
         from backend.services.stream_handler import StreamHandler
 
@@ -318,17 +326,20 @@ class APIHandler(BaseAPIHandler):
             stream_handler = StreamHandler(self, request_id, forward_headers, body_data,
                                           request_received_time, forward_start_time,
                                           "openai", "/v1/chat/completions",
-                                          log_service, metrics_service, proxy_service)
+                                          log_service, metrics_service, proxy_service,
+                                          session_id, session_source)
             stream_handler.handle_openai_stream()
         else:
             # 非流式请求
             print(f"路由到标准处理器: {request_id}")  # 调试信息
             self._handle_standard_request(request_id, forward_headers, body_data,
                                         request_received_time, forward_start_time,
-                                        inter_request_gap, "/v1/chat/completions", "openai", is_stream=False)
+                                        inter_request_gap, "/v1/chat/completions", "openai", is_stream=False,
+                                        session_id=session_id, session_source=session_source)
 
     def _handle_anthropic_messages(self, request_id: str, headers: dict, body_data: dict,
-                                  request_received_time: float, inter_request_gap: Optional[float]):
+                                  request_received_time: float, inter_request_gap: Optional[float],
+                                  session_id: Optional[str] = None, session_source: Optional[str] = None):
         """处理Anthropic消息请求"""
         from backend.services.stream_handler import StreamHandler
 
@@ -341,17 +352,20 @@ class APIHandler(BaseAPIHandler):
             stream_handler = StreamHandler(self, request_id, forward_headers, body_data,
                                           request_received_time, forward_start_time,
                                           "anthropic", "/v1/messages",
-                                          log_service, metrics_service, proxy_service)
+                                          log_service, metrics_service, proxy_service,
+                                          session_id, session_source)
             stream_handler.handle_anthropic_stream()
         else:
             # 非流式请求
             self._handle_standard_request(request_id, forward_headers, body_data,
                                         request_received_time, forward_start_time,
-                                        inter_request_gap, "/v1/messages", "anthropic", is_stream=False)
+                                        inter_request_gap, "/v1/messages", "anthropic", is_stream=False,
+                                        session_id=session_id, session_source=session_source)
 
     def _handle_standard_request(self, request_id: str, forward_headers: dict, body_data: dict,
                                request_received_time: float, forward_start_time: float,
-                               inter_request_gap: Optional[float], endpoint: str, api_type: str, is_stream: bool = False):
+                               inter_request_gap: Optional[float], endpoint: str, api_type: str, is_stream: bool = False,
+                               session_id: Optional[str] = None, session_source: Optional[str] = None):
         """处理标准请求"""
         try:
             request_body = json.dumps(body_data).encode('utf-8')
@@ -378,7 +392,8 @@ class APIHandler(BaseAPIHandler):
                 metrics = proxy_service.calculate_metrics(
                     request_received_time, forward_start_time, response_received_time,
                     inter_request_gap, response.status, has_tool_call,
-                    input_tokens, output_tokens, endpoint, "POST", api_type, is_stream
+                    input_tokens, output_tokens, endpoint, "POST", api_type, is_stream,
+                    session_id, session_source
                 )
                 metrics_service.save_metrics(request_id, metrics)
 
@@ -391,7 +406,8 @@ class APIHandler(BaseAPIHandler):
                 # 即使JSON解析失败，也要记录指标
                 metrics = proxy_service.calculate_metrics(
                     request_received_time, forward_start_time, response_received_time,
-                    inter_request_gap, response.status, False, 0, 0, endpoint, "POST", api_type, is_stream
+                    inter_request_gap, response.status, False, 0, 0, endpoint, "POST", api_type, is_stream,
+                    session_id, session_source
                 )
                 metrics_service.save_metrics(request_id, metrics)
 
@@ -419,7 +435,8 @@ class APIHandler(BaseAPIHandler):
             # 即使失败也要记录指标
             metrics = proxy_service.calculate_metrics(
                 request_received_time, forward_start_time, response_received_time,
-                inter_request_gap, status, False, 0, 0, endpoint, "POST", api_type, is_stream
+                inter_request_gap, status, False, 0, 0, endpoint, "POST", api_type, is_stream,
+                session_id, session_source
             )
             metrics_service.save_metrics(request_id, metrics)
 

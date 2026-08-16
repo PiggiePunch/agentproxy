@@ -60,6 +60,7 @@ def print_startup_info():
     print(f"  - 代理支持 OpenAI 和 Anthropic 两种 API 格式")
     print(f"  - 自动检测 API 类型并转发到对应的上游")
     print(f"  - 客户端的 Authorization 头会原封转发给真实 API")
+    print(f"  - 上层应用可用 {Config.SESSION_HEADER} 请求头标记会话，未携带时按消息链自动推断")
 
     print(f"\n客户端配置:")
     print(f"  - OpenAI 格式: Base URL=http://{Config.SERVER_HOST}:{Config.SERVER_PORT}/v1, Endpoint=/chat/completions")

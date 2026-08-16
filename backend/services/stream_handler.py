@@ -24,7 +24,8 @@ class StreamHandler:
     def __init__(self, request_handler, request_id: str, forward_headers: dict,
                  body_data: dict, request_received_time: float, forward_start_time: float,
                  api_type: str, endpoint: str,
-                 log_service=None, metrics_service=None, proxy_service=None):
+                 log_service=None, metrics_service=None, proxy_service=None,
+                 session_id: str = None, session_source: str = None):
         self.request_handler = request_handler
         self.request_id = request_id
         self.forward_headers = forward_headers
@@ -33,6 +34,8 @@ class StreamHandler:
         self.forward_start_time = forward_start_time
         self.api_type = api_type
         self.endpoint = endpoint
+        self.session_id = session_id
+        self.session_source = session_source
 
         # 使用共享的服务实例，如果没有提供则创建新的
         self.log_service = log_service if log_service else LogService()
@@ -497,7 +500,9 @@ class StreamHandler:
             "status_code": status_code,
             "has_tool_call": has_tool_call,
             "input_tokens": self.input_tokens,
-            "output_tokens": self.output_tokens
+            "output_tokens": self.output_tokens,
+            "session_id": self.session_id,
+            "session_source": self.session_source
         }
 
         self.metrics_service.save_metrics(self.request_id, metrics)
@@ -546,7 +551,9 @@ class StreamHandler:
             "status_code": status_code,
             "has_tool_call": False,
             "input_tokens": 0,
-            "output_tokens": 0
+            "output_tokens": 0,
+            "session_id": self.session_id,
+            "session_source": self.session_source
         }
 
         self.metrics_service.save_metrics(self.request_id, metrics)
