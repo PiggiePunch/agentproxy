@@ -11,7 +11,7 @@ class Config:
 
     # API配置
     REAL_API_URL = os.getenv("REAL_API_URL", "https://api.deepseek.com")
-    ANTHROPIC_API_URL = os.getenv("ANTHROPIC_API_URL", "https://open.bigmodel.cn/api/anthropic")
+    ANTHROPIC_API_URL = os.getenv("ANTHROPIC_API_URL", "https://dashscope.aliyuncs.com/apps/anthropic")
 
     # 服务器配置
     SERVER_HOST = os.getenv("SERVER_HOST", "0.0.0.0")
@@ -41,13 +41,13 @@ class Config:
             cls.RESPONSES_DIR.mkdir(exist_ok=True)
             cls.METRICS_DIR.mkdir(exist_ok=True)
             cls.TRACES_DIR.mkdir(exist_ok=True)
-            print(f"✓ 日志目录初始化成功: {cls.LOGS_DIR}")
+            print(f"日志目录初始化成功: {cls.LOGS_DIR}")
             return True
         except PermissionError as e:
-            print(f"❌ 创建日志目录失败（权限不足）: {e}")
+            print(f"创建日志目录失败（权限不足）: {e}")
             return False
         except Exception as e:
-            print(f"❌ 创建日志目录失败: {e}")
+            print(f"创建日志目录失败: {e}")
             return False
 
     @classmethod

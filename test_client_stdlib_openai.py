@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 
 # ============= 配置区域 =============
 config = {
-    "llm_api_key": "sk-ef89f69a45e4421e9ea8bd967812adba",
+    "llm_api_key": "sk-0717c5ec0ebc4327b651972e2f4b64d6",
     "llm_model": "deepseek-chat",
     "llm_api": "http://localhost:8000/v1/chat/completions"  # 通过代理连接
 }
@@ -99,7 +99,7 @@ def test_non_stream():
         "stream": False
     }
 
-    print(f"\n📤 发送请求到：{url}")
+    print(f"\n发送请求到：{url}")
     print(f"   模型：{data['model']}")
     print(f"   消息：{data['messages'][0]['content']}")
     print(f"   流式：{data['stream']}")
@@ -112,17 +112,17 @@ def test_non_stream():
             content = result['choices'][0]['message']['content']
             tokens = result['usage']['total_tokens']
 
-            print(f"\n✅ 请求成功！")
+            print(f"\n请求成功！")
             print(f"   使用 tokens：{tokens}")
-            print(f"\n📥 AI 回复：")
+            print(f"\nAI 回复：")
             print(f"   {content}")
 
         else:
-            print(f"\n❌ 请求失败：{response.status}")
+            print(f"\n请求失败：{response.status}")
             print(f"   {response_body}")
 
     except Exception as e:
-        print(f"\n❌ 错误：{e}")
+        print(f"\n错误：{e}")
 
 
 def test_stream():
@@ -144,11 +144,11 @@ def test_stream():
         "stream": True
     }
 
-    print(f"\n📤 发送流式请求到：{url}")
+    print(f"\n发送流式请求到：{url}")
     print(f"   模型：{data['model']}")
     print(f"   消息：{data['messages'][0]['content']}")
     print(f"   流式：{data['stream']}")
-    print(f"\n📥 AI 流式回复：")
+    print(f"\nAI 流式回复：")
 
     try:
         host, port, path, use_https = _parse_api_url(url)
@@ -206,22 +206,22 @@ def test_stream():
                                     pass
 
                 except http.client.RemoteDisconnected as e:
-                    print(f"\n⚠️  远程断开连接：{e}")
+                    print(f"\n远程断开连接：{e}")
                 except Exception as e:
-                    print(f"\n⚠️  读取异常：{e}")
+                    print(f"\n读取异常：{e}")
 
-                print(f"\n\n✅ 流式传输完成！共接收 {total_received} 字节，收到 [DONE]: {received_done}")
+                print(f"\n\n流式传输完成！共接收 {total_received} 字节，收到 [DONE]: {received_done}")
 
             else:
                 response_body = response.read().decode('utf-8')
-                print(f"\n❌ 请求失败：{response.status}")
+                print(f"\n请求失败：{response.status}")
                 print(f"   {response_body}")
 
         finally:
             conn.close()
 
     except Exception as e:
-        print(f"\n❌ 错误：{e}")
+        print(f"\n错误：{e}")
 
 
 def test_multi_turn():
@@ -249,13 +249,13 @@ def test_multi_turn():
     print(f"\n开始 {len(conversations)} 轮对话...\n")
 
     for i, user_message in enumerate(conversations, 1):
-        print(f"{'─'*40}")
+        print(f"{'-'*40}")
         print(f"第 {i} 轮")
-        print(f"{'─'*40}")
+        print(f"{'-'*40}")
 
         # 添加用户消息
         messages.append({"role": "user", "content": user_message})
-        print(f"👤 用户：{user_message}")
+        print(f"用户：{user_message}")
 
         # 发送请求
         data = {
@@ -274,20 +274,20 @@ def test_multi_turn():
                 # 添加助手回复到历史
                 messages.append({"role": "assistant", "content": assistant_message})
 
-                print(f"🤖 助手：{assistant_message}")
+                print(f"助手：{assistant_message}")
 
             else:
-                print(f"❌ 请求失败：{response.status}")
+                print(f"请求失败：{response.status}")
                 print(f"   {response_body}")
                 return
 
         except Exception as e:
-            print(f"❌ 错误：{e}")
+            print(f"错误：{e}")
             return
 
-    print(f"\n{'─'*40}")
-    print(f"✅ 多轮对话完成！共 {len(conversations)} 轮")
-    print(f"{'─'*40}")
+    print(f"\n{'-'*40}")
+    print(f"多轮对话完成！共 {len(conversations)} 轮")
+    print(f"{'-'*40}")
 
 
 if __name__ == "__main__":

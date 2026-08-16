@@ -812,7 +812,7 @@ function generateGantt(steps, totalDuration) {
         stepAnnotationsHtml += `<div class="trace-gantt-annotation" style="left:${centerPct}%"><span class="trace-gantt-annotation-text ${typeClass}">${tag} ${formatDuration(duration)}</span></div>`;
     }
 
-    // 计算间隔等待时间 → 标注在上方
+    // 计算间隔等待时间 -> 标注在上方
     let prevEnd = 0;
     const gaps = [];
     for (const step of childSteps) {

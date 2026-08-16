@@ -87,11 +87,11 @@ def classify_proxy_exception(e: BaseException, context: str) -> Tuple[int, str, 
       "upstream_read"     —— 代理从上游 socket 读响应体时出错（response.read1）
       "upstream_connect"  —— 代理与上游建链/发请求/读状态行时出错（conn.request / getresponse / read）
 
-    分类规则（与 RFC 7231 §6.6 对齐）:
-      客户端断开              → 499 client_disconnected  (NGINX 事实约定，非 RFC)
-      上游超时                → 504 upstream_timeout
-      上游通信异常/中途断      → 502 upstream_comm_error
-      代理自身代码异常        → 500 proxy_internal
+    分类规则（与 RFC 7231 Sec.6.6 对齐）:
+      客户端断开              -> 499 client_disconnected  (NGINX 事实约定，非 RFC)
+      上游超时                -> 504 upstream_timeout
+      上游通信异常/中途断      -> 502 upstream_comm_error
+      代理自身代码异常        -> 500 proxy_internal
 
     返回: (status_code, type, failed_at)
     """

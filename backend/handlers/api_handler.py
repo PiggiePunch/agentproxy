@@ -158,10 +158,10 @@ class APIHandler(BaseAPIHandler):
             with open(dashboard_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
             self._send_html_response(html_content)
-            print(f"✓ Dashboard 已发送: {dashboard_path}")
+            print(f"Dashboard 已发送: {dashboard_path}")
         except FileNotFoundError:
             error_msg = f"index.html not found at {dashboard_path}"
-            print(f"❌ {error_msg}")
+            print(f"{error_msg}")
             self._send_json_response(404, {"error": error_msg})
 
     def _handle_static_file(self, path: str):
@@ -297,7 +297,7 @@ class APIHandler(BaseAPIHandler):
             log_response_info(response.status, dict(response.headers), path="/v1/models")
 
         except Exception as e:
-            print(f"❌ 转发请求失败：{e}")
+            print(f"转发请求失败：{e}")
             status, type_, failed_at = classify_proxy_exception(e, "upstream_connect")
             self._send_json_response(status, {"error": str(e), "type": type_, "failed_at": failed_at})
 
@@ -307,14 +307,14 @@ class APIHandler(BaseAPIHandler):
         from backend.services.stream_handler import StreamHandler
 
         is_stream = body_data.get("stream", False) if isinstance(body_data, dict) else False
-        print(f"🔍 检测到stream参数: {is_stream}")  # 调试信息
+        print(f"检测到stream参数: {is_stream}")  # 调试信息
 
         forward_headers = proxy_service.prepare_forward_headers(headers, "openai")
         forward_start_time = time.time()
 
         if is_stream:
             # 流式请求
-            print(f"🌊 路由到流式处理器: {request_id}")  # 调试信息
+            print(f"路由到流式处理器: {request_id}")  # 调试信息
             stream_handler = StreamHandler(self, request_id, forward_headers, body_data,
                                           request_received_time, forward_start_time,
                                           "openai", "/v1/chat/completions",
@@ -322,7 +322,7 @@ class APIHandler(BaseAPIHandler):
             stream_handler.handle_openai_stream()
         else:
             # 非流式请求
-            print(f"📦 路由到标准处理器: {request_id}")  # 调试信息
+            print(f"路由到标准处理器: {request_id}")  # 调试信息
             self._handle_standard_request(request_id, forward_headers, body_data,
                                         request_received_time, forward_start_time,
                                         inter_request_gap, "/v1/chat/completions", "openai", is_stream=False)
@@ -398,7 +398,7 @@ class APIHandler(BaseAPIHandler):
                 self._send_json_response(response.status, {"raw_response": response_body.decode('utf-8')})
 
         except Exception as e:
-            print(f"❌ 转发请求失败：{e}")
+            print(f"转发请求失败：{e}")
             traceback.print_exc()
 
             # 按上游通信上下文分类（forward_request 含 request/getresponse/read）

@@ -33,7 +33,7 @@ class LogService:
                 json.dump(request_data, f, ensure_ascii=False, indent=2)
             return True
         except Exception as e:
-            print(f"❌ 保存请求日志失败: {e}")
+            print(f"保存请求日志失败: {e}")
             return False
 
     def save_response_log(self, request_id: str, body: Any, status_code: int) -> bool:
@@ -49,7 +49,7 @@ class LogService:
                 json.dump(response_data, f, ensure_ascii=False, indent=2)
             return True
         except Exception as e:
-            print(f"❌ 保存响应日志失败: {e}")
+            print(f"保存响应日志失败: {e}")
             return False
 
     def get_request_log(self, request_id: str) -> Optional[Dict[str, Any]]:
@@ -62,7 +62,7 @@ class LogService:
             with open(filename, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            print(f"❌ 读取请求日志失败: {e}")
+            print(f"读取请求日志失败: {e}")
             return None
 
     def get_response_log(self, request_id: str) -> Optional[Dict[str, Any]]:
@@ -75,7 +75,7 @@ class LogService:
             with open(filename, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            print(f"❌ 读取响应日志失败: {e}")
+            print(f"读取响应日志失败: {e}")
             return None
 
     def cleanup_old_logs(self, days_to_keep: int = 3) -> int:
@@ -103,17 +103,17 @@ class LogService:
                             total_deleted += 1
 
                     if deleted_count > 0:
-                        print(f"  ✓ 已清理 {subdir_name}: {deleted_count} 个文件")
+                        print(f"  已清理 {subdir_name}: {deleted_count} 个文件")
                 except Exception as e:
-                    print(f"  ⚠️  清理 {subdir_name} 时出错: {e}")
+                    print(f"  清理 {subdir_name} 时出错: {e}")
 
             if total_deleted > 0:
-                print(f"✓ 日志清理完成: 共删除 {total_deleted} 个 {days_to_keep} 天前的旧文件")
+                print(f"日志清理完成: 共删除 {total_deleted} 个 {days_to_keep} 天前的旧文件")
             else:
-                print(f"✓ 日志清理完成: 无需删除的旧文件")
+                print(f"日志清理完成: 无需删除的旧文件")
 
             return total_deleted
 
         except Exception as e:
-            print(f"❌ 日志清理失败: {e}")
+            print(f"日志清理失败: {e}")
             return 0

@@ -31,11 +31,11 @@ def log_request_info(method: str, path: str, headers: dict, body: dict, request_
 
     if is_internal_request:
         # 内部请求只打印简化信息
-        print("⚙️ {} {} [{}]".format(method, path, datetime.now().strftime('%H:%M:%S')))
+        print("{} {} [{}]".format(method, path, datetime.now().strftime('%H:%M:%S')))
         return
 
     print("\n" + "="*80)
-    print(f"📥 收到请求 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
+    print(f"收到请求 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
     print(f"请求ID: {request_id}")
     print("="*80)
     print(f"方法：{method}")
@@ -66,11 +66,11 @@ def log_response_info(status_code: int, headers: dict, body: str = None, path: s
 
     if is_internal_request:
         # 内部请求只打印简化信息
-        print(f"✓ {path} → {status_code} [{datetime.now().strftime('%H:%M:%S')}]")
+        print(f"{path} -> {status_code} [{datetime.now().strftime('%H:%M:%S')}]")
         return
 
     print("\n" + "="*80)
-    print(f"📤 收到响应 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
+    print(f"收到响应 [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
     print("="*80)
     print(f"状态码：{status_code}")
 

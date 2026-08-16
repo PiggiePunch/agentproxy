@@ -63,7 +63,7 @@ class MetricsService:
             return True
 
         except Exception as e:
-            print(f"❌ 保存指标失败: {e}")
+            print(f"保存指标失败: {e}")
             return False
 
     def _update_cumulative_stats(self, metrics: Dict[str, Any]):

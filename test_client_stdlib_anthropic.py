@@ -14,8 +14,8 @@ from urllib.parse import urlparse
 # ============= 配置区域 =============
 # 从环境变量读取配置
 config = {
-    "api_key": os.getenv("ANTHROPIC_AUTH_TOKEN", "09f83c3a74fb4895a3f5d2df722aab3a.2ke3ztItzBwcvOZz"),
-    "model": os.getenv("ANTHROPIC_MODEL", "glm-4.7"),
+    "api_key": os.getenv("ANTHROPIC_AUTH_TOKEN", "sk-901dca08a8554e63a92ac3db751faa6e"),
+    "model": os.getenv("ANTHROPIC_MODEL", "glm-5.2"),
     # 通过代理连接（推荐）
     "base_url": os.getenv("ANTHROPIC_BASE_URL", "http://localhost:8000/v1"),
     # 如果直连 Moonshot，使用：
@@ -75,7 +75,7 @@ def test_non_stream():
         ]
     }
 
-    print(f"\n📤 发送请求到：{url}")
+    print(f"\n发送请求到：{url}")
     print(f"   模型：{data['model']}")
     print(f"   消息：{data['messages'][0]['content']}")
     print(f"   最大 tokens：{data['max_tokens']}")
@@ -109,26 +109,26 @@ def test_non_stream():
                     input_tokens = result.get("usage", {}).get("input_tokens", 0)
                     output_tokens = result.get("usage", {}).get("output_tokens", 0)
 
-                    print(f"\n✅ 请求成功！")
+                    print(f"\n请求成功！")
                     print(f"   Message ID: {result.get('id', 'N/A')}")
                     print(f"   输入 tokens：{input_tokens}")
                     print(f"   输出 tokens：{output_tokens}")
                     print(f"   停止原因：{result.get('stop_reason', 'N/A')}")
-                    print(f"\n📥 AI 回复：")
+                    print(f"\nAI 回复：")
                     print(f"   {text_content}")
                 else:
-                    print(f"\n⚠️  响应格式异常：")
+                    print(f"\n响应格式异常：")
                     print(f"   {json.dumps(result, indent=2, ensure_ascii=False)}")
 
             else:
-                print(f"\n❌ 请求失败：{response.status}")
+                print(f"\n请求失败：{response.status}")
                 print(f"   {response_body}")
 
         finally:
             conn.close()
 
     except Exception as e:
-        print(f"\n❌ 错误：{e}")
+        print(f"\n错误：{e}")
         import traceback
         traceback.print_exc()
 
@@ -155,11 +155,11 @@ def test_stream():
         "stream": True
     }
 
-    print(f"\n📤 发送流式请求到：{url}")
+    print(f"\n发送流式请求到：{url}")
     print(f"   模型：{data['model']}")
     print(f"   消息：{data['messages'][0]['content']}")
     print(f"   流式：{data['stream']}")
-    print(f"\n📥 AI 流式回复：")
+    print(f"\nAI 流式回复：")
 
     try:
         host, port, path, use_https = _parse_api_url(url)
@@ -230,7 +230,7 @@ def test_stream():
 
                                         # 处理 error 事件
                                         elif current_event == "error":
-                                            print(f"\n❌ 错误事件：{event_data}")
+                                            print(f"\n错误事件：{event_data}")
 
                                     except json.JSONDecodeError:
                                         pass
@@ -239,25 +239,25 @@ def test_stream():
                                     current_data = None
 
                 except http.client.RemoteDisconnected as e:
-                    print(f"\n⚠️  远程断开连接：{e}")
+                    print(f"\n远程断开连接：{e}")
                 except Exception as e:
-                    print(f"\n⚠️  读取异常：{e}")
+                    print(f"\n读取异常：{e}")
 
                 if message_completed:
-                    print("\n✅ 流式传输完成！")
+                    print("\n流式传输完成！")
                 else:
-                    print("\n⚠️  流式传输未正常完成")
+                    print("\n流式传输未正常完成")
 
             else:
                 response_body = response.read().decode('utf-8')
-                print(f"\n❌ 请求失败：{response.status}")
+                print(f"\n请求失败：{response.status}")
                 print(f"   {response_body}")
 
         finally:
             conn.close()
 
     except Exception as e:
-        print(f"\n❌ 错误：{e}")
+        print(f"\n错误：{e}")
         import traceback
         traceback.print_exc()
 
@@ -286,13 +286,13 @@ def test_multi_turn():
     print(f"\n开始 {len(conversations)} 轮对话...\n")
 
     for i, user_message in enumerate(conversations, 1):
-        print(f"{'─'*40}")
+        print(f"{'-'*40}")
         print(f"第 {i} 轮")
-        print(f"{'─'*40}")
+        print(f"{'-'*40}")
 
         # 添加用户消息
         messages.append({"role": "user", "content": user_message})
-        print(f"👤 用户：{user_message}")
+        print(f"用户：{user_message}")
 
         # 准备请求数据
         data = {
@@ -329,13 +329,13 @@ def test_multi_turn():
                         # 添加助手回复到历史
                         messages.append({"role": "assistant", "content": assistant_message})
 
-                        print(f"🤖 助手：{assistant_message}")
+                        print(f"助手：{assistant_message}")
                     else:
-                        print(f"❌ 响应格式异常")
+                        print(f"响应格式异常")
                         return
 
                 else:
-                    print(f"❌ 请求失败：{response.status}")
+                    print(f"请求失败：{response.status}")
                     print(f"   {response_body}")
                     return
 
@@ -343,12 +343,12 @@ def test_multi_turn():
                 conn.close()
 
         except Exception as e:
-            print(f"❌ 错误：{e}")
+            print(f"错误：{e}")
             return
 
-    print(f"\n{'─'*40}")
-    print(f"✅ 多轮对话完成！共 {len(conversations)} 轮")
-    print(f"{'─'*40}")
+    print(f"\n{'-'*40}")
+    print(f"多轮对话完成！共 {len(conversations)} 轮")
+    print(f"{'-'*40}")
 
 
 if __name__ == "__main__":
