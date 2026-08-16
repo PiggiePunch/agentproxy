@@ -2,6 +2,7 @@
 流式请求处理器
 处理流式HTTP请求和响应
 """
+import codecs
 import http.client
 import json
 import ssl
@@ -48,7 +49,13 @@ class StreamHandler:
         self.stream_chunks = []
         self.input_tokens = 0
         self.output_tokens = 0
-        self.usage_buffer = ""  # 用于收集usage信息的buffer
+        # SSE 事件累积缓冲区 + 增量解码器：
+        # 处理 usage/首token 事件被拆分到多个 TCP chunk 的情况；
+        # 增量解码避免多字节 UTF-8 字符跨 chunk 边界时被丢弃
+        self._event_buffer = ""
+        self._decoder = codecs.getincrementaldecoder('utf-8')('ignore')
+        # usage 是否已完整提取（OpenAI: 最终 usage 事件；Anthropic: message_delta）
+        self._usage_finalized = False
         # 失败分类信息（None 表示尚未失败）；由内部 catch 设置后由外层统一落库
         self._failure_info = None
 
@@ -222,29 +229,23 @@ class StreamHandler:
 
     def _stream_openai_response(self, response):
         """流式传输OpenAI响应"""
-        ft_buffer = ""
-
         try:
             while True:
-                if self.response_first_byte_time is None:
-                    self.response_first_byte_time = time.time()
-
                 chunk = response.read1(4096)
                 if not chunk:
                     print(f"\n📦 流结束：上游关闭连接")
                     break
 
+                # 首字节真实到达后才打点（read1 阻塞返回即代表 body 有数据到达）
+                if self.response_first_byte_time is None:
+                    self.response_first_byte_time = time.time()
+
                 self.chunk_count += 1
                 self.total_bytes += len(chunk)
 
-                # 尝试从chunk中提取usage信息（每个chunk都检查）
-                if self.input_tokens == 0 or self.output_tokens == 0:
-                    self._extract_usage_from_openai_chunk(chunk)
-
-                # 检测首token
-                if not self.has_first_token:
-                    self._detect_first_token_openai(chunk, ft_buffer)
-                    ft_buffer = ""
+                # 提取usage + 检测首token（跨chunk缓冲，事件被拆分也不漏检）
+                if not self.has_first_token or not self._usage_finalized:
+                    self._parse_openai_chunk(chunk)
 
                 # 保存chunk数据用于日志记录
                 self.stream_chunks.append(chunk.decode('utf-8', errors='ignore'))
@@ -273,29 +274,23 @@ class StreamHandler:
 
     def _stream_anthropic_response(self, response):
         """流式传输Anthropic响应"""
-        ft_buffer = ""
-
         try:
             while True:
-                if self.response_first_byte_time is None:
-                    self.response_first_byte_time = time.time()
-
                 chunk = response.read1(4096)
                 if not chunk:
                     print(f"\n📦 Anthropic 流结束")
                     break
 
+                # 首字节真实到达后才打点（read1 阻塞返回即代表 body 有数据到达）
+                if self.response_first_byte_time is None:
+                    self.response_first_byte_time = time.time()
+
                 self.chunk_count += 1
                 self.total_bytes += len(chunk)
 
-                # 尝试从chunk中提取usage信息（每个chunk都检查）
-                if self.input_tokens == 0 or self.output_tokens == 0:
-                    self._extract_usage_from_anthropic_chunk(chunk)
-
-                # 检测首token
-                if not self.has_first_token:
-                    self._detect_first_token_anthropic(chunk, ft_buffer)
-                    ft_buffer = ""
+                # 提取usage + 检测首token（跨chunk缓冲，事件被拆分也不漏检）
+                if not self.has_first_token or not self._usage_finalized:
+                    self._parse_anthropic_chunk(chunk)
 
                 # 保存chunk数据用于日志记录
                 self.stream_chunks.append(chunk.decode('utf-8', errors='ignore'))
@@ -322,13 +317,28 @@ class StreamHandler:
             self._record_failure(e, "upstream_read")
             print(f"\n⚠️  [{self._failure_info['type']}] 上游读取超时：{e}")
 
-    def _extract_usage_from_openai_chunk(self, chunk: bytes):
-        """从OpenAI chunk中提取usage信息"""
-        try:
-            chunk_str = chunk.decode('utf-8', errors='ignore')
-            lines = chunk_str.split('\n')
+    def _drain_complete_events(self, chunk: bytes) -> list:
+        """将chunk累积进内部缓冲区，按SSE空行分隔切出完整事件返回
 
-            for line in lines:
+        处理SSE事件被拆分到多个TCP chunk的情况：不完整的事件保留在
+        缓冲区中，与后续chunk拼接后再解析，避免跨chunk漏检。
+        """
+        try:
+            self._event_buffer += self._decoder.decode(chunk)
+        except Exception:
+            return []
+
+        events = []
+        while '\n\n' in self._event_buffer:
+            event_text, self._event_buffer = self._event_buffer.split('\n\n', 1)
+            if event_text.strip():
+                events.append(event_text)
+        return events
+
+    def _parse_openai_chunk(self, chunk: bytes):
+        """从OpenAI chunk中提取usage并检测首token（跨chunk缓冲）"""
+        for event_text in self._drain_complete_events(chunk):
+            for line in event_text.split('\n'):
                 line = line.strip()
                 if not line.startswith('data:'):
                     continue
@@ -339,124 +349,78 @@ class StreamHandler:
 
                 try:
                     data = json.loads(data_str)
-                    # 提取usage信息（通常在最后一个chunk中）
-                    if 'usage' in data:
-                        usage = data.get('usage', {})
-                        self.input_tokens = usage.get('prompt_tokens', 0)
-                        self.output_tokens = usage.get('completion_tokens', 0)
-                        print(f"\n✓ 检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
-                        return True  # 成功提取usage
                 except (json.JSONDecodeError, KeyError, TypeError):
-                    pass
-        except Exception:
-            pass
-        return False
-
-    def _detect_first_token_openai(self, chunk: bytes, buffer: str):
-        """检测OpenAI格式的首token"""
-        try:
-            chunk_str = chunk.decode('utf-8', errors='ignore')
-            buffer += chunk_str.replace('\r\n', '\n')
-
-            while '\n\n' in buffer:
-                event_text, buffer = buffer.split('\n\n', 1)
-                if '[DONE]' in event_text or 'event: ping' in event_text:
                     continue
 
-                for line in event_text.split('\n'):
-                    line = line.strip()
-                    if not line.startswith('data:'):
-                        continue
+                # 提取usage信息（通常在最后一个事件；中间事件usage可能为null）
+                if not self._usage_finalized:
+                    usage = data.get('usage')
+                    if isinstance(usage, dict) and usage:
+                        self.input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
+                        self.output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
+                        self._usage_finalized = True
+                        print(f"\n✓ 检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
 
-                    data_str = line[5:].strip()
-                    if not data_str or data_str == '[DONE]':
-                        continue
+                # 检测首token
+                if not self.has_first_token:
+                    for choice in data.get('choices', []):
+                        delta = choice.get('delta', {})
+                        if delta.get('content'):
+                            self.first_token_time = time.time()
+                            self.has_first_token = True
+                            print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
+                            break
 
-                    try:
-                        data = json.loads(data_str)
-                        # 检测首token
-                        for choice in data.get('choices', []):
-                            delta = choice.get('delta', {})
-                            content = delta.get('content', '')
-                            if content:
-                                self.first_token_time = time.time()
-                                self.has_first_token = True
-                                print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
-                                return
-                    except (json.JSONDecodeError, KeyError, TypeError):
-                        pass
+    def _parse_anthropic_chunk(self, chunk: bytes):
+        """从Anthropic chunk中提取usage并检测首token（跨chunk缓冲）
 
-        except Exception:
-            pass
-
-    def _extract_usage_from_anthropic_chunk(self, chunk: bytes):
-        """从Anthropic chunk中提取usage信息"""
-        try:
-            chunk_str = chunk.decode('utf-8', errors='ignore')
-            lines = chunk_str.split('\n')
+        usage分布：input_tokens 在 message_start 事件（嵌套于 message.usage），
+        最终的 output_tokens 在 message_delta 事件。
+        """
+        for event_text in self._drain_complete_events(chunk):
+            if 'event: ping' in event_text:
+                continue
 
             current_event = None
-            for line in lines:
+            for line in event_text.split('\n'):
                 line = line.strip()
                 if line.startswith('event:'):
                     current_event = line[6:].strip()
-                elif line.startswith('data:'):
-                    data_str = line[5:].strip()
-                    if not data_str:
-                        continue
-
-                    try:
-                        data = json.loads(data_str)
-                        # 提取usage信息（通常在message_delta事件中）
-                        if current_event == 'message_delta' and 'usage' in data:
-                            usage = data.get('usage', {})
-                            self.input_tokens = usage.get('input_tokens', 0)
-                            self.output_tokens = usage.get('output_tokens', 0)
-                            print(f"\n✓ 检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
-                            return True  # 成功提取usage
-                    except (json.JSONDecodeError, TypeError):
-                        pass
-        except Exception:
-            pass
-        return False
-
-    def _detect_first_token_anthropic(self, chunk: bytes, buffer: str):
-        """检测Anthropic格式的首token"""
-        try:
-            chunk_str = chunk.decode('utf-8', errors='ignore')
-            buffer += chunk_str.replace('\r\n', '\n')
-
-            while '\n\n' in buffer:
-                event_text, buffer = buffer.split('\n\n', 1)
-                if 'event: message_stop' in event_text or 'event: ping' in event_text:
+                    continue
+                if not line.startswith('data:'):
                     continue
 
-                current_event = None
-                for line in event_text.split('\n'):
-                    line = line.strip()
-                    if line.startswith('event:'):
-                        current_event = line[6:].strip()
-                    elif line.startswith('data:'):
-                        data_str = line[5:].strip()
-                        if not data_str:
-                            continue
+                data_str = line[5:].strip()
+                if not data_str:
+                    continue
 
-                        try:
-                            data = json.loads(data_str)
-                            # 检测首token
-                            if current_event == 'content_block_delta':
-                                delta = data.get('delta', {})
-                                if (delta.get('type') == 'text_delta' and delta.get('text', '')) or \
-                                   (delta.get('type') == 'thinking_delta' and delta.get('thinking', '')):
-                                    self.first_token_time = time.time()
-                                    self.has_first_token = True
-                                    print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
-                                    return
-                        except (json.JSONDecodeError, TypeError):
-                            pass
+                try:
+                    data = json.loads(data_str)
+                except (json.JSONDecodeError, TypeError):
+                    continue
 
-        except Exception:
-            pass
+                # 提取usage信息
+                if not self._usage_finalized:
+                    if current_event == 'message_start':
+                        usage = data.get('message', {}).get('usage') or {}
+                        if usage:
+                            self.input_tokens = usage.get('input_tokens', self.input_tokens)
+                            print(f"\n✓ 检测到token使用(message_start): 输入={self.input_tokens}")
+                    elif current_event == 'message_delta' and isinstance(data.get('usage'), dict):
+                        usage = data['usage']
+                        self.input_tokens = usage.get('input_tokens', self.input_tokens)
+                        self.output_tokens = usage.get('output_tokens', self.output_tokens)
+                        self._usage_finalized = True
+                        print(f"\n✓ 检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}")
+
+                # 检测首token
+                if not self.has_first_token and current_event == 'content_block_delta':
+                    delta = data.get('delta', {})
+                    if (delta.get('type') == 'text_delta' and delta.get('text', '')) or \
+                       (delta.get('type') == 'thinking_delta' and delta.get('thinking', '')):
+                        self.first_token_time = time.time()
+                        self.has_first_token = True
+                        print(f"\n✓ 首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
 
     def _forward_chunk_to_client(self, chunk: bytes):
         """转发数据块给客户端"""
