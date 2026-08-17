@@ -28,6 +28,9 @@ let allTraces = [];
 // 当前页签
 let currentPageName = 'overview';
 
+// KPI 卡片增强状态
+let metricCardEnhanced = false;
+
 // Chart.js 默认配置（移至initCharts中设置，避免defer加载时Chart未定义）
 
 /**
@@ -73,9 +76,9 @@ function getThemeColors() {
 
 function initCharts() {
     Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
-    Chart.defaults.color = '#4E5969';
-
     const colors = getThemeColors();
+    Chart.defaults.color = colors.textSecondary;
+
     const ctx1 = document.getElementById('responseTimeChart').getContext('2d');
     responseTimeChart = new Chart(ctx1, {
         type: 'line',
@@ -84,27 +87,27 @@ function initCharts() {
             datasets: [{
                 label: '总耗时',
                 data: [],
-                borderColor: '#0064C8',
-                backgroundColor: 'rgba(0, 100, 200, 0.08)',
+                borderColor: colors.primary,
+                backgroundColor: colors.primary + '1a',
                 borderWidth: 2,
                 tension: 0.3,
                 fill: true,
                 pointRadius: 0,
                 pointHoverRadius: 6,
-                pointHoverBackgroundColor: '#0064C8',
+                pointHoverBackgroundColor: colors.primary,
                 pointHoverBorderColor: colors.surface,
                 pointHoverBorderWidth: 2
             }, {
                 label: '模型耗时',
                 data: [],
-                borderColor: '#00A854',
-                backgroundColor: 'rgba(0, 168, 84, 0.08)',
+                borderColor: colors.success,
+                backgroundColor: colors.success + '1a',
                 borderWidth: 2,
                 tension: 0.3,
                 fill: true,
                 pointRadius: 0,
                 pointHoverRadius: 6,
-                pointHoverBackgroundColor: '#00A854',
+                pointHoverBackgroundColor: colors.success,
                 pointHoverBorderColor: colors.surface,
                 pointHoverBorderWidth: 2
             }]
@@ -195,12 +198,12 @@ function initCharts() {
             datasets: [{
                 data: [0, 0],
                 backgroundColor: [
-                    'rgba(0, 100, 200, 0.8)',
-                    'rgba(0, 168, 84, 0.8)'
+                    hexToRgba(colors.primary, 0.8),
+                    hexToRgba(colors.success, 0.8)
                 ],
                 borderColor: [
-                    '#0064C8',
-                    '#00A854'
+                    colors.primary,
+                    colors.success
                 ],
                 borderWidth: 0,
                 borderRadius: 4,
@@ -262,6 +265,23 @@ function initCharts() {
             }
         }
     });
+}
+
+function hexToRgba(hex, alpha) {
+    const normalized = hex.replace('#', '');
+    if (normalized.length === 3) {
+        const r = parseInt(normalized[0] + normalized[0], 16);
+        const g = parseInt(normalized[1] + normalized[1], 16);
+        const b = parseInt(normalized[2] + normalized[2], 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    if (normalized.length === 6) {
+        const r = parseInt(normalized.substring(0, 2), 16);
+        const g = parseInt(normalized.substring(2, 4), 16);
+        const b = parseInt(normalized.substring(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    return hex;
 }
 
 let serverAvailable = true;
@@ -341,6 +361,7 @@ async function refreshData() {
         updateCharts(data.metrics);
         updateSessionFilterOptions(data.metrics);
         updateTable(data.metrics);
+        renderSparklines(allMetrics);
 
         hideErrorBanner();
 
@@ -1136,6 +1157,16 @@ function escapeHtml(str) {
 
 // ===================== 主题切换 =====================
 
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+}
+
+function toggleThemeFromSettings(checkbox) {
+    setTheme(checkbox.checked ? 'dark' : 'light');
+}
+
 function initTheme() {
     const saved = localStorage.getItem('openclaw-theme') || 'light';
     setTheme(saved);
@@ -1147,6 +1178,14 @@ function setTheme(theme) {
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
     });
+    const settingsToggle = document.getElementById('settingsThemeToggle');
+    if (settingsToggle) {
+        settingsToggle.checked = theme === 'dark';
+    }
+    const settingsLabel = document.getElementById('themeLabel');
+    if (settingsLabel) {
+        settingsLabel.textContent = theme === 'dark' ? '深色' : '浅色';
+    }
     // 更新 Chart.js 图表颜色
     updateChartTheme(theme);
 }
@@ -1157,6 +1196,12 @@ function updateChartTheme(theme) {
     Chart.defaults.color = colors.textSecondary;
 
     if (responseTimeChart) {
+        responseTimeChart.data.datasets[0].borderColor = colors.primary;
+        responseTimeChart.data.datasets[0].backgroundColor = colors.primary + '1a';
+        responseTimeChart.data.datasets[0].pointHoverBackgroundColor = colors.primary;
+        responseTimeChart.data.datasets[1].borderColor = colors.success;
+        responseTimeChart.data.datasets[1].backgroundColor = colors.success + '1a';
+        responseTimeChart.data.datasets[1].pointHoverBackgroundColor = colors.success;
         responseTimeChart.options.scales.x.ticks.color = colors.textMuted;
         responseTimeChart.options.scales.y.ticks.color = colors.textMuted;
         responseTimeChart.options.scales.y.grid.color = colors.border;
@@ -1168,6 +1213,8 @@ function updateChartTheme(theme) {
         responseTimeChart.update();
     }
     if (timeDistributionChart) {
+        timeDistributionChart.data.datasets[0].backgroundColor = [hexToRgba(colors.primary, 0.8), hexToRgba(colors.success, 0.8)];
+        timeDistributionChart.data.datasets[0].borderColor = [colors.primary, colors.success];
         timeDistributionChart.options.scales.x.ticks.color = colors.textPrimary;
         timeDistributionChart.options.scales.y.ticks.color = colors.textMuted;
         timeDistributionChart.options.scales.y.grid.color = colors.border;
@@ -1177,6 +1224,136 @@ function updateChartTheme(theme) {
         timeDistributionChart.options.plugins.tooltip.borderColor = colors.border;
         timeDistributionChart.update();
     }
+    if (allMetrics.length) {
+        renderSparklines(allMetrics);
+    }
+}
+
+// ===================== KPI Sparklines =====================
+
+function enhanceMetricCards() {
+    if (metricCardEnhanced) return;
+    document.querySelectorAll('.metric-card').forEach((card, index) => {
+        card.dataset.metricIndex = String(index);
+        const valueEl = card.querySelector('.metric-value');
+        if (!valueEl) return;
+        const trend = document.createElement('span');
+        trend.className = 'metric-trend';
+        trend.id = 'trend-' + index;
+        trend.textContent = '';
+        const row = document.createElement('div');
+        row.className = 'metric-value-row';
+        valueEl.parentNode.insertBefore(row, valueEl);
+        row.appendChild(valueEl);
+        row.appendChild(trend);
+        const canvas = document.createElement('canvas');
+        canvas.className = 'sparkline';
+        canvas.id = 'sparkline-' + index;
+        canvas.height = 40;
+        card.appendChild(canvas);
+    });
+    metricCardEnhanced = true;
+}
+
+function renderSparklines(metrics) {
+    if (!metrics || metrics.length < 2) return;
+    const n = Math.min(metrics.length, 20);
+    const recent = metrics.slice(-n);
+    const getVal = (m, cfg, idx, arr) => {
+        if (cfg.compute) return cfg.compute(m, idx, arr);
+        if (!cfg.key) return idx + 1;
+        let v = m[cfg.key];
+        if (v == null) v = 0;
+        if (cfg.ms) v = v * 1000;
+        return v;
+    };
+    const configs = [
+        { key: null },
+        { key: 'total_time', ms: true },
+        { key: 'proxy_processing_time', ms: true },
+        { key: 'model_response_time', ms: true },
+        { key: 'inter_request_gap', ms: true },
+        { key: 'total_time', ms: true },
+        { key: 'status_code', compute: m => m.status_code === 200 ? 1 : 0 },
+        { key: 'status_code', compute: m => m.status_code !== 200 ? 1 : 0 },
+        { key: 'status_code', compute: (m, i, arr) => {
+            const slice = arr.slice(0, i + 1);
+            const ok = slice.filter(x => x.status_code === 200).length;
+            return ok / (slice.length || 1) * 100;
+        }},
+    ];
+    document.querySelectorAll('.metric-card').forEach((card) => {
+        const idx = parseInt(card.dataset.metricIndex || '0', 10);
+        const cfg = configs[idx] || configs[0];
+        const values = recent.map((m, i) => getVal(m, cfg, i, recent));
+        drawSparkline('sparkline-' + idx, values);
+        const lastIdx = values.length - 1;
+        if (lastIdx > 0) {
+            const diff = values[lastIdx] - values[lastIdx - 1];
+            const trendEl = document.getElementById('trend-' + idx);
+            if (trendEl && diff !== 0) {
+                const pct = Math.abs((diff / (values[lastIdx - 1] || 1)) * 100).toFixed(1);
+                const arrow = diff > 0 ? '↑' : '↓';
+                trendEl.textContent = `${arrow} ${pct}%`;
+                trendEl.classList.add(diff > 0 ? 'up' : 'down');
+            }
+        }
+    });
+}
+
+function drawSparkline(canvasId, data) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !data || data.length < 2) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    ctx.scale(dpr, dpr);
+    const width = rect.width;
+    const height = rect.height;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+    const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#0064C8';
+    ctx.clearRect(0, 0, width, height);
+
+    // 业界 KPI sparkline 通常只做极淡的趋势提示：
+    // 1px 细线 + 几乎透明的填充，不抢数字的风头
+    const strokeColor = hexToRgba(primary, 0.35);
+    const fillTop = hexToRgba(primary, 0.08);
+    const fillBottom = hexToRgba(primary, 0);
+
+    // 填充区域（极淡）
+    ctx.beginPath();
+    data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * width;
+        const y = height - ((v - min) / range) * (height - 8) - 4;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.lineTo(width, height);
+    ctx.lineTo(0, height);
+    ctx.closePath();
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, fillTop);
+    gradient.addColorStop(1, fillBottom);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // 细线
+    ctx.beginPath();
+    data.forEach((v, i) => {
+        const x = (i / (data.length - 1)) * width;
+        const y = height - ((v - min) / range) * (height - 8) - 4;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 1;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
 }
 
 // ===================== 事件监听器 =====================
@@ -1274,6 +1451,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isServerUp = await checkServerStatus();
 
         if (isServerUp) {
+            enhanceMetricCards();
             initCharts();
             refreshData();
             autoRefreshInterval = setInterval(refreshData, 5000);

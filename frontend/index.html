@@ -6,7 +6,7 @@
     <title>AgentProxy 控制台</title>
 
     <!-- 本地资源 -->
-    <link rel="stylesheet" href="/static/css/style.css?v=20">
+    <link rel="stylesheet" href="/static/css/style.css?v=21">
     <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -32,6 +32,12 @@
             </div>
         </div>
         <div class="header-right">
+            <button class="btn-icon" id="headerThemeToggle" title="切换主题" onclick="toggleTheme()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+            </button>
             <div class="status-badge">
                 <span class="status-dot"></span>
                 <span>已连接</span>
@@ -45,7 +51,7 @@
         <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
         <!-- Sidebar -->
-        <div class="sidebar collapsed" id="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <button class="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="收起/展开菜单">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -86,11 +92,11 @@
         <!-- Content Area -->
         <div class="content-area">
             <!-- Error Banner -->
-            <div id="errorBanner" style="display: none; background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; display: flex; align-items: center; gap: 12px;">
-                <svg style="width: 20px; height: 20px; color: #ef4444; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div id="errorBanner" style="display: none;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span class="error-message" style="color: #991b1b; font-weight: 500;"></span>
+                <span class="error-message"></span>
             </div>
 
             <div class="content-wrapper">
@@ -462,10 +468,11 @@
                             </div>
                         </div>
                         <div class="settings-item-right">
-                            <div class="theme-switcher">
-                                <button class="theme-btn" data-theme="light">浅色</button>
-                                <button class="theme-btn" data-theme="dark">深色</button>
-                            </div>
+                            <label class="theme-toggle">
+                                <input type="checkbox" id="settingsThemeToggle" onchange="toggleThemeFromSettings(this)">
+                                <span class="theme-toggle-slider"></span>
+                                <span class="theme-toggle-label" id="themeLabel">浅色</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -498,6 +505,6 @@
     </div>
 
     <!-- 前端逻辑 -->
-    <script src="/static/js/app.js?v=20"></script>
+    <script src="/static/js/app.js?v=21"></script>
 </body>
 </html>
