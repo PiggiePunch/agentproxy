@@ -17,8 +17,10 @@ from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
 from backend.services.session_service import SessionService
 from backend.services.trace_service import TraceService
+from backend.services.trace_assembler import trace_assembler
 from backend.utils.logger import log_request_info, log_response_info
-from backend.utils.helpers import detect_api_type, get_api_url, detect_tool_call, classify_proxy_exception
+from backend.utils.helpers import (detect_api_type, get_api_url, detect_tool_call,
+                                   classify_proxy_exception, extract_response_tool_info)
 
 
 # 全局服务实例
@@ -27,6 +29,9 @@ metrics_service = MetricsService()
 proxy_service = ProxyService()
 trace_service = TraceService()
 session_service = SessionService()
+
+# 自动追踪拼装器复用同一个 trace_service 落盘
+trace_assembler.set_trace_service(trace_service)
 
 # 全局状态
 session_start_time = datetime.now()
@@ -107,6 +112,11 @@ class APIHandler(BaseAPIHandler):
 
         log_request_info("POST", path, headers, body_data, request_id, api_type)
         log_service.save_request_log(request_id, headers, body_data, session_id)
+
+        # 自动追踪：请求到达时记录 span 状态（仅 LLM 对话端点）
+        if path in ("/v1/chat/completions", "/v1/messages"):
+            trace_assembler.on_request(session_id, api_type, body_data,
+                                       request_id, request_received_time)
 
         # 路由分发
         if path == "/v1/chat/completions":
@@ -396,6 +406,17 @@ class APIHandler(BaseAPIHandler):
                     session_id, session_source
                 )
                 metrics_service.save_metrics(request_id, metrics)
+
+                # 自动追踪：响应完成后填充 model step 并判定 span 收尾
+                has_tool_use, tool_uses, final_text = extract_response_tool_info(response_json, api_type)
+                model_duration = response_received_time - forward_start_time
+                trace_assembler.on_response(
+                    session_id, request_id, has_tool_use,
+                    input_tokens=input_tokens, output_tokens=output_tokens,
+                    duration_seconds=model_duration,
+                    tool_uses=tool_uses, final_text=final_text,
+                    ttft_seconds=model_duration,
+                    bytes_request=len(request_body), bytes_response=len(response_body))
 
                 self._send_json_response(response.status, response_json, dict(response.headers))
                 log_response_info(response.status, dict(response.headers), response_body.decode('utf-8'), path=endpoint)

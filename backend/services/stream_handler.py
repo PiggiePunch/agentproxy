@@ -52,6 +52,11 @@ class StreamHandler:
         self.stream_chunks = []
         self.input_tokens = 0
         self.output_tokens = 0
+        # 自动追踪：从流式响应里轻量提取 tool_use 与最终文本（用于 span 拼装）
+        self.pending_tool_uses = []
+        self.response_text_parts = []
+        self._response_text_len = 0
+        self._RESPONSE_TEXT_CAP = 300
         # SSE 事件累积缓冲区 + 增量解码器：
         # 处理 usage/首token 事件被拆分到多个 TCP chunk 的情况；
         # 增量解码避免多字节 UTF-8 字符跨 chunk 边界时被丢弃
@@ -374,6 +379,24 @@ class StreamHandler:
                             print(f"\n首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
                             break
 
+                # 自动追踪：检测 tool_calls 并累积最终文本
+                for choice in data.get('choices', []):
+                    delta = choice.get('delta', {}) or {}
+                    for tc in delta.get('tool_calls', []) or []:
+                        fn = tc.get('function', {}) or {}
+                        if tc.get('id') or fn.get('name'):
+                            self.pending_tool_uses.append(
+                                {'id': tc.get('id', ''), 'name': fn.get('name', '')})
+                    if delta.get('content'):
+                        self._accumulate_response_text(delta['content'])
+
+    def _accumulate_response_text(self, text: str):
+        """累积响应文本用于 span 收尾摘要，超过上限后停止累积"""
+        if self._response_text_len >= self._RESPONSE_TEXT_CAP:
+            return
+        self.response_text_parts.append(text)
+        self._response_text_len += len(text)
+
     @staticmethod
     def _sum_anthropic_input_tokens(usage: dict, fallback: int) -> int:
         """计算Anthropic输入token总数 = input_tokens + 缓存写入 + 缓存读取
@@ -420,6 +443,13 @@ class StreamHandler:
                 except (json.JSONDecodeError, TypeError):
                     continue
 
+                # 自动追踪：检测 tool_use 块（content_block_start）
+                if current_event == 'content_block_start':
+                    cb = data.get('content_block', {}) or {}
+                    if cb.get('type') == 'tool_use':
+                        self.pending_tool_uses.append(
+                            {'id': cb.get('id', ''), 'name': cb.get('name', '')})
+
                 # 提取usage信息
                 if not self._usage_finalized:
                     if current_event == 'message_start':
@@ -442,6 +472,12 @@ class StreamHandler:
                         self.first_token_time = time.time()
                         self.has_first_token = True
                         print(f"\n首token延迟: {(self.first_token_time - self.forward_start_time)*1000:.2f}ms")
+
+                # 自动追踪：累积最终文本（截断，避免长回答占用内存）
+                if current_event == 'content_block_delta':
+                    delta = data.get('delta', {})
+                    if delta.get('type') == 'text_delta' and delta.get('text'):
+                        self._accumulate_response_text(delta['text'])
 
     def _forward_chunk_to_client(self, chunk: bytes):
         """转发数据块给客户端"""
@@ -506,6 +542,26 @@ class StreamHandler:
         }
 
         self.metrics_service.save_metrics(self.request_id, metrics)
+
+        # 自动追踪：流式响应完成后填充 model step 并判定 span 收尾
+        try:
+            from backend.services.trace_assembler import trace_assembler
+            has_tool_use = len(self.pending_tool_uses) > 0
+            final_text = '' if has_tool_use else ''.join(self.response_text_parts)
+            ttft = (self.first_token_time - self.forward_start_time) if self.first_token_time else 0
+            try:
+                req_bytes = len(json.dumps(self.body_data).encode('utf-8'))
+            except Exception:
+                req_bytes = 0
+            trace_assembler.on_response(
+                self.session_id, self.request_id, has_tool_use,
+                input_tokens=self.input_tokens, output_tokens=self.output_tokens,
+                duration_seconds=max(0, self.stream_complete_time - self.forward_start_time),
+                tool_uses=self.pending_tool_uses, final_text=final_text,
+                ttft_seconds=max(0, ttft),
+                bytes_request=req_bytes, bytes_response=self.total_bytes)
+        except Exception:
+            pass
 
         # 保存响应数据
         response_data = {

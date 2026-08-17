@@ -841,7 +841,73 @@ function renderTraceList(traces) {
         container.innerHTML = '<div class="loading-state"><div style="color: #4E5969;">暂无追踪记录</div></div>';
         return;
     }
-    container.innerHTML = traces.map(t => generateTraceCard(t)).join('');
+
+    // 按 session 归组：同一会话的多个 span（对话轮次）折叠在一个 session 卡片下
+    const groups = new Map();
+    for (const t of traces) {
+        const key = t.session_id || '__agent__';
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(t);
+    }
+
+    let html = '';
+    groups.forEach((spans, key) => {
+        html += generateSessionGroup(key, spans);
+    });
+    container.innerHTML = html;
+}
+
+/**
+ * 生成 session 分组卡片（一级折叠），内部是若干 span（二级折叠）
+ */
+function generateSessionGroup(sessionKey, spans) {
+    const isAgent = sessionKey === '__agent__';
+    const label = isAgent ? 'Agent 上报' : escapeHtml(sessionKey);
+    const totalDuration = spans.reduce((s, t) => s + (t.duration_seconds || 0), 0);
+    const totalModel = spans.reduce((s, t) => s + ((t.summary && t.summary.model_calls) || 0), 0);
+    const totalTool = spans.reduce((s, t) => s + ((t.summary && t.summary.tool_calls) || 0), 0);
+    const sourceTag = isAgent
+        ? '<span class="session-source-tag agent">上报</span>'
+        : '<span class="session-source-tag auto">自动识别</span>';
+
+    const spansHtml = spans.map(t => generateTraceCard(t)).join('');
+
+    return `
+    <div class="session-group">
+        <div class="session-group-header" onclick="toggleSessionGroup(this)">
+            <div class="session-group-left">
+                <div class="session-group-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <div class="session-group-info">
+                    <div class="session-group-title">${label} ${sourceTag}</div>
+                    <div class="session-group-meta">
+                        <span>${spans.length} 轮对话</span>
+                        <span class="session-meta-dot"></span>
+                        <span>${totalModel} 次模型调用</span>
+                        <span class="session-meta-dot"></span>
+                        <span>${totalTool} 次工具调用</span>
+                    </div>
+                </div>
+            </div>
+            <div class="session-group-right">
+                <span class="session-group-duration">${formatDuration(totalDuration)}</span>
+                <div class="trace-expand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="session-group-body" style="display: none;">
+            ${spansHtml}
+        </div>
+    </div>`;
+}
+
+function toggleSessionGroup(headerEl) {
+    const group = headerEl.closest('.session-group');
+    const body = group.querySelector('.session-group-body');
+    const icon = headerEl.querySelector('.trace-expand-icon svg');
+    const isExpanded = body.style.display !== 'none';
+    body.style.display = isExpanded ? 'none' : 'block';
+    icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
 }
 
 /**
@@ -923,62 +989,94 @@ function generateTraceCard(trace) {
 }
 
 /**
- * 甘特图时间轴
+ * 时间轴（刻度尺 + 网格线 + 悬停 tooltip 的专业 trace 风格）
  */
 function generateGantt(steps, totalDuration) {
     if (totalDuration <= 0) return '';
 
-    // 只取子步骤（depth > 0）
     const childSteps = steps.filter(s => s.depth > 0);
+
+    // 时间刻度（4 等分，共 5 个刻度）
+    const TICKS = 4;
+    let gridHtml = '';
+    let rulerHtml = '';
+    for (let i = 0; i <= TICKS; i++) {
+        const pct = (i / TICKS * 100).toFixed(2);
+        const t = totalDuration * i / TICKS;
+        gridHtml += `<div class="tg-gridline" style="left:${pct}%"></div>`;
+        rulerHtml += `<span class="tg-ruler-label" style="left:${pct}%">${formatAxisTime(t)}</span>`;
+    }
+
+    // 步骤色段
     let segmentsHtml = '';
-    let stepAnnotationsHtml = '';
-    let idleAnnotationsHtml = '';
-
-    const tagMap = {model: 'AI', tool: '工具', run: '主'};
-
+    const nameMap = { model: 'AI 思考', run: '主流程' };
     for (const step of childSteps) {
         const offset = step.offset_seconds || 0;
         const duration = step.duration_seconds || 0;
-        const leftPct = (offset / totalDuration * 100).toFixed(1);
-        const widthPct = (duration / totalDuration * 100).toFixed(1);
-        const typeClass = `type-${step.type}`;
-        const labelMap = {model: 'AI思考', tool: step.name || '工具', run: '主流程'};
-        const label = labelMap[step.type] || '';
-        segmentsHtml += `<div class="trace-gantt-segment ${typeClass}" style="left:${leftPct}%;width:${Math.max(widthPct,0.5)}%;" title="${label} ${formatDuration(duration)}"></div>`;
-
-        const centerPct = ((offset + duration / 2) / totalDuration * 100).toFixed(1);
-        const tag = tagMap[step.type] || '';
-        stepAnnotationsHtml += `<div class="trace-gantt-annotation" style="left:${centerPct}%"><span class="trace-gantt-annotation-text ${typeClass}">${tag} ${formatDuration(duration)}</span></div>`;
-    }
-
-    // 计算间隔等待时间 -> 标注在上方
-    let prevEnd = 0;
-    const gaps = [];
-    for (const step of childSteps) {
-        const offset = step.offset_seconds || 0;
-        if (offset > prevEnd + 0.01) {
-            gaps.push({start: prevEnd, duration: offset - prevEnd});
-        }
-        prevEnd = (step.offset_seconds || 0) + (step.duration_seconds || 0);
-    }
-    if (totalDuration > prevEnd + 0.01) {
-        gaps.push({start: prevEnd, duration: totalDuration - prevEnd});
-    }
-
-    for (const gap of gaps) {
-        const centerPct = ((gap.start + gap.duration / 2) / totalDuration * 100).toFixed(1);
-        idleAnnotationsHtml += `<div class="trace-gantt-annotation" style="left:${centerPct}%"><span class="trace-gantt-annotation-text type-idle">间隔 ${formatDuration(gap.duration)}</span></div>`;
+        const leftPct = (offset / totalDuration * 100).toFixed(2);
+        const widthPct = Math.max(duration / totalDuration * 100, 0.6).toFixed(2);
+        const name = step.type === 'tool' ? (step.name || '工具') : (nameMap[step.type] || step.type);
+        const tip = `${name}  ${formatDuration(duration)}  ·  +${formatAxisTime(offset)}`;
+        segmentsHtml += `<div class="trace-gantt-segment type-${step.type}" ` +
+            `style="left:${leftPct}%;width:${widthPct}%" data-tip="${escapeHtml(tip)}"></div>`;
     }
 
     return `
-    <div class="trace-gantt-legend">
-        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot ai"></span>AI思考</span>
-        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot tool"></span>工具调用</span>
-        <span class="trace-gantt-legend-item"><span class="trace-gantt-legend-dot idle"></span>间隔等待</span>
-    </div>
-    ${idleAnnotationsHtml ? `<div class="trace-gantt-annotations-above">${idleAnnotationsHtml}</div>` : ''}
-    <div class="trace-gantt">${segmentsHtml}</div>
-    ${stepAnnotationsHtml ? `<div class="trace-gantt-annotations">${stepAnnotationsHtml}</div>` : ''}`;
+    <div class="tg">
+        <div class="tg-header">
+            <div class="tg-legend">
+                <span class="tg-legend-item"><i class="tg-dot model"></i>AI 思考</span>
+                <span class="tg-legend-item"><i class="tg-dot tool"></i>工具调用</span>
+                <span class="tg-legend-item"><i class="tg-dot idle"></i>间隔</span>
+            </div>
+            <span class="tg-total">总耗时 ${formatDuration(totalDuration)}</span>
+        </div>
+        <div class="tg-ruler">${rulerHtml}</div>
+        <div class="tg-body">
+            ${gridHtml}
+            <div class="tg-track"></div>
+            ${segmentsHtml}
+        </div>
+    </div>`;
+}
+
+/**
+ * 时间轴刻度格式化：0 / 250ms / 1.2s / 2m05s
+ */
+function formatAxisTime(seconds) {
+    if (!seconds || seconds <= 0) return '0';
+    if (seconds < 1) return Math.round(seconds * 1000) + 'ms';
+    if (seconds < 60) return (Math.round(seconds * 10) / 10) + 's';
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60);
+    return m + 'm' + String(s).padStart(2, '0') + 's';
+}
+
+/**
+ * 时间轴悬停提示（全局单例，事件委托）
+ */
+function ensureGanttTooltip() {
+    if (document.getElementById('tgTooltip')) return;
+    const tip = document.createElement('div');
+    tip.id = 'tgTooltip';
+    tip.className = 'tg-tooltip';
+    document.body.appendChild(tip);
+
+    document.addEventListener('mouseover', function (e) {
+        const seg = e.target.closest('.trace-gantt-segment');
+        if (seg && seg.dataset.tip) {
+            tip.textContent = seg.dataset.tip;
+            tip.style.opacity = '1';
+        } else {
+            tip.style.opacity = '0';
+        }
+    });
+    document.addEventListener('mousemove', function (e) {
+        if (tip.style.opacity === '1') {
+            tip.style.left = (e.pageX + 12) + 'px';
+            tip.style.top = (e.pageY - 30) + 'px';
+        }
+    });
 }
 
 /**
@@ -1361,6 +1459,9 @@ function drawSparkline(canvasId, data) {
 document.addEventListener('DOMContentLoaded', function() {
     // 初始化主题
     initTheme();
+
+    // 时间轴悬停提示
+    ensureGanttTooltip();
 
     // 主题切换按钮
     document.querySelectorAll('.theme-btn').forEach(btn => {

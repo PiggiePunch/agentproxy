@@ -62,6 +62,40 @@ def detect_tool_call(request_body: dict, response_body: dict) -> bool:
     return False
 
 
+def extract_response_tool_info(response_body: dict, api_type: str):
+    """从非流式响应中提取 (has_tool_use, tool_uses, final_text)。
+
+    tool_uses: [{'id','name'}]，用于与下一次请求里的 tool_result 配对。
+    final_text: 最终文本回答（无工具调用时），用于 span 收尾摘要。
+    """
+    tool_uses = []
+    final_text_parts = []
+
+    if not isinstance(response_body, dict):
+        return False, [], ''
+
+    if api_type == 'anthropic':
+        for block in response_body.get('content', []) or []:
+            if not isinstance(block, dict):
+                continue
+            if block.get('type') == 'tool_use':
+                tool_uses.append({'id': block.get('id', ''), 'name': block.get('name', '')})
+            elif block.get('type') == 'text':
+                final_text_parts.append(block.get('text', ''))
+        return (len(tool_uses) > 0), tool_uses, '\n'.join(final_text_parts)
+
+    # openai
+    for choice in response_body.get('choices', []) or []:
+        message = choice.get('message', {}) or {}
+        for tc in message.get('tool_calls', []) or []:
+            fn = tc.get('function', {}) or {}
+            tool_uses.append({'id': tc.get('id', ''), 'name': fn.get('name', '')})
+        content = message.get('content')
+        if isinstance(content, str) and content:
+            final_text_parts.append(content)
+    return (len(tool_uses) > 0), tool_uses, '\n'.join(final_text_parts)
+
+
 def format_time_duration(seconds: float) -> str:
     """格式化时间时长"""
     if seconds < 1:

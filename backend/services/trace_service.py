@@ -20,9 +20,48 @@ class TraceService:
         self.traces: List[Dict[str, Any]] = []
         self.lock = threading.Lock()
         self.max_traces = 200
+        # 一旦有 agent 通过 POST /traces 主动上报，就抑制代理侧自动拼装，
+        # 避免同一对话产生重复 trace（自动解析仅作为未上报时的补充）
+        self.agent_reported = False
+        # 最近一次 agent 上报的时间戳（用于时间窗口去重）
+        self.last_agent_report_ts = 0.0
+
+    def mark_agent_reported(self):
+        """标记已有 agent 主动上报 trace"""
+        import time as _time
+        self.agent_reported = True
+        self.last_agent_report_ts = _time.time()
+
+    def has_agent_trace_in_window(self, start_ts: float, end_ts: float) -> bool:
+        """判断 [start_ts, end_ts] 时间窗口内是否已有 agent 上报的 trace。
+
+        用于自动拼装去重：若某段对话已经被 agent 主动上报覆盖，
+        就不再产出重复的自动 trace。
+        """
+        from datetime import datetime as _dt
+        with self.lock:
+            for t in self.traces:
+                if t.get('source', 'agent') != 'agent':
+                    continue
+                started = t.get('started_at') or t.get('received_at') or ''
+                try:
+                    a_start = _dt.fromisoformat(started).timestamp()
+                except Exception:
+                    continue
+                a_end = a_start + float(t.get('duration_seconds') or 0)
+                # 时间区间有交集即视为已覆盖
+                if a_start <= end_ts and a_end >= start_ts:
+                    return True
+        return False
 
     def save_trace(self, trace_data: Dict[str, Any]) -> str:
         """保存一条对话追踪记录。返回服务器端存储ID。"""
+        # agent 主动上报（source != auto）时，标记已上报
+        if trace_data.get('source', 'agent') != 'auto':
+            import time as _time
+            self.agent_reported = True
+            self.last_agent_report_ts = _time.time()
+
         storage_id = str(uuid.uuid4())
 
         trace = ConversationTrace(storage_id, trace_data)

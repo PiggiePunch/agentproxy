@@ -106,6 +106,8 @@ class ConversationTrace:
         self.storage_id = storage_id
         self.trace_id = trace_data.get('trace_id', '')
         self.agent_id = trace_data.get('agent_id', '')
+        self.session_id = trace_data.get('session_id', '')
+        self.source = trace_data.get('source', 'agent')
         self.started_at = trace_data.get('started_at', '')
         self.duration_seconds = trace_data.get('duration_seconds', 0)
         self.steps = trace_data.get('steps', [])
@@ -118,6 +120,8 @@ class ConversationTrace:
             "storage_id": self.storage_id,
             "trace_id": self.trace_id,
             "agent_id": self.agent_id,
+            "session_id": self.session_id,
+            "source": self.source,
             "started_at": self.started_at,
             "duration_seconds": self.duration_seconds,
             "steps": self.steps,
