@@ -913,6 +913,113 @@ body {
     max-width: 280px;
 }
 
+/* 追踪页列表工具栏 */
+.trace-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.trace-toolbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trace-toolbar-title svg {
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary);
+}
+
+.trace-toolbar-count {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.trace-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.trace-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.trace-search-box svg {
+    position: absolute;
+    left: 12px;
+    width: 15px;
+    height: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.trace-search-box input {
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--btn-bg);
+    width: 240px;
+    font-family: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.trace-search-box input::placeholder {
+    color: var(--text-muted);
+}
+
+.trace-search-box input:hover {
+    border-color: var(--border-light);
+    box-shadow: var(--card-shadow);
+}
+
+.trace-search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 100, 200, 0.15);
+}
+
+#traceSessionFilter {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--btn-bg);
+    cursor: pointer;
+    max-width: 280px;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+#traceSessionFilter:hover {
+    border-color: var(--border-light);
+    box-shadow: var(--card-shadow);
+}
+
+#traceSessionFilter:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 100, 200, 0.15);
+}
+
 .metric-value-cell {
     font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
     font-weight: 500;
@@ -1212,6 +1319,15 @@ body {
     gap: 20px;
     border-top: 1px solid var(--table-border);
     flex-wrap: wrap;
+}
+
+/* 追踪页分页控件：独立卡片风格（不依附表格容器） */
+#tracePagination {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-top: 4px;
 }
 
 .pagination-size {

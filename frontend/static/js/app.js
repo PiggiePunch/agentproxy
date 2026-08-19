@@ -25,6 +25,14 @@ const SESSION_COLORS = ['#5B8FF9', '#5AD8A6', '#F6BD16', '#E86452', '#6DC8EC',
 // Trace数据
 let allTraces = [];
 
+// Trace页过滤/搜索/分页状态
+let traceSessionFilter = '';      // '' = 全部会话，其他为 session key（会话ID 或 '__agent__'）
+let traceSearchKeyword = '';      // 关键词：匹配用户问题 / 会话ID / trace_id
+let traceCurrentPage = 1;
+let tracePageSize = 10;           // 每页显示的 session 分组数
+let lastTraceHash = '';           // 数据指纹，无变化时跳过DOM重建
+let traceSearchTimer = null;
+
 // 当前页签
 let currentPageName = 'overview';
 
@@ -809,6 +817,8 @@ function hideErrorBanner() {
  * 刷新追踪数据
  */
 async function refreshTraces() {
+    // 仅在追踪页可见时拉取，避免在其他页签空转
+    if (currentPageName !== 'trace') return;
     try {
         const response = await fetch('/traces');
         if (!response.ok) {
@@ -817,7 +827,8 @@ async function refreshTraces() {
         const data = await response.json();
         allTraces = data.traces || [];
         document.getElementById('traceCount').textContent = data.total || 0;
-        renderTraceList(allTraces);
+        updateTraceSessionFilterOptions();
+        renderTraceList();
     } catch (error) {
         console.error('获取追踪数据失败:', error);
     }
@@ -835,26 +846,183 @@ async function clearTraces() {
     }
 }
 
-function renderTraceList(traces) {
-    const container = document.getElementById('tracesContainer');
-    if (!traces || traces.length === 0) {
-        container.innerHTML = '<div class="loading-state"><div style="color: #4E5969;">暂无追踪记录</div></div>';
-        return;
+/**
+ * 提取一条 trace 的用户问题文本（run 步骤的 query），用于关键词搜索
+ */
+function getTraceQueryText(trace) {
+    const steps = trace.steps || [];
+    const runStep = steps.find(s => s.type === 'run');
+    return (runStep && runStep.detail && runStep.detail.query) || '';
+}
+
+/**
+ * 更新会话过滤器下拉选项（保持当前选中项）
+ * 选项集合无变化时跳过重建，避免自动刷新时打断用户操作
+ */
+let lastTraceFilterOptionsSig = '';
+
+function updateTraceSessionFilterOptions() {
+    const counts = new Map();
+    for (const t of allTraces) {
+        const key = t.session_id || '__agent__';
+        counts.set(key, (counts.get(key) || 0) + 1);
     }
 
-    // 按 session 归组：同一会话的多个 span（对话轮次）折叠在一个 session 卡片下
+    const sig = Array.from(counts.entries()).map(([k, n]) => k + ':' + n).join('|');
+    if (sig === lastTraceFilterOptionsSig && counts.size > 0) {
+        return;
+    }
+    lastTraceFilterOptionsSig = sig;
+
+    const select = document.getElementById('traceSessionFilter');
+    const options = ['<option value="">全部会话</option>'];
+    counts.forEach((n, key) => {
+        const isAgent = key === '__agent__';
+        const label = isAgent ? 'Agent 上报' : (key.length > 28 ? key.slice(0, 28) + '…' : key);
+        options.push(`<option value="${escapeHtml(key)}">${escapeHtml(label)} (${n})</option>`);
+    });
+    select.innerHTML = options.join('');
+
+    if (traceSessionFilter && counts.has(traceSessionFilter)) {
+        select.value = traceSessionFilter;
+    } else {
+        traceSessionFilter = '';
+        select.value = '';
+    }
+}
+
+/**
+ * 按当前过滤/搜索条件归组 trace，返回 Map<sessionKey, spans[]>
+ */
+function getFilteredTraceGroups() {
+    const kw = traceSearchKeyword.trim().toLowerCase();
     const groups = new Map();
-    for (const t of traces) {
+    for (const t of allTraces) {
         const key = t.session_id || '__agent__';
+        if (traceSessionFilter && key !== traceSessionFilter) continue;
+        if (kw) {
+            const haystack = ((t.session_id || '') + ' ' + getTraceQueryText(t) + ' ' + (t.trace_id || '')).toLowerCase();
+            if (!haystack.includes(kw)) continue;
+        }
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key).push(t);
     }
+    return groups;
+}
+
+function setTraceSessionFilter(value) {
+    traceSessionFilter = value;
+    traceCurrentPage = 1;
+    lastTraceHash = '';
+    document.getElementById('traceSessionFilter').value = value;
+    renderTraceList();
+}
+
+function setTraceSearchKeyword(value) {
+    traceSearchKeyword = value;
+    traceCurrentPage = 1;
+    lastTraceHash = '';
+    renderTraceList();
+}
+
+function goToTracePrevPage() {
+    if (traceCurrentPage > 1) {
+        traceCurrentPage--;
+        lastTraceHash = '';
+        renderTraceList();
+    }
+}
+
+function goToTraceNextPage() {
+    const totalPages = Math.ceil(getFilteredTraceGroups().size / tracePageSize);
+    if (traceCurrentPage < totalPages) {
+        traceCurrentPage++;
+        lastTraceHash = '';
+        renderTraceList();
+    }
+}
+
+function changeTracePageSize(newSize) {
+    tracePageSize = parseInt(newSize);
+    traceCurrentPage = 1;
+    lastTraceHash = '';
+    renderTraceList();
+}
+
+/**
+ * 更新 Trace 分页控件
+ */
+function updateTracePagination(totalGroups) {
+    const pagination = document.getElementById('tracePagination');
+    const pageInfo = document.getElementById('tracePageInfo');
+    const prevBtn = document.getElementById('tracePrevPage');
+    const nextBtn = document.getElementById('traceNextPage');
+
+    if (totalGroups === 0) {
+        pagination.style.display = 'none';
+        return;
+    }
+    pagination.style.display = 'flex';
+
+    const totalPages = Math.ceil(totalGroups / tracePageSize);
+    pageInfo.textContent = `第 ${traceCurrentPage} 页 / 共 ${totalPages} 页`;
+    prevBtn.disabled = traceCurrentPage === 1;
+    nextBtn.disabled = traceCurrentPage === totalPages;
+}
+
+function renderTraceList() {
+    const container = document.getElementById('tracesContainer');
+
+    if (!allTraces || allTraces.length === 0) {
+        container.innerHTML = '<div class="loading-state"><div style="color: #4E5969;">暂无追踪记录</div></div>';
+        updateTracePagination(0);
+        document.getElementById('traceFilterCount').textContent = '';
+        lastTraceHash = '';
+        return;
+    }
+
+    const groups = getFilteredTraceGroups();
+    const filterCountEl = document.getElementById('traceFilterCount');
+
+    if (groups.size === 0) {
+        container.innerHTML = '<div class="loading-state"><div style="color: #4E5969;">无符合过滤条件的追踪记录</div></div>';
+        updateTracePagination(0);
+        filterCountEl.textContent = `共 ${allTraces.length} 条记录，无匹配`;
+        lastTraceHash = '';
+        return;
+    }
+
+    // 数据指纹：过滤条件 + 分页 + 各分组记录，无变化时跳过DOM重建（保留展开状态）
+    const hashParts = [traceSessionFilter, traceSearchKeyword, traceCurrentPage, tracePageSize];
+    groups.forEach((spans, key) => {
+        hashParts.push(key + ':' + spans.map(t => t.storage_id + '|' + (t.started_at || '') + '|' + (t.duration_seconds || 0)).join(','));
+    });
+    const currentHash = hashParts.join('#');
+    if (currentHash === lastTraceHash) {
+        return;
+    }
+    lastTraceHash = currentHash;
+
+    const keys = Array.from(groups.keys());
+    const totalPages = Math.ceil(keys.length / tracePageSize);
+    if (traceCurrentPage > totalPages && totalPages > 0) {
+        traceCurrentPage = totalPages;
+    }
+    const start = (traceCurrentPage - 1) * tracePageSize;
+    const pageKeys = keys.slice(start, start + tracePageSize);
 
     let html = '';
-    groups.forEach((spans, key) => {
-        html += generateSessionGroup(key, spans);
-    });
+    for (const key of pageKeys) {
+        html += generateSessionGroup(key, groups.get(key));
+    }
     container.innerHTML = html;
+
+    updateTracePagination(keys.length);
+    const totalMatchedSpans = Array.from(groups.values()).reduce((s, v) => s + v.length, 0);
+    const filtering = traceSessionFilter || traceSearchKeyword.trim();
+    filterCountEl.textContent = filtering
+        ? `匹配 ${keys.length} 个会话 / ${totalMatchedSpans} 轮对话`
+        : `共 ${keys.length} 个会话 / ${allTraces.length} 轮对话`;
 }
 
 /**
@@ -912,6 +1080,7 @@ function toggleSessionGroup(headerEl) {
 
 /**
  * 生成追踪卡片 — 对话故事流设计
+ * 卡片体（统计/甘特图/瀑布流）延迟到首次展开时渲染，避免大量DOM一次性构建导致卡顿
  */
 function generateTraceCard(trace) {
     const summary = trace.summary || {};
@@ -925,11 +1094,8 @@ function generateTraceCard(trace) {
     const modelCalls = summary.model_calls || 0;
     const toolCalls = summary.tool_calls || 0;
 
-    const waterfallHtml = generateWaterfall(steps, trace.duration_seconds || 0);
-    const ganttHtml = generateGantt(steps, trace.duration_seconds || 0);
-
     return `
-    <div class="trace-card">
+    <div class="trace-card" data-storage-id="${escapeHtml(trace.storage_id || '')}">
         <div class="trace-card-header" onclick="toggleTraceExpand(this)">
             <div class="trace-header-left">
                 <div class="trace-header-avatar">Q</div>
@@ -951,41 +1117,55 @@ function generateTraceCard(trace) {
                 </div>
             </div>
         </div>
-        <div class="trace-card-body" style="display: none;">
-            <div class="trace-stats-bar">
-                <div class="trace-stat-card">
-                    <div class="trace-stat-card-icon model"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4"/></svg></div>
-                    <div class="trace-stat-card-text">
-                        <span class="trace-stat-card-label">模型调用</span>
-                        <span class="trace-stat-card-value">${modelCalls}</span>
-                    </div>
-                </div>
-                <div class="trace-stat-card">
-                    <div class="trace-stat-card-icon tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-                    <div class="trace-stat-card-text">
-                        <span class="trace-stat-card-label">工具调用</span>
-                        <span class="trace-stat-card-value">${toolCalls}</span>
-                    </div>
-                </div>
-                <div class="trace-stat-card">
-                    <div class="trace-stat-card-icon token"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/></svg></div>
-                    <div class="trace-stat-card-text">
-                        <span class="trace-stat-card-label">Token</span>
-                        <span class="trace-stat-card-value">in ${formatTokenCount(summary.tokens_in)} / out ${formatTokenCount(summary.tokens_out)}</span>
-                    </div>
-                </div>
-                <div class="trace-stat-card">
-                    <div class="trace-stat-card-icon time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                    <div class="trace-stat-card-text">
-                        <span class="trace-stat-card-label">模型耗时</span>
-                        <span class="trace-stat-card-value">${formatDuration(summary.model_time_seconds || 0)}</span>
-                    </div>
+        <div class="trace-card-body" style="display: none;"></div>
+    </div>`;
+}
+
+/**
+ * 生成追踪卡片体内容（首次展开时调用）
+ */
+function generateTraceCardBody(trace) {
+    const summary = trace.summary || {};
+    const steps = trace.steps || [];
+    const modelCalls = summary.model_calls || 0;
+    const toolCalls = summary.tool_calls || 0;
+
+    const waterfallHtml = generateWaterfall(steps, trace.duration_seconds || 0);
+    const ganttHtml = generateGantt(steps, trace.duration_seconds || 0);
+
+    return `
+        <div class="trace-stats-bar">
+            <div class="trace-stat-card">
+                <div class="trace-stat-card-icon model"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4"/></svg></div>
+                <div class="trace-stat-card-text">
+                    <span class="trace-stat-card-label">模型调用</span>
+                    <span class="trace-stat-card-value">${modelCalls}</span>
                 </div>
             </div>
-            <div class="trace-gantt-wrap">${ganttHtml}</div>
-            <div class="trace-waterfall">${waterfallHtml}</div>
+            <div class="trace-stat-card">
+                <div class="trace-stat-card-icon tool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <div class="trace-stat-card-text">
+                    <span class="trace-stat-card-label">工具调用</span>
+                    <span class="trace-stat-card-value">${toolCalls}</span>
+                </div>
+            </div>
+            <div class="trace-stat-card">
+                <div class="trace-stat-card-icon token"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/></svg></div>
+                <div class="trace-stat-card-text">
+                    <span class="trace-stat-card-label">Token</span>
+                    <span class="trace-stat-card-value">in ${formatTokenCount(summary.tokens_in)} / out ${formatTokenCount(summary.tokens_out)}</span>
+                </div>
+            </div>
+            <div class="trace-stat-card">
+                <div class="trace-stat-card-icon time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                <div class="trace-stat-card-text">
+                    <span class="trace-stat-card-label">模型耗时</span>
+                    <span class="trace-stat-card-value">${formatDuration(summary.model_time_seconds || 0)}</span>
+                </div>
+            </div>
         </div>
-    </div>`;
+        <div class="trace-gantt-wrap">${ganttHtml}</div>
+        <div class="trace-waterfall">${waterfallHtml}</div>`;
 }
 
 /**
@@ -1148,6 +1328,14 @@ function toggleTraceExpand(headerEl) {
     const body = card.querySelector('.trace-card-body');
     const icon = headerEl.querySelector('.trace-expand-icon svg');
     const isExpanded = body.style.display !== 'none';
+    // 首次展开时才渲染卡片体（懒渲染，避免初始DOM过大）
+    if (!isExpanded && !body.dataset.rendered) {
+        const trace = allTraces.find(t => t.storage_id === card.dataset.storageId);
+        if (trace) {
+            body.innerHTML = generateTraceCardBody(trace);
+        }
+        body.dataset.rendered = '1';
+    }
     body.style.display = isExpanded ? 'none' : 'block';
     icon.style.transform = isExpanded ? '' : 'rotate(180deg)';
 }
@@ -1532,6 +1720,27 @@ document.addEventListener('DOMContentLoaded', function() {
         setSessionFilter(e.target.value);
     });
 
+    // 追踪页：会话过滤器
+    document.getElementById('traceSessionFilter').addEventListener('change', function(e) {
+        setTraceSessionFilter(e.target.value);
+    });
+
+    // 追踪页：关键词搜索（防抖，避免输入时频繁重建DOM）
+    document.getElementById('traceSearchInput').addEventListener('input', function(e) {
+        const value = e.target.value;
+        clearTimeout(traceSearchTimer);
+        traceSearchTimer = setTimeout(function() {
+            setTraceSearchKeyword(value);
+        }, 250);
+    });
+
+    // 追踪页：分页控件
+    document.getElementById('tracePrevPage').addEventListener('click', goToTracePrevPage);
+    document.getElementById('traceNextPage').addEventListener('click', goToTraceNextPage);
+    document.getElementById('tracePageSize').addEventListener('change', function(e) {
+        changeTracePageSize(e.target.value);
+    });
+
     // 点击会话徽章切换过滤（事件委托，避免对不可信会话ID生成内联事件）
     document.getElementById('requestsTableBody').addEventListener('click', function(e) {
         const badge = e.target.closest('.badge-session');
@@ -1556,6 +1765,8 @@ document.addEventListener('DOMContentLoaded', function() {
             initCharts();
             refreshData();
             autoRefreshInterval = setInterval(refreshData, 5000);
+            // 追踪页自动刷新默认开启（与开关的 active 初始状态保持一致）
+            traceAutoRefreshInterval = setInterval(refreshTraces, 5000);
         } else {
             showErrorBanner('代理服务器未启动 - 请先启动代理服务器后刷新此页面');
             setTimeout(() => {

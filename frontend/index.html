@@ -437,11 +437,52 @@
                     </div>
                 </div>
 
+                <!-- 列表工具栏：标题 + 过滤/搜索 -->
+                <div class="trace-toolbar">
+                    <div class="trace-toolbar-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        会话列表
+                        <span class="trace-toolbar-count" id="traceFilterCount"></span>
+                    </div>
+                    <div class="trace-toolbar-actions">
+                        <div class="trace-search-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" id="traceSearchInput" placeholder="搜索用户问题 / 会话ID" title="按用户问题或会话ID搜索" />
+                        </div>
+                        <select id="traceSessionFilter" title="按会话过滤追踪记录">
+                            <option value="">全部会话</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Trace List -->
                 <div class="traces-section" id="tracesContainer">
                     <div class="loading-state">
                         <div class="spinner"></div>
                         <div>加载追踪数据中...</div>
+                    </div>
+                </div>
+
+                <!-- 分页控件 -->
+                <div class="pagination-controls" id="tracePagination" style="display: none;">
+                    <div class="pagination-size">
+                        <select id="tracePageSize">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span>会话/页</span>
+                    </div>
+                    <div class="pagination-nav">
+                        <button id="tracePrevPage" disabled>上一页</button>
+                        <span id="tracePageInfo">第 1 页 / 共 1 页</span>
+                        <button id="traceNextPage" disabled>下一页</button>
                     </div>
                 </div>
             </div>

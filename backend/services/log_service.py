@@ -18,6 +18,7 @@ class LogService:
         self.requests_dir = Config.REQUESTS_DIR
         self.responses_dir = Config.RESPONSES_DIR
         self.metrics_dir = Config.METRICS_DIR
+        self.traces_dir = Config.TRACES_DIR
 
     def save_request_log(self, request_id: str, headers: dict, body: dict,
                          session_id: str = None) -> bool:
@@ -88,11 +89,12 @@ class LogService:
             cutoff_time = datetime.now() - timedelta(days=days_to_keep)
             total_deleted = 0
 
-            # 清理三个子目录
+            # 清理四个子目录
             for subdir_name, subdir_path in [
                 ("请求日志", self.requests_dir),
                 ("响应日志", self.responses_dir),
-                ("性能指标", self.metrics_dir)
+                ("性能指标", self.metrics_dir),
+                ("对话追踪", self.traces_dir)
             ]:
                 if not subdir_path.exists():
                     continue
