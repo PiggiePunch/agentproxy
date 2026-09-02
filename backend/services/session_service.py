@@ -10,12 +10,21 @@
 """
 import hashlib
 import json
+import re
 import threading
 import time
 import uuid
 from typing import Optional, Tuple
 
 from backend.config import Config
+
+_INJECTED_TAG_RE = re.compile(
+    r'<([a-z][\w-]*)(?:\s[^>]*)?>.*?</\1>\n?', re.DOTALL
+)
+_WRAPPER_RE = re.compile(
+    r'^(?:你收到一条消息[^：:\n]*|You receive a new message[^：:\n]*)[：:]\s*\n?(.+)$',
+    re.DOTALL
+)
 
 
 class SessionService:
@@ -92,6 +101,23 @@ class SessionService:
                 del self.sessions[oldest]
             return sid
 
+    @staticmethod
+    def _strip_injected_tags(text: str) -> str:
+        return _INJECTED_TAG_RE.sub('', text)
+
+    @staticmethod
+    def _unwrap_content(text: str) -> str:
+        m = _WRAPPER_RE.match(text)
+        if not m:
+            return text
+        try:
+            data = json.loads(m.group(1).strip())
+            if isinstance(data, dict):
+                return data.get('content', text)
+        except (json.JSONDecodeError, ValueError):
+            pass
+        return text
+
     def _fingerprint(self, item) -> str:
         """对单条消息/系统提示词生成指纹"""
         try:
@@ -147,9 +173,12 @@ class SessionService:
 
         单个 text 块与纯文本字符串视为等价；thinking/reasoning 块为模型派生
         内容，agent 轮次间常剥离或改写，不参与指纹。
+        同时剥离框架注入的动态标签（<system-reminder>、<prompt-attachment> 等），
+        避免指纹漂移导致会话链断裂。
         """
         if isinstance(content, str):
-            return content
+            stripped = self._strip_injected_tags(content).strip()
+            return self._unwrap_content(stripped) if stripped else ''
         if not isinstance(content, list):
             return content
 
@@ -160,7 +189,10 @@ class SessionService:
                 continue
             btype = b.get('type')
             if btype == 'text':
-                blocks.append({'type': 'text', 'text': b.get('text', '')})
+                text = self._strip_injected_tags(b.get('text', '')).strip()
+                text = self._unwrap_content(text) if text else ''
+                if text:
+                    blocks.append({'type': 'text', 'text': text})
             elif btype == 'tool_use':
                 blocks.append({'type': 'tool_use', 'id': b.get('id'),
                                'name': b.get('name'), 'input': b.get('input')})
@@ -182,32 +214,35 @@ class SessionService:
         return blocks
 
     def _build_chain(self, body_data: dict, messages: list) -> list:
-        """构建消息指纹链（Anthropic 的 system 字段置于链首）"""
+        """构建消息指纹链
+
+        跳过纯注入消息（<system-reminder> 等剥离后为空），
+        避免动态注入内容导致指纹链长度/内容漂移。
+        系统提示词不参与指纹（部分框架的 system prompt 包含运行时动态内容）。
+        """
         chain = []
-        system = body_data.get('system')
-        if system:
-            chain.append(self._fingerprint(self._normalize_content(system)))
         for msg in messages:
-            chain.append(self._fingerprint(self._normalize_message(msg)))
+            norm = self._normalize_message(msg)
+            content = norm.get('content') if isinstance(norm, dict) else None
+            if content is not None and content != '' and content != []:
+                chain.append(self._fingerprint(norm))
         return chain
 
     def _build_head_key(self, body_data: dict, messages: list) -> Optional[str]:
-        """构建稳定头：系统提示词 + 首条用户消息（中段上下文被截断时仍然存在）"""
-        system = body_data.get('system')
-        if system:
-            system = self._normalize_content(system)
-        else:
-            for msg in messages:
-                if isinstance(msg, dict) and msg.get('role') in ('system', 'developer'):
-                    system = self._normalize_content(msg.get('content'))
-                    break
+        """构建稳定头：系统提示词 + 首条用户消息（中段上下文被截断时仍然存在）
 
+        系统提示词不参与指纹（部分框架的 system prompt 包含运行时时间戳等动态内容，
+        会导致同一会话的 head_key 漂移），仅用首条用户消息匹配。
+        """
         first_user = None
         for msg in messages:
             if isinstance(msg, dict) and msg.get('role') == 'user':
-                first_user = self._normalize_message(msg)
-                break
+                norm = self._normalize_message(msg)
+                content = norm.get('content') if isinstance(norm, dict) else None
+                if content is not None and content != '' and content != []:
+                    first_user = norm
+                    break
 
-        if system is None and first_user is None:
+        if first_user is None:
             return None
-        return self._fingerprint([system, first_user])
+        return self._fingerprint([first_user])

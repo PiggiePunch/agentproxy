@@ -9,17 +9,34 @@ TraceAssembler - 从代理流量自动重建对话追踪
   - span 继续：   请求最后一条消息是 tool_result（Anthropic）/ role=tool（OpenAI）
   - span 结束：   某次模型响应不再包含 tool_use（最终回答）
 
+兼容性处理：
+  - 部分 agent 框架（如 jiuwenswarm）会在 messages 中注入动态标签消息
+    （<system-reminder>、<prompt-attachment> 等），每条请求内容不同。
+    识别时跳过纯注入消息，找到真实的用户/工具消息来分类和提取查询。
+  - 部分框架将用户消息包装为 "你收到一条消息：\n{JSON}" 格式，
+    提取时解析 JSON 取出 content 字段。
+
 性能约束：
   - 只复用已解析的请求体 / 响应数据，不做额外反序列化
   - 组装发生在响应完成之后（与 metrics 统计同时），纯内存 dict 操作
   - per-session 状态有界，session 数超限淘汰最旧
 """
+import json as _json
+import re
 import time
 import threading
 import uuid
 from collections import OrderedDict
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+
+_INJECTED_TAG_RE = re.compile(
+    r'<([a-z][\w-]*)(?:\s[^>]*)?>.*?</\1>\n?', re.DOTALL
+)
+_WRAPPER_RE = re.compile(
+    r'^(?:你收到一条消息[^：:\n]*|You receive a new message[^：:\n]*)[：:]\s*\n?(.+)$',
+    re.DOTALL
+)
 
 
 class TraceAssembler:
@@ -99,6 +116,57 @@ class TraceAssembler:
                     self._finalize_open_span(state)
         except Exception:
             pass
+
+    # ---------- 注入标签处理 ----------
+
+    @staticmethod
+    def _strip_injected_tags(text: str) -> str:
+        return _INJECTED_TAG_RE.sub('', text)
+
+    @classmethod
+    def _msg_real_content(cls, msg: dict) -> str:
+        content = msg.get('content', '')
+        if isinstance(content, list):
+            parts = []
+            for b in content:
+                if isinstance(b, dict) and b.get('type') == 'text':
+                    parts.append(b.get('text', ''))
+            content = '\n'.join(parts)
+        return cls._strip_injected_tags(str(content)).strip()
+
+    @classmethod
+    def _is_injected_only(cls, msg: dict) -> bool:
+        role = msg.get('role', '')
+        if role in ('tool', 'assistant'):
+            return False
+        if msg.get('tool_call_id') or msg.get('tool_calls'):
+            return False
+        if msg.get('content') and isinstance(msg['content'], list):
+            for b in msg['content']:
+                if isinstance(b, dict) and b.get('type') == 'tool_result':
+                    return False
+        return cls._msg_real_content(msg) == ''
+
+    @classmethod
+    def _find_last_real_message(cls, messages: List[dict]) -> Optional[dict]:
+        for msg in reversed(messages):
+            if not cls._is_injected_only(msg):
+                return msg
+        return None
+
+    @classmethod
+    def _unwrap_user_content(cls, text: str) -> str:
+        m = _WRAPPER_RE.match(text)
+        if not m:
+            return text
+        json_str = m.group(1).strip()
+        try:
+            data = _json.loads(json_str)
+            if isinstance(data, dict):
+                return data.get('content', text)
+        except (_json.JSONDecodeError, ValueError):
+            pass
+        return text
 
     # ---------- session / span 生命周期 ----------
 
@@ -274,40 +342,44 @@ class TraceAssembler:
     # ---------- 报文解析 ----------
 
     def _classify_last_message(self, messages: List[dict], api_type: str) -> str:
-        last = messages[-1] if messages else {}
-        role = last.get('role', '')
+        msg = self._find_last_real_message(messages)
+        if msg is None:
+            return 'new_user_turn'
+        role = msg.get('role', '')
         if api_type == 'anthropic':
             if role != 'user':
                 return 'new_user_turn'
-            content = last.get('content')
+            content = msg.get('content')
             if isinstance(content, list):
                 for block in content:
                     if isinstance(block, dict) and block.get('type') == 'tool_result':
                         return 'tool_continuation'
             return 'new_user_turn'
-        # openai
-        if role == 'tool' or last.get('tool_call_id'):
+        if role == 'tool' or msg.get('tool_call_id'):
             return 'tool_continuation'
         return 'new_user_turn'
 
     def _extract_user_query(self, messages: List[dict], api_type: str) -> str:
-        last = messages[-1] if messages else {}
-        content = last.get('content', '')
+        msg = self._find_last_real_message(messages)
+        if msg is None:
+            return ''
+        content = msg.get('content', '')
         if isinstance(content, str):
-            return content
+            return self._unwrap_user_content(content)
         if isinstance(content, list):
             parts = []
             for block in content:
                 if isinstance(block, dict) and block.get('type') == 'text':
                     parts.append(block.get('text', ''))
-            return '\n'.join(parts)
+            text = '\n'.join(parts)
+            return self._unwrap_user_content(text)
         return ''
 
     def _extract_tool_results(self, messages: List[dict], api_type: str) -> List[dict]:
         results = []
         if api_type == 'anthropic':
-            last = messages[-1] if messages else {}
-            content = last.get('content')
+            msg = self._find_last_real_message(messages) or (messages[-1] if messages else {})
+            content = msg.get('content')
             if isinstance(content, list):
                 for block in content:
                     if isinstance(block, dict) and block.get('type') == 'tool_result':
@@ -316,7 +388,7 @@ class TraceAssembler:
                             'content': self._block_text(block.get('content', '')),
                         })
             return results
-        # openai：末尾可能连续多条 role=tool
+        # openai：末尾可能连续多条 role=tool，跳过纯注入消息
         for msg in reversed(messages):
             if msg.get('role') == 'tool':
                 results.append({
@@ -324,6 +396,8 @@ class TraceAssembler:
                     'tool_call_id': msg.get('tool_call_id', ''),
                     'content': self._block_text(msg.get('content', '')),
                 })
+            elif self._is_injected_only(msg):
+                continue
             else:
                 break
         results.reverse()
