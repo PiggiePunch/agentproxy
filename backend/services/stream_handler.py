@@ -5,6 +5,7 @@
 import codecs
 import http.client
 import json
+import re
 import ssl
 import socket
 import time
@@ -16,6 +17,11 @@ from backend.services.log_service import LogService
 from backend.services.metrics_service import MetricsService
 from backend.services.proxy_service import ProxyService
 from backend.utils.helpers import get_api_url, detect_tool_call, classify_proxy_exception
+
+
+# 兜底：上游 SSE data 偶有非法/拼接 JSON（如个别 vLLM 版本），json.loads 失败时
+# 直接按文本捞出缓存命中数，避免缓存命中率整条漏记
+_CACHED_TOKENS_RE = re.compile(r'"cached_tokens"\s*:\s*(\d+)')
 
 
 class StreamHandler:
@@ -52,6 +58,7 @@ class StreamHandler:
         self.stream_chunks = []
         self.input_tokens = 0
         self.output_tokens = 0
+        self.cached_tokens = None  # 命中缓存的输入 token；None 表示上游未上报
         # 自动追踪：从流式响应里轻量提取 tool_use 与最终文本（用于 span 拼装）
         self.pending_tool_uses = []
         self.response_text_parts = []
@@ -62,7 +69,9 @@ class StreamHandler:
         # 增量解码避免多字节 UTF-8 字符跨 chunk 边界时被丢弃
         self._event_buffer = ""
         self._decoder = codecs.getincrementaldecoder('utf-8')('ignore')
-        # usage 是否已完整提取（OpenAI: 最终 usage 事件；Anthropic: message_delta）
+        # usage 是否已提取（OpenAI: 最终 usage 事件；Anthropic: message_delta）
+        # 注意：只是"日志已打印"的标记，不能作为停止解析的开关 ——
+        # 部分上游（如 vLLM 系）每个 chunk 都带累计 usage，缓存字段往往只在末尾事件里出现
         self._usage_finalized = False
         # 失败分类信息（None 表示尚未失败）；由内部 catch 设置后由外层统一落库
         self._failure_info = None
@@ -251,9 +260,9 @@ class StreamHandler:
                 self.chunk_count += 1
                 self.total_bytes += len(chunk)
 
-                # 提取usage + 检测首token（跨chunk缓冲，事件被拆分也不漏检）
-                if not self.has_first_token or not self._usage_finalized:
-                    self._parse_openai_chunk(chunk)
+                # 解析 usage / 首token / tool_use / 文本（每个 chunk 都要解析：
+                # usage 是累计值且缓存字段常出现在末尾事件，提前停解析会漏掉）
+                self._parse_openai_chunk(chunk)
 
                 # 保存chunk数据用于日志记录
                 self.stream_chunks.append(chunk.decode('utf-8', errors='ignore'))
@@ -296,9 +305,8 @@ class StreamHandler:
                 self.chunk_count += 1
                 self.total_bytes += len(chunk)
 
-                # 提取usage + 检测首token（跨chunk缓冲，事件被拆分也不漏检）
-                if not self.has_first_token or not self._usage_finalized:
-                    self._parse_anthropic_chunk(chunk)
+                # 解析 usage / 首token / tool_use / 文本（每个 chunk 都解析，理由同 OpenAI）
+                self._parse_anthropic_chunk(chunk)
 
                 # 保存chunk数据用于日志记录
                 self.stream_chunks.append(chunk.decode('utf-8', errors='ignore'))
@@ -344,7 +352,14 @@ class StreamHandler:
         return events
 
     def _parse_openai_chunk(self, chunk: bytes):
-        """从OpenAI chunk中提取usage并检测首token（跨chunk缓冲）"""
+        """从OpenAI chunk中提取usage并检测首token（跨chunk缓冲）
+
+        usage 在不同上游的出现方式差异很大：
+        - 标准 OpenAI：只有末尾一个带 usage 的事件
+        - vLLM 等兼容实现：每个 chunk 都带累计 usage，缓存命中字段
+          （prompt_tokens_details.cached_tokens）可能只在最后一个事件里出现
+        因此这里对每个事件都做合并（取累计最大值），不能用"首次出现即锁定"。
+        """
         for event_text in self._drain_complete_events(chunk):
             for line in event_text.split('\n'):
                 line = line.strip()
@@ -358,21 +373,19 @@ class StreamHandler:
                 try:
                     data = json.loads(data_str)
                 except (json.JSONDecodeError, KeyError, TypeError):
+                    # 上游返回了非法/拼接 JSON：尽力从原文提取缓存命中数
+                    self._recover_cached_tokens_from_text(data_str)
                     continue
 
-                # 提取usage信息（通常在最后一个事件；中间事件usage可能为null）
-                if not self._usage_finalized:
-                    usage = data.get('usage')
-                    if isinstance(usage, dict) and usage:
-                        self.input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
-                        self.output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
-                        self._usage_finalized = True
-                        print(f"\n检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
+                if not isinstance(data, dict):
+                    continue
+
+                self._merge_openai_usage(data)
 
                 # 检测首token
                 if not self.has_first_token:
-                    for choice in data.get('choices', []):
-                        delta = choice.get('delta', {})
+                    for choice in data.get('choices', []) or []:
+                        delta = choice.get('delta', {}) or {}
                         if delta.get('content'):
                             self.first_token_time = time.time()
                             self.has_first_token = True
@@ -380,7 +393,7 @@ class StreamHandler:
                             break
 
                 # 自动追踪：检测 tool_calls 并累积最终文本
-                for choice in data.get('choices', []):
+                for choice in data.get('choices', []) or []:
                     delta = choice.get('delta', {}) or {}
                     for tc in delta.get('tool_calls', []) or []:
                         fn = tc.get('function', {}) or {}
@@ -389,6 +402,44 @@ class StreamHandler:
                                 {'id': tc.get('id', ''), 'name': fn.get('name', '')})
                     if delta.get('content'):
                         self._accumulate_response_text(delta['content'])
+
+    def _merge_openai_usage(self, data: dict):
+        """合并单个OpenAI事件里的 usage（累计值，取最大值防止被早期不完整事件覆盖）"""
+        usage = data.get('usage')
+        if isinstance(usage, dict) and usage:
+            inp = usage.get('prompt_tokens')
+            if inp is None:
+                inp = usage.get('input_tokens')
+            if isinstance(inp, (int, float)):
+                self.input_tokens = max(self.input_tokens, int(inp))
+
+            out = usage.get('completion_tokens')
+            if out is None:
+                out = usage.get('output_tokens')
+            if isinstance(out, (int, float)):
+                self.output_tokens = max(self.output_tokens, int(out))
+
+            if not self._usage_finalized:
+                self._usage_finalized = True
+                print(f"\n检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}, 缓存命中={self.cached_tokens}")
+
+        # 缓存命中数可能在 usage 内，也可能与 usage 平级；可能为 0（未命中）
+        cached_tokens = self.proxy_service.extract_cached_tokens(data)
+        if cached_tokens is not None:
+            new_value = max(cached_tokens, self.cached_tokens or 0)
+            if new_value != (self.cached_tokens or 0):
+                self.cached_tokens = new_value
+                print(f"\n更新缓存命中token: {self.cached_tokens}")
+
+    def _recover_cached_tokens_from_text(self, data_str: str):
+        """JSON解析失败时的兜底：直接按文本提取 cached_tokens"""
+        try:
+            matched = _CACHED_TOKENS_RE.search(data_str)
+            if matched:
+                value = int(matched.group(1))
+                self.cached_tokens = max(value, self.cached_tokens or 0)
+        except (ValueError, TypeError):
+            pass
 
     def _accumulate_response_text(self, text: str):
         """累积响应文本用于 span 收尾摘要，超过上限后停止累积"""
@@ -414,6 +465,12 @@ class StreamHandler:
         if total == 0:
             return fallback
         return max(total, fallback)
+
+    def _merge_anthropic_cached_tokens(self, usage: dict):
+        """合并 Anthropic 缓存命中 token（message_start/message_delta 都可能上报）"""
+        cached = self.proxy_service.extract_cached_tokens({'usage': usage})
+        if cached is not None:
+            self.cached_tokens = max(cached, self.cached_tokens or 0)
 
     def _parse_anthropic_chunk(self, chunk: bytes):
         """从Anthropic chunk中提取usage并检测首token（跨chunk缓冲）
@@ -450,19 +507,23 @@ class StreamHandler:
                         self.pending_tool_uses.append(
                             {'id': cb.get('id', ''), 'name': cb.get('name', '')})
 
-                # 提取usage信息
-                if not self._usage_finalized:
-                    if current_event == 'message_start':
-                        usage = data.get('message', {}).get('usage') or {}
-                        if usage:
-                            self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
-                            print(f"\n检测到token使用(message_start): 输入={self.input_tokens}")
-                    elif current_event == 'message_delta' and isinstance(data.get('usage'), dict):
-                        usage = data['usage']
+                # 提取usage信息：每个事件都合并（message_start 带输入侧分解，
+                # message_delta 带最终 output_tokens；不再"见一次就锁死"，防止漏掉后到字段）
+                if current_event == 'message_start':
+                    usage = data.get('message', {}).get('usage') or {}
+                    if usage:
                         self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
-                        self.output_tokens = usage.get('output_tokens', self.output_tokens)
-                        self._usage_finalized = True
-                        print(f"\n检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}")
+                        self._merge_anthropic_cached_tokens(usage)
+                        print(f"\n检测到token使用(message_start): 输入={self.input_tokens}, 缓存命中={self.cached_tokens}")
+                elif current_event == 'message_delta' and isinstance(data.get('usage'), dict):
+                    usage = data['usage']
+                    self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
+                    out = usage.get('output_tokens')
+                    if isinstance(out, (int, float)):
+                        self.output_tokens = max(self.output_tokens, int(out))
+                    self._merge_anthropic_cached_tokens(usage)
+                    self._usage_finalized = True
+                    print(f"\n检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}, 缓存命中={self.cached_tokens}")
 
                 # 检测首token
                 if not self.has_first_token and current_event == 'content_block_delta':
@@ -537,6 +598,8 @@ class StreamHandler:
             "has_tool_call": has_tool_call,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
+            "cached_tokens": self.cached_tokens,
+            "cache_hit_rate": self.proxy_service.calculate_cache_hit_rate(self.input_tokens, self.cached_tokens),
             "session_id": self.session_id,
             "session_source": self.session_source
         }
@@ -559,7 +622,8 @@ class StreamHandler:
                 duration_seconds=max(0, self.stream_complete_time - self.forward_start_time),
                 tool_uses=self.pending_tool_uses, final_text=final_text,
                 ttft_seconds=max(0, ttft),
-                bytes_request=req_bytes, bytes_response=self.total_bytes)
+                bytes_request=req_bytes, bytes_response=self.total_bytes,
+                cached_tokens=self.cached_tokens)
         except Exception:
             pass
 
@@ -608,6 +672,8 @@ class StreamHandler:
             "has_tool_call": False,
             "input_tokens": 0,
             "output_tokens": 0,
+            "cached_tokens": None,
+            "cache_hit_rate": None,
             "session_id": self.session_id,
             "session_source": self.session_source
         }

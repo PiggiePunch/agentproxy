@@ -89,7 +89,8 @@ class TraceAssembler:
                     has_tool_use: bool, input_tokens: int = 0, output_tokens: int = 0,
                     duration_seconds: float = 0.0, tool_uses: Optional[List[dict]] = None,
                     final_text: Optional[str] = None, ttft_seconds: float = 0.0,
-                    bytes_request: int = 0, bytes_response: int = 0):
+                    bytes_request: int = 0, bytes_response: int = 0,
+                    cached_tokens: Optional[int] = None):
         """响应完成时调用。填充 model step，并按是否有 tool_use 决定收尾。"""
         if not session_id:
             return
@@ -101,9 +102,12 @@ class TraceAssembler:
                 span = state['span']
                 self._fill_model_step(span, request_id, input_tokens, output_tokens,
                                       duration_seconds, ttft_seconds,
-                                      bytes_request, bytes_response)
+                                      bytes_request, bytes_response, cached_tokens)
                 span['tokens_in'] += input_tokens or 0
                 span['tokens_out'] += output_tokens or 0
+                if cached_tokens is not None:
+                    span['tokens_cache'] += cached_tokens or 0
+                    span['cache_reported'] = True
                 if has_tool_use:
                     # 记录待配对的 tool_use，span 保持打开
                     span['pending_tool_uses'] = tool_uses or []
@@ -194,6 +198,8 @@ class TraceAssembler:
             'steps': [],
             'tokens_in': 0,
             'tokens_out': 0,
+            'tokens_cache': 0,
+            'cache_reported': False,
             'model_calls': 0,
             'tool_calls': 0,
             'model_time': 0.0,
@@ -240,6 +246,19 @@ class TraceAssembler:
             'tokens_out': span['tokens_out'],
             'reply_summary': span.get('reply_summary', ''),
         })
+        if span.get('cache_reported'):
+            run_step['detail']['tokens_cache'] = span['tokens_cache']
+
+        trace_summary = {
+            'model_calls': span['model_calls'],
+            'tool_calls': span['tool_calls'],
+            'tokens_in': span['tokens_in'],
+            'tokens_out': span['tokens_out'],
+            'model_time_seconds': round(span['model_time'], 3),
+            'top_tools': span['top_tools'],
+        }
+        if span.get('cache_reported'):
+            trace_summary['tokens_cache'] = span['tokens_cache']
 
         trace_data = {
             'trace_id': span['trace_id'],
@@ -249,14 +268,7 @@ class TraceAssembler:
             'started_at': span['started_at'],
             'duration_seconds': round(duration, 3),
             'steps': span['steps'],
-            'summary': {
-                'model_calls': span['model_calls'],
-                'tool_calls': span['tool_calls'],
-                'tokens_in': span['tokens_in'],
-                'tokens_out': span['tokens_out'],
-                'model_time_seconds': round(span['model_time'], 3),
-                'top_tools': span['top_tools'],
-            },
+            'summary': trace_summary,
         }
         self.trace_service.save_trace(trace_data)
 
@@ -286,7 +298,7 @@ class TraceAssembler:
     def _fill_model_step(self, span: Dict[str, Any], request_id: str,
                          input_tokens: int, output_tokens: int, duration_seconds: float,
                          ttft_seconds: float = 0.0, bytes_request: int = 0,
-                         bytes_response: int = 0):
+                         bytes_response: int = 0, cached_tokens: Optional[int] = None):
         # 找到对应 request_id 的 model step（通常是最后一个）
         target = None
         for step in reversed(span['steps']):
@@ -303,6 +315,8 @@ class TraceAssembler:
             'bytes_request': bytes_request or 0,
             'bytes_response': bytes_response or 0,
         }
+        if cached_tokens is not None:
+            target['detail']['tokens_cache'] = cached_tokens
         span['model_time'] += duration_seconds or 0
 
     def _attach_tool_results(self, state: Dict[str, Any], messages: List[dict],

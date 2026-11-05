@@ -6,7 +6,7 @@
     <title>AgentProxy 控制台</title>
 
     <!-- 本地资源 -->
-    <link rel="stylesheet" href="/static/css/style.css?v=21">
+    <link rel="stylesheet" href="/static/css/style.css?v=26">
     <script src="/static/js/chart.umd.min.js" defer></script>
 </head>
 <body>
@@ -356,6 +356,7 @@
                                     <th>工具调用</th>
                                     <th>状态码</th>
                                     <th>输入Token</th>
+                                    <th>缓存命中率(%)</th>
                                     <th>输出Token</th>
                                     <th>总耗时</th>
                                     <th>代理耗时</th>
@@ -366,7 +367,7 @@
                             </thead>
                             <tbody id="requestsTableBody">
                                 <tr>
-                                    <td colspan="12">
+                                    <td colspan="13">
                                         <div class="loading-state">
                                             <div class="spinner"></div>
                                             <div>加载指标数据中...</div>
@@ -546,6 +547,6 @@
     </div>
 
     <!-- 前端逻辑 -->
-    <script src="/static/js/app.js?v=21"></script>
+    <script src="/static/js/app.js?v=27"></script>
 </body>
 </html>
