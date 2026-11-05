@@ -397,13 +397,14 @@ class APIHandler(BaseAPIHandler):
 
                 # 提取token使用量
                 input_tokens, output_tokens = proxy_service.extract_token_usage(response_json, body_data)
+                cached_tokens = proxy_service.extract_cached_tokens(response_json)
 
                 # 保存性能指标
                 metrics = proxy_service.calculate_metrics(
                     request_received_time, forward_start_time, response_received_time,
                     inter_request_gap, response.status, has_tool_call,
                     input_tokens, output_tokens, endpoint, "POST", api_type, is_stream,
-                    session_id, session_source
+                    session_id, session_source, cached_tokens=cached_tokens
                 )
                 metrics_service.save_metrics(request_id, metrics)
 
@@ -416,7 +417,8 @@ class APIHandler(BaseAPIHandler):
                     duration_seconds=model_duration,
                     tool_uses=tool_uses, final_text=final_text,
                     ttft_seconds=model_duration,
-                    bytes_request=len(request_body), bytes_response=len(response_body))
+                    bytes_request=len(request_body), bytes_response=len(response_body),
+                    cached_tokens=cached_tokens)
 
                 self._send_json_response(response.status, response_json, dict(response.headers))
                 log_response_info(response.status, dict(response.headers), response_body.decode('utf-8'), path=endpoint)

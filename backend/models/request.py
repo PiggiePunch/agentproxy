@@ -28,6 +28,8 @@ class RequestMetrics:
         self.has_tool_call: bool = False
         self.input_tokens: int = 0
         self.output_tokens: int = 0
+        self.cached_tokens: Optional[int] = None
+        self.cache_hit_rate: Optional[float] = None
         self.inter_request_gap: Optional[float] = None
 
     def to_dict(self) -> Dict[str, Any]:
@@ -51,6 +53,8 @@ class RequestMetrics:
             "has_tool_call": self.has_tool_call,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
+            "cached_tokens": self.cached_tokens,
+            "cache_hit_rate": self.cache_hit_rate,
             "inter_request_gap": self.inter_request_gap
         }
 

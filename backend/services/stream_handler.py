@@ -52,6 +52,7 @@ class StreamHandler:
         self.stream_chunks = []
         self.input_tokens = 0
         self.output_tokens = 0
+        self.cached_tokens = None  # 命中缓存的输入 token；None 表示上游未上报
         # 自动追踪：从流式响应里轻量提取 tool_use 与最终文本（用于 span 拼装）
         self.pending_tool_uses = []
         self.response_text_parts = []
@@ -366,8 +367,11 @@ class StreamHandler:
                     if isinstance(usage, dict) and usage:
                         self.input_tokens = usage.get('prompt_tokens') or usage.get('input_tokens', 0)
                         self.output_tokens = usage.get('completion_tokens') or usage.get('output_tokens', 0)
+                        cached_tokens = self.proxy_service.extract_cached_tokens(data)
+                        if cached_tokens is not None:
+                            self.cached_tokens = cached_tokens
                         self._usage_finalized = True
-                        print(f"\n检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}")
+                        print(f"\n检测到token使用: 输入={self.input_tokens}, 输出={self.output_tokens}, 缓存命中={self.cached_tokens}")
 
                 # 检测首token
                 if not self.has_first_token:
@@ -415,6 +419,12 @@ class StreamHandler:
             return fallback
         return max(total, fallback)
 
+    def _merge_anthropic_cached_tokens(self, usage: dict):
+        """合并 Anthropic 缓存命中 token（message_start/message_delta 都可能上报）"""
+        cached = self.proxy_service.extract_cached_tokens({'usage': usage})
+        if cached is not None:
+            self.cached_tokens = max(cached, self.cached_tokens or 0)
+
     def _parse_anthropic_chunk(self, chunk: bytes):
         """从Anthropic chunk中提取usage并检测首token（跨chunk缓冲）
 
@@ -456,13 +466,15 @@ class StreamHandler:
                         usage = data.get('message', {}).get('usage') or {}
                         if usage:
                             self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
-                            print(f"\n检测到token使用(message_start): 输入={self.input_tokens}")
+                            self._merge_anthropic_cached_tokens(usage)
+                            print(f"\n检测到token使用(message_start): 输入={self.input_tokens}, 缓存命中={self.cached_tokens}")
                     elif current_event == 'message_delta' and isinstance(data.get('usage'), dict):
                         usage = data['usage']
                         self.input_tokens = self._sum_anthropic_input_tokens(usage, self.input_tokens)
                         self.output_tokens = usage.get('output_tokens', self.output_tokens)
+                        self._merge_anthropic_cached_tokens(usage)
                         self._usage_finalized = True
-                        print(f"\n检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}")
+                        print(f"\n检测到token使用(message_delta): 输入={self.input_tokens}, 输出={self.output_tokens}, 缓存命中={self.cached_tokens}")
 
                 # 检测首token
                 if not self.has_first_token and current_event == 'content_block_delta':
@@ -537,6 +549,8 @@ class StreamHandler:
             "has_tool_call": has_tool_call,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
+            "cached_tokens": self.cached_tokens,
+            "cache_hit_rate": self.proxy_service.calculate_cache_hit_rate(self.input_tokens, self.cached_tokens),
             "session_id": self.session_id,
             "session_source": self.session_source
         }
@@ -559,7 +573,8 @@ class StreamHandler:
                 duration_seconds=max(0, self.stream_complete_time - self.forward_start_time),
                 tool_uses=self.pending_tool_uses, final_text=final_text,
                 ttft_seconds=max(0, ttft),
-                bytes_request=req_bytes, bytes_response=self.total_bytes)
+                bytes_request=req_bytes, bytes_response=self.total_bytes,
+                cached_tokens=self.cached_tokens)
         except Exception:
             pass
 
@@ -608,6 +623,8 @@ class StreamHandler:
             "has_tool_call": False,
             "input_tokens": 0,
             "output_tokens": 0,
+            "cached_tokens": None,
+            "cache_hit_rate": None,
             "session_id": self.session_id,
             "session_source": self.session_source
         }

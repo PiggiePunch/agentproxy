@@ -371,6 +371,11 @@ async function refreshData() {
         updateTable(data.metrics);
         renderSparklines(allMetrics);
 
+        // 追踪页的会话缓存命中率依赖 metrics，指标刷新后同步重算
+        if (currentPageName === 'trace') {
+            renderTraceList();
+        }
+
         hideErrorBanner();
 
     } catch (error) {
@@ -429,7 +434,7 @@ function renderTable() {
         const emptyText = allMetrics.length === 0 ? '暂无请求记录' : '无符合过滤条件的请求记录';
         tableBody.innerHTML = `
             <tr>
-                <td colspan="12">
+                <td colspan="13">
                     <div class="loading-state">
                         <div style="color: #4E5969;">${emptyText}</div>
                     </div>
@@ -442,7 +447,7 @@ function renderTable() {
     }
 
     // 检测数据是否变化，避免无变化时重建DOM
-    const currentHash = sessionFilter + '|' + filteredMetrics.map(m => m.request_id + ':' + m.status_code + ':' + (m.total_time || 0)).join('|');
+    const currentHash = sessionFilter + '|' + filteredMetrics.map(m => m.request_id + ':' + m.status_code + ':' + (m.total_time || 0) + ':' + (m.cached_tokens ?? '')).join('|');
     if (currentHash === lastMetricsHash) {
         return;
     }
@@ -500,6 +505,21 @@ function generateTableRow(m) {
     const inputTokensDisplay = inputTokens > 0 ? inputTokens : 'N/A';
     const outputTokensDisplay = outputTokens > 0 ? outputTokens : 'N/A';
 
+    // 缓存命中率：优先使用后端计算值；旧记录/未上报缓存信息时显示 N/A
+    const cachedTokens = typeof m.cached_tokens === 'number' ? m.cached_tokens : null;
+    let cacheHitRate = typeof m.cache_hit_rate === 'number' ? m.cache_hit_rate : null;
+    if (cacheHitRate === null && cachedTokens !== null && inputTokens > 0) {
+        cacheHitRate = cachedTokens / inputTokens * 100;
+    }
+    let cacheHitDisplay = '<span class="cache-rate cache-rate-na">N/A</span>';
+    if (cacheHitRate !== null && Number.isFinite(cacheHitRate)) {
+        const rateClass = cacheHitRate >= 50 ? 'cache-rate-high' : 'cache-rate-low';
+        const rateTitle = cachedTokens !== null
+            ? `命中缓存 ${cachedTokens} / 输入 ${inputTokens} tokens`
+            : `缓存命中率 ${cacheHitRate.toFixed(1)}%`;
+        cacheHitDisplay = `<span class="cache-rate ${rateClass}" title="${rateTitle}">${cacheHitRate.toFixed(1)}%</span>`;
+    }
+
     return `
         <tr>
             <td ${m.session_id ? `style="box-shadow: inset 3px 0 0 ${sessionColor(m.session_id)}"` : ''}>
@@ -515,6 +535,7 @@ function generateTableRow(m) {
             <td>${toolCallBadge}</td>
             <td>${statusBadge}</td>
             <td class="metric-value-cell">${inputTokensDisplay}</td>
+            <td class="metric-value-cell">${cacheHitDisplay}</td>
             <td class="metric-value-cell">${outputTokensDisplay}</td>
             <td class="metric-value-cell">${totalTime.toFixed(0)}ms</td>
             <td class="metric-value-cell">${proxyTime.toFixed(2)}ms</td>
@@ -992,10 +1013,17 @@ function renderTraceList() {
         return;
     }
 
-    // 数据指纹：过滤条件 + 分页 + 各分组记录，无变化时跳过DOM重建（保留展开状态）
+    // 每个会话的缓存命中率：优先模型步骤/指标数据，旧数据回退到 trace summary
+    const metricsIndex = buildTraceMetricsIndex();
+    const groupCacheStats = new Map();
+
+    // 数据指纹：过滤条件 + 分页 + 各分组记录 + 缓存统计，无变化时跳过DOM重建（保留展开状态）
     const hashParts = [traceSessionFilter, traceSearchKeyword, traceCurrentPage, tracePageSize];
     groups.forEach((spans, key) => {
-        hashParts.push(key + ':' + spans.map(t => t.storage_id + '|' + (t.started_at || '') + '|' + (t.duration_seconds || 0)).join(','));
+        const stats = getSessionCacheStats(spans, metricsIndex);
+        groupCacheStats.set(key, stats);
+        const cacheSig = stats ? `${stats.rate}|${stats.cached}|${stats.input}` : 'na';
+        hashParts.push(key + ':' + spans.map(t => t.storage_id + '|' + (t.started_at || '') + '|' + (t.duration_seconds || 0)).join(',') + ':cache=' + cacheSig);
     });
     const currentHash = hashParts.join('#');
     if (currentHash === lastTraceHash) {
@@ -1013,7 +1041,7 @@ function renderTraceList() {
 
     let html = '';
     for (const key of pageKeys) {
-        html += generateSessionGroup(key, groups.get(key));
+        html += generateSessionGroup(key, groups.get(key), groupCacheStats.get(key));
     }
     container.innerHTML = html;
 
@@ -1026,9 +1054,81 @@ function renderTraceList() {
 }
 
 /**
+ * 建立 request_id -> 指标 的索引，供 trace 会话级缓存命中率回查
+ */
+function buildTraceMetricsIndex() {
+    const index = new Map();
+    for (const m of allMetrics) {
+        if (m && m.request_id) index.set(m.request_id, m);
+    }
+    return index;
+}
+
+/**
+ * 计算一个会话（多个 trace）的缓存命中率
+ * 优先级：模型步骤自带缓存字段 > 按 request_id 查 metrics > trace summary
+ */
+function getSessionCacheStats(spans, metricsIndex) {
+    let cached = 0;
+    let input = 0;
+    let reported = false;
+    const seenRequests = new Set();
+
+    for (const trace of spans) {
+        let traceCached = 0;
+        let traceInput = 0;
+        let traceReported = false;
+
+        for (const step of trace.steps || []) {
+            if (step.type !== 'model') continue;
+            const d = step.detail || {};
+            const reqId = step.request_id || '';
+
+            if (typeof d.tokens_cache === 'number') {
+                if (reqId && seenRequests.has(reqId)) continue;
+                traceCached += d.tokens_cache;
+                traceInput += typeof d.tokens_in === 'number' ? d.tokens_in : 0;
+                traceReported = true;
+                if (reqId) seenRequests.add(reqId);
+                continue;
+            }
+
+            if (reqId && !seenRequests.has(reqId)) {
+                const metric = metricsIndex.get(reqId);
+                if (metric && typeof metric.cached_tokens === 'number' && (metric.input_tokens || 0) > 0) {
+                    traceCached += metric.cached_tokens;
+                    traceInput += metric.input_tokens || 0;
+                    traceReported = true;
+                    seenRequests.add(reqId);
+                }
+            }
+        }
+
+        if (traceReported) {
+            cached += traceCached;
+            input += traceInput;
+            reported = true;
+            continue;
+        }
+
+        // 旧 trace / agent 主动上报：使用 summary 里的汇总值
+        const s = trace.summary || {};
+        if (typeof s.tokens_cache === 'number' && (s.tokens_in || 0) > 0) {
+            cached += s.tokens_cache;
+            input += s.tokens_in;
+            reported = true;
+        }
+    }
+
+    if (!reported || input <= 0) return null;
+    const rate = Math.min(100, Math.max(0, cached / input * 100));
+    return { rate, cached, input };
+}
+
+/**
  * 生成 session 分组卡片（一级折叠），内部是若干 span（二级折叠）
  */
-function generateSessionGroup(sessionKey, spans) {
+function generateSessionGroup(sessionKey, spans, cacheStats) {
     const isAgent = sessionKey === '__agent__';
     const label = isAgent ? 'Agent 上报' : escapeHtml(sessionKey);
     const totalDuration = spans.reduce((s, t) => s + (t.duration_seconds || 0), 0);
@@ -1037,6 +1137,14 @@ function generateSessionGroup(sessionKey, spans) {
     const sourceTag = isAgent
         ? '<span class="session-source-tag agent">上报</span>'
         : '<span class="session-source-tag auto">自动识别</span>';
+
+    const cacheClass = cacheStats === null ? 'na' : (cacheStats.rate >= 50 ? 'high' : 'low');
+    const cacheText = cacheStats === null ? '缓存 N/A' : `缓存 ${cacheStats.rate.toFixed(1)}%`;
+    const cacheTitle = cacheStats === null
+        ? '暂无可用的缓存命中数据'
+        : `命中缓存 ${cacheStats.cached} / 输入 ${cacheStats.input} tokens`;
+    const cacheHtml = `<span class="session-group-cache-rate ${cacheClass}" title="${cacheTitle}">${cacheText}</span>`;
+    const durationText = formatDuration(totalDuration);
 
     const spansHtml = spans.map(t => generateTraceCard(t)).join('');
 
@@ -1057,7 +1165,8 @@ function generateSessionGroup(sessionKey, spans) {
                 </div>
             </div>
             <div class="session-group-right">
-                <span class="session-group-duration">${formatDuration(totalDuration)}</span>
+                ${cacheHtml}
+                <span class="session-group-duration" title="耗时 ${durationText}">耗时 ${durationText}</span>
                 <div class="trace-expand-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                 </div>

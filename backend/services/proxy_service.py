@@ -169,6 +169,47 @@ class ProxyService:
 
         return input_tokens, output_tokens
 
+    @staticmethod
+    def extract_cached_tokens(response_body: dict) -> Optional[int]:
+        """提取命中缓存的输入 token 数
+
+        兼容多种上游格式：
+        - OpenAI: usage.prompt_tokens_details.cached_tokens
+        - OpenAI Responses: usage.input_tokens_details.cached_tokens
+        - Anthropic: usage.cache_read_input_tokens
+        - DeepSeek: usage.prompt_cache_hit_tokens
+        上游未上报缓存信息时返回 None（前端显示 N/A，而不是误判为 0%）。
+        """
+        if not isinstance(response_body, dict):
+            return None
+        usage = response_body.get('usage') or {}
+        if not isinstance(usage, dict):
+            return None
+
+        for details_key in ('prompt_tokens_details', 'input_tokens_details'):
+            details = usage.get(details_key)
+            if isinstance(details, dict) and 'cached_tokens' in details:
+                value = details.get('cached_tokens')
+                if isinstance(value, (int, float)):
+                    return max(0, int(value))
+
+        for key in ('cached_tokens', 'cache_read_input_tokens',
+                    'prompt_cache_hit_tokens', 'cache_read_tokens', 'cache_hit_tokens'):
+            if key in usage:
+                value = usage.get(key)
+                if isinstance(value, (int, float)):
+                    return max(0, int(value))
+
+        return None
+
+    @staticmethod
+    def calculate_cache_hit_rate(input_tokens: int, cached_tokens: Optional[int]) -> Optional[float]:
+        """计算缓存命中率（命中缓存的输入 token / 输入 token 总数）"""
+        if cached_tokens is None or not input_tokens or input_tokens <= 0:
+            return None
+        rate = cached_tokens / input_tokens * 100
+        return round(max(0.0, min(100.0, rate)), 2)
+
     def calculate_metrics(self, request_received_time: float, forward_start_time: float,
                          response_received_time: float, inter_request_gap: Optional[float] = None,
                          status_code: int = 200, has_tool_call: bool = False,
@@ -176,7 +217,8 @@ class ProxyService:
                          endpoint: str = "", method: str = "POST",
                          api_type: str = "", stream: bool = False,
                          session_id: Optional[str] = None,
-                         session_source: Optional[str] = None) -> dict:
+                         session_source: Optional[str] = None,
+                         cached_tokens: Optional[int] = None) -> dict:
         """计算性能指标"""
         return {
             "request_received_time": request_received_time,
@@ -195,6 +237,8 @@ class ProxyService:
             "has_tool_call": has_tool_call,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
+            "cached_tokens": cached_tokens,
+            "cache_hit_rate": self.calculate_cache_hit_rate(input_tokens, cached_tokens),
             "session_id": session_id,
             "session_source": session_source
         }

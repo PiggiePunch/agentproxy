@@ -1025,6 +1025,24 @@ body {
     font-weight: 500;
 }
 
+.cache-rate {
+    font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+    font-weight: 600;
+}
+
+.cache-rate-high {
+    color: var(--success);
+}
+
+.cache-rate-low {
+    color: var(--error);
+}
+
+.cache-rate-na {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
 .latency-indicator {
     display: inline-block;
     width: 6px;
@@ -1622,11 +1640,37 @@ body {
     flex-shrink: 0;
 }
 
+.session-group-cache-rate,
 .session-group-duration {
-    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--primary);
     font-family: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+    white-space: nowrap;
+}
+
+.session-group-cache-rate.high {
+    color: var(--success);
+    background: var(--success-light);
+}
+
+.session-group-cache-rate.low {
+    color: var(--error);
+    background: var(--error-light);
+}
+
+.session-group-cache-rate.na {
+    color: var(--text-muted);
+    background: var(--surface-hover);
+    font-weight: 400;
+}
+
+.session-group-duration {
+    color: var(--primary);
+    background: var(--primary-light);
 }
 
 .session-group-body {
