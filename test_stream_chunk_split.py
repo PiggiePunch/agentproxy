@@ -38,6 +38,7 @@ FRAG_DELAY = 0.05         # 片段间间隔（秒），确保事件被拆到不�
 
 EXPECTED_OPENAI_INPUT = 123
 EXPECTED_OPENAI_OUTPUT = 45
+EXPECTED_OPENAI_CACHED = 100  # 缓存命中数只在末尾 usage 事件上报（模拟 vLLM 累计 usage）
 # Anthropic 输入侧：非缓存输入 77 + 缓存写入 15411 + 缓存读取 200
 # （agent 预置系统提示词通常走 cache_creation/cache_read，必须三项相加）
 ANTHROPIC_INPUT_BASE = 77
@@ -50,12 +51,19 @@ EXPECTED_ANTHROPIC_OUTPUT = 88
 # ============= 假上游：构造被刻意拆分的 SSE 片段 =============
 
 def build_openai_fragments():
-    """OpenAI 格式 SSE，首token事件从'你'的UTF-8字节中间切开，usage事件JSON拦腰切开"""
+    """OpenAI 格式 SSE，首token事件从'你'的UTF-8字节中间切开，usage事件JSON拦腰切开
+
+    模拟客户环境（vLLM）行为：每个 chunk 都带累计 usage，
+    缓存命中字段只出现在末尾的 usage 事件里。
+    """
     e_role = 'data: {"id":"chatcmpl-test","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"role":"assistant","content":""}}]}\n\n'
+    e_usage_early = ('data: {"id":"chatcmpl-test","choices":[],"usage":'
+                     '{"prompt_tokens":%d,"completion_tokens":0}}\n\n') % EXPECTED_OPENAI_INPUT
     e_first = 'data: {"id":"chatcmpl-test","choices":[{"index":0,"delta":{"content":"你好"}}]}\n\n'
     e_more = 'data: {"id":"chatcmpl-test","choices":[{"index":0,"delta":{"content":"世界"}}]}\n\n'
-    e_usage = 'data: {"id":"chatcmpl-test","choices":[],"usage":{"prompt_tokens":%d,"completion_tokens":%d}}\n\n' % (
-        EXPECTED_OPENAI_INPUT, EXPECTED_OPENAI_OUTPUT)
+    e_usage = ('data: {"id":"chatcmpl-test","choices":[],"usage":{"prompt_tokens":%d,'
+               '"completion_tokens":%d,"prompt_tokens_details":{"cached_tokens":%d}}}\n\n') % (
+        EXPECTED_OPENAI_INPUT, EXPECTED_OPENAI_OUTPUT, EXPECTED_OPENAI_CACHED)
     e_done = 'data: [DONE]\n\n'
 
     b_first = e_first.encode('utf-8')
@@ -66,6 +74,7 @@ def build_openai_fragments():
 
     return [
         e_role.encode('utf-8'),
+        e_usage_early.encode('utf-8'),
         b_first[:cut_first],
         b_first[cut_first:],
         e_more.encode('utf-8'),
@@ -220,6 +229,16 @@ def main():
                                                    "prompt_tokens_details": {"cached_tokens": 80}}})
     check("OpenAI usage 直接取 prompt_tokens", inp2 == 100 and out2 == 20, f"(实际 {inp2}/{out2})")
 
+    # 缓存命中提取：标准嵌套 + vLLM 平级两种位置都要支持
+    check("缓存命中（usage 内嵌套）",
+          ps.extract_cached_tokens({"usage": {"prompt_tokens": 100,
+                                             "prompt_tokens_details": {"cached_tokens": 80}}}) == 80)
+    check("缓存命中（prompt_tokens_details 与 usage 平级）",
+          ps.extract_cached_tokens({"usage": {"prompt_tokens": 100},
+                                    "prompt_tokens_details": {"cached_tokens": 60}}) == 60)
+    check("上游未上报缓存 -> None（前端显示 N/A）",
+          ps.extract_cached_tokens({"usage": {"prompt_tokens": 100}}) is None)
+
     upstream = http.server.ThreadingHTTPServer(('127.0.0.1', UPSTREAM_PORT), FakeUpstreamHandler)
     threading.Thread(target=upstream.serve_forever, daemon=True).start()
 
@@ -276,6 +295,11 @@ def main():
                   m_openai['input_tokens'] == EXPECTED_OPENAI_INPUT, f"(实际 {m_openai['input_tokens']})")
             check(f"output_tokens == {EXPECTED_OPENAI_OUTPUT}",
                   m_openai['output_tokens'] == EXPECTED_OPENAI_OUTPUT, f"(实际 {m_openai['output_tokens']})")
+            check(f"cached_tokens == {EXPECTED_OPENAI_CACHED}（只在末尾 usage 事件上报也不漏）",
+                  m_openai['cached_tokens'] == EXPECTED_OPENAI_CACHED, f"(实际 {m_openai['cached_tokens']})")
+            check("cache_hit_rate 已计算（非 N/A）",
+                  m_openai.get('cache_hit_rate') is not None,
+                  f"(实际 {m_openai.get('cache_hit_rate')})")
             check("首token已检测到（事件跨chunk+UTF-8字节被切断）",
                   m_openai['first_token_latency'] > 0, f"(实际 {m_openai['first_token_latency']})")
             check(f"time_to_first_byte 反映上游延迟(>{FIRST_BYTE_DELAY - 0.05}s)",

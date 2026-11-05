@@ -178,29 +178,37 @@ class ProxyService:
         - OpenAI Responses: usage.input_tokens_details.cached_tokens
         - Anthropic: usage.cache_read_input_tokens
         - DeepSeek: usage.prompt_cache_hit_tokens
+        - 部分 vLLM 兼容实现：prompt_tokens_details 与 usage 平级（不嵌套在 usage 内）
         上游未上报缓存信息时返回 None（前端显示 N/A，而不是误判为 0%）。
         """
         if not isinstance(response_body, dict):
             return None
         usage = response_body.get('usage') or {}
         if not isinstance(usage, dict):
+            usage = {}
+
+        def _pick(container: dict) -> Optional[int]:
+            if not isinstance(container, dict):
+                return None
+            for details_key in ('prompt_tokens_details', 'input_tokens_details'):
+                details = container.get(details_key)
+                if isinstance(details, dict) and 'cached_tokens' in details:
+                    value = details.get('cached_tokens')
+                    if isinstance(value, (int, float)):
+                        return max(0, int(value))
+            for key in ('cached_tokens', 'cache_read_input_tokens',
+                        'prompt_cache_hit_tokens', 'cache_read_tokens', 'cache_hit_tokens'):
+                if key in container:
+                    value = container.get(key)
+                    if isinstance(value, (int, float)):
+                        return max(0, int(value))
             return None
 
-        for details_key in ('prompt_tokens_details', 'input_tokens_details'):
-            details = usage.get(details_key)
-            if isinstance(details, dict) and 'cached_tokens' in details:
-                value = details.get('cached_tokens')
-                if isinstance(value, (int, float)):
-                    return max(0, int(value))
-
-        for key in ('cached_tokens', 'cache_read_input_tokens',
-                    'prompt_cache_hit_tokens', 'cache_read_tokens', 'cache_hit_tokens'):
-            if key in usage:
-                value = usage.get(key)
-                if isinstance(value, (int, float)):
-                    return max(0, int(value))
-
-        return None
+        # 先按标准位置（usage 内），再兼容平级字段（部分 vLLM 实现的流式事件）
+        value = _pick(usage)
+        if value is not None:
+            return value
+        return _pick(response_body)
 
     @staticmethod
     def calculate_cache_hit_rate(input_tokens: int, cached_tokens: Optional[int]) -> Optional[float]:
